@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+*.egg-info/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Editores y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# MongoDB: backups y volcados (pueden contener datos)
+dump/
+backups/
+*.bson
+*.archive
+*.gz
+
+# Datos locales
+data/raw/
+*.log
