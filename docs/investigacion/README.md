@@ -4,8 +4,8 @@ Material de contexto del proyecto.
 
 | Archivo | Contenido | Estado |
 |---|---|---|
-| `contexto-problema.md` | Problemática de viñateros y contratistas de Mendoza (2020 a octubre de 2026) | **Pendiente de copiar** |
-| `fuentes-de-datos.md` | Fuentes públicas de datos meteorológicos y de riego | **Pendiente de copiar** |
+| `contexto-problema.md` | Problemática de viñateros y contratistas de Mendoza (2020 a octubre de 2026) | Copiado (sin datos de contacto) |
+| `fuentes-de-datos.md` | Fuentes públicas de datos meteorológicos y de riego | Copiado (sin datos de contacto) |
 
 ## Antes de copiarlos (el repositorio es público)
 
