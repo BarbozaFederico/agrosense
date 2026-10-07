@@ -5,7 +5,7 @@
 | Integrante | GitHub | Rol principal |
 |---|---|---|
 | Federico Daniel Barboza Araya | [@BarbozaFederico](https://github.com/BarbozaFederico) | Integrante 1: monitoreo y helada *(a confirmar)* |
-| FERNANDEZ ACTIS, Luciano Agustín | [@USUARIO] | Integrante 2: geoespacial y riego *(a confirmar)* |
+| FERNANDEZ ACTIS, Luciano Agustín | [@lufernandez-um](https://github.com/lufernandez-um) | Integrante 2: geoespacial y riego *(a confirmar)* |
 
 ## Reparto por funcionalidad completa
 

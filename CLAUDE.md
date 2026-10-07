@@ -175,7 +175,6 @@ Reglas:
 
 ## 13. Pendientes conocidos
 
-- Usuario de GitHub del segundo integrante, FERNANDEZ ACTIS, Luciano Agustín (para `docs/equipo.md`).
 - Confirmar con el docente si las series temporales entran en el alcance (ADR-001).
 - Copiar los informes a `docs/investigacion/`, quitando datos de contacto personales.
 - Verificar si el lunes 12/10 es feriado.
