@@ -1,6 +1,6 @@
 # ADR-001: Series temporales para las lecturas
 
-**Estado:** Aceptado por el equipo (8/10/2026). Falta informarlo al docente; si lo rechaza, se aplica la regla de decisión por defecto.
+**Estado:** Aceptado (8/10/2026). Decisión firme del equipo: el docente admite ir más allá de los contenidos de la cátedra.
 
 ## Contexto
 
@@ -10,7 +10,7 @@ Las lecturas de sensores son documentos muy numerosos, con la misma forma y orde
 
 Usar una colección de series temporales para `lecturas` (`timeField: ts`, `metaField: meta`).
 
-## Regla de decisión por defecto
+## Regla de decisión por defecto (ya no aplica)
 
 Si antes de cerrar el Sprint A el docente no lo confirma, o si la prueba con la versión instalada falla, `lecturas` se implementa como **colección común con índice compuesto** (`meta.parcela_id` y `ts`).
 

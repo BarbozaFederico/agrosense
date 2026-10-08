@@ -44,7 +44,7 @@ Informes de contexto en `docs/investigacion/`: `contexto-problema.md` y `fuentes
 |---|---|
 | Motor | MongoDB Community Server (verificar la versión instalada antes de usar funciones nuevas) |
 | Consola y GUI | `mongosh` y MongoDB Compass |
-| Lecturas | Serie temporal (`timeField: ts`, `metaField: meta`), aceptada por el equipo; falta informarlo al docente. Si lo rechaza, colección común con índice compuesto. Ver ADR-001 |
+| Lecturas | Serie temporal (`timeField: ts`, `metaField: meta`). Decisión firme, ver ADR-001 |
 | Geoespacial | GeoJSON + índices `2dsphere` |
 | Validación | `$jsonSchema` en todas las colecciones |
 | Simulador | Python + `pymongo`, en `simulator/`, con funciones importables |
@@ -182,6 +182,5 @@ Reglas:
 
 ## 13. Pendientes conocidos
 
-- Informar al docente que se usan series temporales (ADR-001).
 - Investigación profunda de la vid (Malbec): grados-día por etapa, umbrales por etapa BBCH, cortes del índice de riesgo, umbral de humedad de suelo y sistema de riego.
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).
