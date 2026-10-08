@@ -88,16 +88,17 @@ El escenario realista justifica la serie temporal, los índices y una política 
 | `fincas` | Nombre, departamento, ubicación, geometría |
 | `parcelas` | Finca, variedad, estado fenológico, geometría |
 | `nodos` | Parcela, ubicación (Point), estado, sensores |
-| `lecturas` | `ts`, `meta` (nodo, parcela), temperatura, humedades, `fuente`, `escenario_id` |
+| `lecturas` | `ts`, `meta` (nodo, parcela, finca), temperatura, humedades, `fuente`, `escenario_id` |
 | `alertas` | Tipo, parcela, inicio, fin, valor mínimo, estado, `escenario_id` |
 | `riegos` | Parcela, inicio, fin, litros, origen |
 | `eventos_climaticos` | Tipo, inicio, fin, polígono afectado, mínima |
+| `umbrales_fenologia` | Configuración: estado fenológico y umbral de helada (ver [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md)) |
 
 El diseño detallado va en [`modelo-datos.md`](modelo-datos.md).
 
 ## 8. Criterios de aceptación del MVP
 
-- [ ] Las 7 colecciones existen con validación de esquema.
+- [ ] Las 7 colecciones y la de configuración `umbrales_fenologia` existen con validación de esquema.
 - [ ] El simulador carga unas 100.000 lecturas o más, con noches de helada en las 3 fincas.
 - [ ] Las consultas Q1 a Q8 están en `db/queries/` y devuelven resultados correctos sobre los datos simulados.
 - [ ] Hay mediciones antes y después de índices para al menos 3 consultas.

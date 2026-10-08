@@ -13,14 +13,24 @@ Ver Q1 a Q8 en [`requisitos.md`](requisitos.md). El modelo es adecuado si las re
 | `fincas` | *A definir* | |
 | `parcelas` | *A definir* | |
 | `nodos` | *A definir* | |
-| `lecturas` | *A definir* | Ver [ADR-001](decisions/ADR-001-series-temporales.md) |
+| `lecturas` | `ts`, `meta` (`nodo_id`, `parcela_id`, `finca_id`), resto *a definir* | Ver [ADR-001](decisions/ADR-001-series-temporales.md) |
 | `alertas` | *A definir* | |
 | `riegos` | *A definir* | |
 | `eventos_climaticos` | *A definir* | |
+| `umbrales_fenologia` | `estado`, `umbral_helada_c`, `fuente_umbral` | Configuración. Ver [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md) |
 
 ## 3. Relaciones y decisiones de modelado
 
-*A completar:* qué se embebe y qué se referencia, con el motivo de cada decisión. Regla de partida: embeber lo que se lee junto y referenciar lo que crece sin límite.
+Regla de partida: embeber lo que se lee junto y referenciar lo que crece sin límite.
+
+Decisiones tomadas (detalle en [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md)):
+
+- Los umbrales de helada viven en la colección de configuración `umbrales_fenologia`; la parcela guarda solo su `fenologia`.
+- `alertas` guarda solo referencias (`parcela_id`); el departamento se obtiene con `$lookup` alertas → parcelas → fincas (Q8).
+- `lecturas.meta` incluye `nodo_id`, `parcela_id` y `finca_id`, para filtrar por parcela o finca sin `$lookup`.
+- La alerta de riego se dispara cuando la humedad de suelo baja de un umbral configurable (supuesto del proyecto).
+
+*A completar:* el resto de las relaciones.
 
 ## 4. Diagrama
 
