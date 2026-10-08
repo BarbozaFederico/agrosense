@@ -4,7 +4,7 @@
 
 ## 1. Consultas que guían el modelo
 
-Ver Q1 a Q8 en [`requisitos.md`](requisitos.md). El modelo es adecuado si las responde de forma simple y eficiente.
+Ver Q1 a Q10 en [`requisitos.md`](requisitos.md). El modelo es adecuado si las responde de forma simple y eficiente.
 
 ## 2. Colecciones
 
@@ -17,7 +17,8 @@ Ver Q1 a Q8 en [`requisitos.md`](requisitos.md). El modelo es adecuado si las re
 | `alertas` | *A definir* | |
 | `riegos` | *A definir* | |
 | `eventos_climaticos` | *A definir* | |
-| `umbrales_fenologia` | `estado`, `umbral_helada_c`, `fuente_umbral` | Configuración. Ver [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md) |
+| `variedades` | Nombre, `ficticia`, y por etapa BBCH: umbral de helada y grados-día; *resto a definir* | Configuración. Ver [ADR-004](decisions/ADR-004-temporada-malbec.md) |
+| `observaciones_fenologicas` | *A definir* | Etapa BBCH observada a mano |
 
 ## 3. Relaciones y decisiones de modelado
 
@@ -25,7 +26,8 @@ Regla de partida: embeber lo que se lee junto y referenciar lo que crece sin lí
 
 Decisiones tomadas (detalle en [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md)):
 
-- Los umbrales de helada viven en la colección de configuración `umbrales_fenologia`; la parcela guarda solo su `fenologia`.
+- Los umbrales de helada y los grados-día por etapa viven en la colección de configuración `variedades` (ADR-004 reemplaza a `umbrales_fenologia`); la parcela guarda su variedad.
+- La etapa vigente sale de la última observación manual o, si no hay, de la estimación por grados-día (Q9).
 - `alertas` guarda solo referencias (`parcela_id`); el departamento se obtiene con `$lookup` alertas → parcelas → fincas (Q8).
 - `lecturas.meta` incluye `nodo_id`, `parcela_id` y `finca_id`, para filtrar por parcela o finca sin `$lookup`.
 - La alerta de riego se dispara cuando la humedad de suelo baja de un umbral configurable (supuesto del proyecto).

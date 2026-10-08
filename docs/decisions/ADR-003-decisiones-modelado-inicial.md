@@ -10,6 +10,8 @@ Antes de escribir `modelo-datos.md` y los esquemas, el equipo eligió entre dos 
 
 ### 1. Umbrales de helada en una colección de configuración
 
+> **Reemplazada por [ADR-004](ADR-004-temporada-malbec.md):** la colección pasa a llamarse `variedades` y guarda umbrales y grados-día por etapa BBCH.
+
 | Opción | Ventaja | Desventaja |
 |---|---|---|
 | **Colección `umbrales_fenologia` (elegida)** | El valor se cambia en un solo lugar; Q2 hace un `$lookup` claro | Agrega una colección de configuración al modelo |

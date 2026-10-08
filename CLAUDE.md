@@ -31,11 +31,12 @@ Informes de contexto en `docs/investigacion/`: `contexto-problema.md` y `fuentes
 ## 4. Alcance del MVP
 
 - **3 fincas ficticias en 3 departamentos de Mendoza, 6 parcelas (2 por finca), 12 nodos (2 por parcela)**, 3 variables (temperatura, humedad de suelo, humedad de aire), 2 tipos de alerta (helada y riego).
-- Colecciones: `fincas`, `parcelas`, `nodos`, `lecturas`, `alertas`, `riegos`, `eventos_climaticos`, más la colección de configuración `umbrales_fenologia` (ADR-003).
-- Historia simulada: 30 días, 1 lectura cada 5 minutos por nodo, unas 103.680 lecturas.
+- Variedad: **Malbec** en las 6 parcelas; una "variedad simulada X" es opcional al final (ADR-004).
+- Colecciones: `fincas`, `parcelas`, `nodos`, `lecturas`, `alertas`, `riegos`, `eventos_climaticos`, `observaciones_fenologicas` y la colección de configuración `variedades` (ADR-003 y ADR-004).
+- Temporada simulada: 1/9/2026 a 31/3/2027, 1 lectura cada 5 minutos por nodo, unas 732.700 lecturas; 6 a 8 noches de helada entre septiembre y noviembre.
 - **Dashboard web de escritorio con Streamlit: obligatorio.** 4 pantallas, tema oscuro, noche de helada precargada.
 - **Opcional (primero que se recorta):** simulación de la noche en vivo desde el dashboard (RF-14 y RF-15).
-- **Fuera de alcance:** siniestros, seguros, contratistas, cosechas, costos, hidrología, estaciones reales, versión móvil, alerta temprana y pronóstico, Docker y Atlas.
+- **Fuera de alcance:** siniestros, seguros, contratistas, cosechas, costos, hidrología, estaciones reales, versión móvil, alerta temprana y pronóstico climático, Docker y Atlas. Descartados en ADR-004: variable de altura y daño en porcentaje por etapa.
 
 ## 5. Decisiones técnicas acordadas
 
@@ -63,6 +64,8 @@ Precaución: probar temprano cómo se combinan índices geoespaciales y series t
   - Floración: ejemplo de trabajo −1,5 °C, a validar.
 - **Nodo inactivo:** sin lecturas durante un tiempo configurable (inicial: 30 minutos).
 - **Alerta de helada:** se abre al superar el umbral y se cierra al recuperarse, guardando inicio, fin y mínima.
+- **Etapa fenológica:** se guarda en escala BBCH. Se estima por grados-día (Q9) y se corrige con observaciones manuales; si hay observación, manda la observación.
+- **Índice de riesgo de helada:** bajo, medio o alto según horas bajo el umbral, mínima, humedad del aire y humedad de suelo. No es un porcentaje de daño; los cortes son a validar.
 
 ## 7. Consultas que el modelo debe resolver
 
@@ -76,6 +79,8 @@ Precaución: probar temprano cómo se combinan índices geoespaciales y series t
 | Q6 | Humedad de suelo promedio por hora (últimas 24 h) | agregación |
 | Q7 | Litros regados por parcela y semana | `$group` |
 | Q8 | Eventos de helada por departamento y semana | `$group` + `$lookup` |
+| Q9 | Etapa fenológica estimada por grados-día acumulados | `$setWindowFields` (suma acumulada) |
+| Q10 | Índice de riesgo de helada por parcela y noche | `$group` + `$lookup` |
 
 Cada consulta va en `db/queries/qN_nombre.js`, con un comentario inicial que indique la pregunta y el requisito asociado.
 
@@ -105,7 +110,7 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001 a ADR-003
+│   ├── decisions/             # ADR-001 a ADR-004
 │   └── sprints/
 ├── db/
 │   ├── schemas/
@@ -131,11 +136,11 @@ agrosense/
 | Sprint | Fechas | Foco |
 |---|---|---|
 | A | 6/10 a 12/10 | Repo, documentación, modelado, validaciones, wireframes, simulador base |
-| B | 13/10 a 19/10 | Carga de datos, Q1 a Q8, índices con medición, noche precargada, inicio del dashboard |
+| B | 13/10 a 19/10 | Carga de datos, Q1 a Q10, índices con medición, noche precargada, inicio del dashboard |
 | C | 20/10 a 26/10 | Dashboard completo, backup con restauración, roles, demo sin internet |
 | Cierre | 27/10 y 28/10 | Congelar, ensayar la demo, tag `v1.0.0`, entrega |
 
-**Prioridades (lo que se sacrifica primero va al final):** 1) núcleo de la base de datos, 2) dashboard con 4 pantallas y noche precargada, 3) estilo visual oscuro y pulido, 4) simulación en vivo.
+**Prioridades (lo que se sacrifica primero va al final):** 1) núcleo de la base de datos (incluye Q9 y Q10), 2) dashboard con 4 pantallas y noche precargada, 3) estilo visual oscuro y pulido, 4) variedad simulada X, 5) simulación en vivo.
 
 ## 11. Interfaz (UI/UX)
 
@@ -176,6 +181,7 @@ Reglas:
 ## 13. Pendientes conocidos
 
 - Confirmar con el docente si las series temporales entran en el alcance (ADR-001).
-- Definir los estados fenológicos de las 6 parcelas, con investigación, para el caso más real posible.
-- Definir la hora de referencia para Q5 y Q6 (la historia simulada termina el 30/9/2026).
+- Definir la hora de referencia para Q5 y Q6 (la temporada simulada termina el 31/3/2027).
+- Definir cómo aparecen las observaciones fenológicas manuales en la demo.
+- Investigación profunda de la vid (Malbec): grados-día por etapa, umbrales por etapa BBCH, cortes del índice de riesgo, umbral de humedad de suelo y sistema de riego.
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).
