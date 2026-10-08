@@ -1,5 +1,7 @@
 > **Documento de trabajo.** Segunda investigación (octubre de 2026), acotada a los datos que el primer informe ([`vid-malbec.md`](vid-malbec.md)) dejó como "supuesto", "adaptado" o "no encontrado". Su tabla final "Reemplazos para el modelo" indica qué valores del primer informe cambian. Los datos leídos en fragmentos, prensa o resúmenes deben confirmarse en la fuente primaria antes de la evaluación.
 
+> **Verificado el 8/10/2026:** ver [`verificacion-fuentes.md`](verificacion-fuentes.md), que corrige las mínimas absolutas del SMN y la humedad de día y de noche, y confirma otros datos. Prevalece sobre este informe donde haya diferencias.
+
 # Segunda investigación: datos faltantes para el simulador de sensores de viñedo (Malbec, Mendoza)
 
 Conseguí con fuente casi todo lo que falta sobre heladas, el coeficiente de cultivo (Kc), la fracción "p", el riego por surco y las hectáreas de Malbec por departamento. Para el Malbec también conseguí dos datos muy útiles: los parámetros propios del modelo de resistencia al frío de WSU (Ferguson et al. 2014) y los grados-día de floración y envero del modelo GFV (Parker et al. 2013). Quedaron sin fuente directa los grados-día de cada etapa BBCH intermedia, la ETo mensual por zona, la capacidad de campo medida en Mendoza, el riego por departamento del CNA 2018, la humedad relativa de día y de noche, y la verificación de las normales del SMN: el PDF del SMN bloqueó la descarga automática.
