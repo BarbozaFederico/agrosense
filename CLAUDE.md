@@ -26,7 +26,7 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Informes de contexto en `docs/investigacion/`: `contexto-problema.md` y `fuentes-de-datos.md`. Decisiones de modelado en `docs/decisions/` (ADR-003).
+Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-005).
 
 ## 4. Alcance del MVP
 
@@ -58,14 +58,12 @@ Precaución: probar temprano cómo se combinan índices geoespaciales y series t
 ## 6. Reglas de dominio
 
 - **Datos sintéticos.** Nodos y lecturas son simulados. Los documentos llevan `fuente` (por ejemplo, `simulado`) y, si fueron generados por una simulación en vivo, `escenario_id`.
-- **Umbral de helada por estado fenológico, configurable.** Cada parcela tiene `fenologia`; los umbrales viven en datos de configuración, no en el código. Valores de partida (a validar con criterio agronómico):
-  - Informe IDR + DACC 2021 (nomenclatura de frutales): −1,1 °C en corola visible y −0,6 °C en plena flor y fruto cuajado.
-  - Brotación: sin umbral oficial verificado; **valor de trabajo** −2 °C, marcado como supuesto.
-  - Floración: ejemplo de trabajo −1,5 °C, a validar.
+- **Umbral de helada por etapa BBCH, configurable** (colección `variedades`, ADR-005). Se compara con la **temperatura estimada en el brote** = sensor − Δ (Δ = 2 °C, supuesto configurable). Valores del Malbec: yema dormida −10,6 °C; yema hinchada −6,1 °C; brotación −3,9 °C; primera hoja −2,8 °C; 2 a 5 hojas −2,2 °C; racimos visibles −1,2 °C; floración y cuaje 0 °C. Los valores IDR + DACC (−1,1 y −0,6 °C) son de **frutales** y no se usan.
 - **Nodo inactivo:** sin lecturas durante un tiempo configurable (inicial: 30 minutos).
 - **Alerta de helada:** se abre al superar el umbral y se cierra al recuperarse, guardando inicio, fin y mínima.
 - **Etapa fenológica:** se guarda en escala BBCH. Se estima por grados-día (Q9) y se corrige con observaciones manuales; si hay observación, manda la observación.
-- **Índice de riesgo de helada:** bajo, medio o alto según horas bajo el umbral, mínima, humedad del aire y humedad de suelo. No es un porcentaje de daño; los cortes son a validar.
+- **Índice de riesgo de helada:** nivel base por el margen entre la mínima del brote y el umbral (bajo > 2 °C, medio 0 a 2 °C, alto ≤ 0 °C); sube un nivel por 2 h o más cerca del umbral, por aire seco (< 60 %) o por suelo seco. No es un porcentaje de daño (ADR-005).
+- **Riego y suelo por finca:** San Rafael surco y suelo franco; San Martín surco y franco arenoso; Tupungato goteo y pedregoso (ADR-005).
 
 ## 7. Consultas que el modelo debe resolver
 
@@ -110,7 +108,7 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001 a ADR-004
+│   ├── decisions/             # ADR-001 a ADR-005
 │   └── sprints/
 ├── db/
 │   ├── schemas/
@@ -182,5 +180,4 @@ Reglas:
 
 ## 13. Pendientes conocidos
 
-- Investigación profunda de la vid (Malbec): grados-día por etapa, umbrales por etapa BBCH, cortes del índice de riesgo, umbral de humedad de suelo y sistema de riego.
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).

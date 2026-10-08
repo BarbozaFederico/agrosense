@@ -15,9 +15,12 @@
 | Período simulado | 1/9/2026 a 31/3/2027 (temporada completa; no copia datos reales) |
 | Variedad | Malbec en las 6 parcelas; "variedad simulada X" opcional |
 | Noches de helada | 6 a 8, entre septiembre y noviembre, en distintas etapas; una es la noche precargada |
-| Riego | Mixto: turnos fijos más riegos extra cuando se abre la alerta de riego. Sistema de riego: *a definir con investigación* |
+| Riego | Mixto: turnos fijos más riegos extra cuando se abre la alerta de riego. San Rafael y San Martín por surco (76 mm cada 7 días); Tupungato por goteo (1,5 a 3,5 mm/día). Ver [ADR-005](decisions/ADR-005-parametros-simulacion.md) |
+| Suelo | San Rafael franco; San Martín franco arenoso; Tupungato pedregoso |
+| Clima | Normales SMN (San Rafael, San Martín) y El Peral DACC (Tupungato); ver `investigacion/verificacion-fuentes.md` |
+| Heladas | Mínimas en el sensor sin pasar los récords de septiembre (San Rafael −4,5 °C; San Martín −2,8 °C); la mínima ocurre al amanecer |
 | Fincas | San Rafael, Tupungato y San Martín (ficticias) |
-| Etapas fenológicas | Escala BBCH; avance según grados-día del Malbec, *a definir con investigación* |
+| Etapas fenológicas | Escala BBCH; grados-día base 10 °C desde el 1/9: 260 de brotación a floración y 712 de floración a envero (Zapata 2017); etapas intermedias repartidas en forma pareja (supuesto) |
 
 > **Hora de referencia:** Q5 (últimos 30 minutos) y Q6 (últimas 24 horas) reciben la fecha "ahora" como parámetro, elegida con un selector en el dashboard (ADR-004). Las fechas del seed no se desplazan.
 

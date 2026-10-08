@@ -60,15 +60,20 @@ El escenario realista justifica la serie temporal, los índices y una política 
 
 ## 5. Reglas de negocio
 
-- **Umbral de helada por estado fenológico.** Cada parcela tiene un estado (reposo, brotación, floración, etc.) y cada estado tiene un umbral de temperatura. Los valores son configurables y deben validarse con criterio agronómico antes de usarse.
+- **Umbral de helada por etapa BBCH.** Cada etapa tiene un umbral configurable, guardado en `variedades`. Se compara con la temperatura estimada en el brote (sensor − 2 °C). Detalle y fuentes en [ADR-005](decisions/ADR-005-parametros-simulacion.md).
 
-| Estado fenológico | Umbral de alerta |
-|---|---|
-| Brotación | Valor de trabajo: −2 °C (sin aval oficial verificado) |
-| Floración | Ejemplo de trabajo: −1,5 °C (a validar) |
-| Otros estados | A definir |
+| Etapa (BBCH) | Umbral del Malbec | Marca |
+|---|---|---|
+| Yema dormida (00) | −10,6 °C | con fuente (WSU) |
+| Yema hinchada (01-05) | −6,1 °C | con fuente (WSU) |
+| Brotación (07-09) | −3,9 °C | con fuente (WSU; FDF) |
+| Primera hoja (11) | −2,8 °C | con fuente (WSU) |
+| 2 a 5 hojas (12-15) | −2,2 °C | con fuente (WSU) |
+| Racimos visibles (53-57) | −1,2 °C | adaptado (Ferguson 2014, Malbec) |
+| Floración y cuaje (60-71) | 0 °C | con fuente (FDF / INIA 2016) |
 
-  Referencia del informe IDR + DACC 2021 (nomenclatura de frutales): −1,1 °C en corola visible y −0,6 °C en plena flor y fruto cuajado.
+- **Índice de riesgo de helada.** Nivel base según el margen entre la mínima del brote y el umbral; sube un nivel por duración, aire seco o suelo seco ([ADR-005](decisions/ADR-005-parametros-simulacion.md)).
+- **Alerta de riego.** Se abre cuando la humedad de suelo baja del umbral del suelo de la finca en ese período ([ADR-005](decisions/ADR-005-parametros-simulacion.md)).
 
 - **Nodo sin reportar.** Un nodo se considera inactivo si no envía lecturas durante un tiempo configurable (valor inicial: 30 minutos).
 - **Alerta de helada.** Se abre cuando se supera el umbral y se cierra cuando la temperatura se recupera, guardando inicio, fin y mínima registrada.

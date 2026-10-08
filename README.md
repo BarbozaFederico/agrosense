@@ -68,7 +68,7 @@ agrosense/
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-004) |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-005) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta

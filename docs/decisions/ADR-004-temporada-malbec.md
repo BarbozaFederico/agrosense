@@ -43,6 +43,7 @@ El alcance original simulaba 30 días de septiembre sin una variedad definida. E
 - Estimar la etapa no es pronóstico climático (que sigue fuera de alcance): usa datos ya medidos.
 - **Dependen de la investigación profunda:** grados-día del Malbec por etapa, umbrales de helada por etapa BBCH, cortes del índice de riesgo, umbral de humedad de suelo y sistema de riego. Si no se consiguen los grados-día con fuente, Q9 se recorta y la etapa queda solo manual.
 - Los pesos de la humedad del aire y del suelo en el índice de riesgo son supuestos, a validar.
+- **Actualizado por [ADR-005](ADR-005-parametros-simulacion.md):** el índice usa margen más agravantes (no cuatro variables con el mismo peso), y se fijan los umbrales por etapa, el riego y el suelo de cada finca.
 
 ## Decisiones posteriores (8/10/2026)
 
