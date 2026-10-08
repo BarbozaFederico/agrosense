@@ -44,7 +44,9 @@ El alcance original simulaba 30 días de septiembre sin una variedad definida. E
 - **Dependen de la investigación profunda:** grados-día del Malbec por etapa, umbrales de helada por etapa BBCH, cortes del índice de riesgo, umbral de humedad de suelo y sistema de riego. Si no se consiguen los grados-día con fuente, Q9 se recorta y la etapa queda solo manual.
 - Los pesos de la humedad del aire y del suelo en el índice de riesgo son supuestos, a validar.
 
-## A decidir
+## Decisiones posteriores (8/10/2026)
 
-- Hora de referencia ("ahora") para Q5 y Q6.
-- Cómo aparecen las observaciones manuales en la demo (solo en el seed, o en el seed y con un formulario en el dashboard).
+| Tema | Decisión | Alternativas descartadas |
+|---|---|---|
+| Hora de referencia ("ahora") para Q5 y Q6 | **Selector de fecha en el dashboard:** las consultas reciben la fecha como parámetro y muestran la base como estaba ese día. Plan B si falta tiempo: fecha fija (31/3/2027 23:55) | Correr las fechas al cargar el seed (rompe el calendario de la temporada) |
+| Observaciones fenológicas en la demo | **Solo precargadas en el seed** (por ejemplo, una por parcela por mes). El dashboard sigue siendo de solo lectura | Formulario en el dashboard (más trabajo de escritura y validación) |

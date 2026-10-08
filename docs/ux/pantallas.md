@@ -18,10 +18,12 @@ Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [AD
 | Simulación en vivo | Opcional; **es lo primero que se recorta** si falta tiempo |
 | Mapa | Polígonos esquemáticos de fincas ficticias, sin mapa base |
 | Fincas | 3, con un selector de finca en la barra lateral |
+| Fecha de referencia | Selector de fecha en la barra lateral: define el "ahora" de las consultas (ADR-004) |
+| Observaciones fenológicas | Solo lectura, precargadas en el seed |
 
 ## 2. Elementos comunes
 
-- Barra lateral con la navegación entre las 4 pantallas y el **selector de finca**.
+- Barra lateral con la navegación entre las 4 pantallas, el **selector de finca** y el **selector de fecha de referencia**.
 - Etiqueta visible **"datos simulados"**.
 - Panel desplegable **"Ver consulta"** con la consulta de MongoDB que alimenta la pantalla.
 - Indicador "último dato hace X min".

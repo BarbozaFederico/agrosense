@@ -44,7 +44,7 @@ Informes de contexto en `docs/investigacion/`: `contexto-problema.md` y `fuentes
 |---|---|
 | Motor | MongoDB Community Server (verificar la versión instalada antes de usar funciones nuevas) |
 | Consola y GUI | `mongosh` y MongoDB Compass |
-| Lecturas | Serie temporal (`timeField: ts`, `metaField: meta`) **si el docente lo confirma**; si no, colección común con índice compuesto. Ver ADR-001 |
+| Lecturas | Serie temporal (`timeField: ts`, `metaField: meta`), aceptada por el equipo; falta informarlo al docente. Si lo rechaza, colección común con índice compuesto. Ver ADR-001 |
 | Geoespacial | GeoJSON + índices `2dsphere` |
 | Validación | `$jsonSchema` en todas las colecciones |
 | Simulador | Python + `pymongo`, en `simulator/`, con funciones importables |
@@ -166,6 +166,8 @@ Reglas:
 - Verificar las versiones instaladas de Streamlit y Plotly antes de escribir código y fijarlas en `requirements.txt`.
 - Probar cada pantalla con datos del seed y correr la app antes de dar algo por terminado.
 - Pantallas: resumen de finca (con selector de finca), detalle de parcela, alertas, estado de nodos.
+- Selector de **fecha de referencia** en la barra lateral: es el "ahora" de Q5 y Q6, que lo reciben como parámetro (ADR-004).
+- Observaciones fenológicas: solo precargadas en el seed; el dashboard es de solo lectura.
 - **Simulación en vivo (opcional):** reproduce la noche paso a paso (unos 30 segundos), inserta lecturas en MongoDB y ejecuta la regla de alerta en cada paso; la alerta debe salir de la base. Variable con valores aleatorios acotados y semilla opcional; datos marcados con `escenario_id` y botón "Reiniciar demo". Verificar el bucle con la versión instalada de Streamlit. Es lo primero que se recorta.
 
 ## 12. Definition of Done por tarea
@@ -180,8 +182,6 @@ Reglas:
 
 ## 13. Pendientes conocidos
 
-- Confirmar con el docente si las series temporales entran en el alcance (ADR-001).
-- Definir la hora de referencia para Q5 y Q6 (la temporada simulada termina el 31/3/2027).
-- Definir cómo aparecen las observaciones fenológicas manuales en la demo.
+- Informar al docente que se usan series temporales (ADR-001).
 - Investigación profunda de la vid (Malbec): grados-día por etapa, umbrales por etapa BBCH, cortes del índice de riesgo, umbral de humedad de suelo y sistema de riego.
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).

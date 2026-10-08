@@ -19,7 +19,9 @@
 | Fincas | San Rafael, Tupungato y San Martín (ficticias) |
 | Etapas fenológicas | Escala BBCH; avance según grados-día del Malbec, *a definir con investigación* |
 
-> **A resolver:** Q5 (últimos 30 minutos) y Q6 (últimas 24 horas) usan tiempos relativos, pero la temporada termina el 31/3/2027. Hay que definir una "hora de referencia" (por ejemplo, el fin de la historia) o ajustar las fechas al cargar el seed.
+> **Hora de referencia:** Q5 (últimos 30 minutos) y Q6 (últimas 24 horas) reciben la fecha "ahora" como parámetro, elegida con un selector en el dashboard (ADR-004). Las fechas del seed no se desplazan.
+
+> **Observaciones fenológicas:** el seed incluye observaciones manuales precargadas (por ejemplo, una por parcela por mes).
 
 ## Parámetros
 
