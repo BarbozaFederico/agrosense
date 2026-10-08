@@ -32,7 +32,7 @@ El reparto es por funcionalidad completa, de la base al dashboard. Detalle en [`
 | 1 | docs | Copiar los informes de investigación a `docs/investigacion/` (quitando datos de contacto personales) | Integrante 1 |
 | 2 | chore | Instalar MongoDB, `mongosh` y Compass; verificar la versión | Ambos |
 | 3 | spike | CRUD básico en `mongosh` y notas de lo aprendido | Ambos |
-| 4 | docs | Confirmar con el docente si las series temporales entran y cerrar [ADR-001](decisions/ADR-001-series-temporales.md) | Integrante 1 |
+| 4 | spike | Probar series temporales en la versión instalada (borrado e índices geoespaciales), según [ADR-001](decisions/ADR-001-series-temporales.md) | Integrante 1 |
 | 5 | docs | `modelo-datos.md`: colecciones, embeber o referenciar, diagrama | Ambos |
 | 6 | feat | Validaciones `$jsonSchema` de `nodos`, `lecturas` y `alertas` | Integrante 1 |
 | 7 | feat | Validaciones `$jsonSchema` de `fincas`, `parcelas`, `eventos_climaticos` y `riegos` | Integrante 2 |
@@ -51,6 +51,5 @@ Alerta temprana y pronóstico, Docker, Atlas, datos reales de la DACC y de ERA5-
 | Riesgo | Mitigación |
 |---|---|
 | Plazo corto | Prioridades explícitas; la simulación en vivo se recorta primero |
-| Series temporales no confirmadas por el docente | ADR-001 con regla de decisión por defecto |
 | Dashboard obligatorio compite con el núcleo | El dashboard arranca con datos del seed en el Sprint B, sin esperar al cierre del núcleo |
 | La demo falla en vivo | Noche precargada y prueba previa sin internet |
