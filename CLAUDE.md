@@ -177,6 +177,5 @@ Reglas:
 
 - Confirmar con el docente si las series temporales entran en el alcance (ADR-001).
 - Definir los estados fenológicos de las 6 parcelas, con investigación, para el caso más real posible.
-- Definir la herramienta de wireframes.
 - Definir la hora de referencia para Q5 y Q6 (la historia simulada termina el 30/9/2026).
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).

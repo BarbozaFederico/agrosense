@@ -28,4 +28,13 @@
 
 ## Wireframes
 
-Ver `wireframes/` (a crear en el Sprint A).
+Se hacen con **Excalidraw** (gratuito, desde el navegador). Por cada pantalla se guardan en `wireframes/` el archivo editable `.excalidraw` y su exportación `.png`:
+
+| Pantalla | Archivos |
+|---|---|
+| Resumen de finca | `resumen-finca.excalidraw`, `resumen-finca.png` |
+| Detalle de parcela | `detalle-parcela.excalidraw`, `detalle-parcela.png` |
+| Alertas | `alertas.excalidraw`, `alertas.png` |
+| Estado de nodos | `estado-nodos.excalidraw`, `estado-nodos.png` |
+
+Los elementos de cada pantalla están en [`pantallas.md`](pantallas.md). *A crear en el Sprint A.*
