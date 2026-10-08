@@ -11,7 +11,7 @@
 | **C** | mar 20/10 a lun 26/10 | Dashboard completo (4 pantallas, tema oscuro), backup con restauración probada, roles, demo sin internet | Dashboard, `backup-restore.md`, roles |
 | **Cierre** | mar 27/10 y mié 28/10 | Congelar el código, ensayar la demo, tag `v1.0.0`, entrega | Entrega final |
 
-> Verificar si el lunes 12/10 es feriado; en ese caso el Sprint A tiene un día menos.
+> El lunes 12/10 es feriado: el Sprint A tiene un día hábil menos.
 
 ## Prioridades (lo que se sacrifica primero va al final)
 

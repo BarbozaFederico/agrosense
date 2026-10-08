@@ -26,12 +26,12 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Pendientes de copiar por el equipo a `docs/investigacion/`: `contexto-problema.md` y `fuentes-de-datos.md` (informes de contexto y de fuentes de datos). Si faltan, pedíselos antes de inventar su contenido.
+Informes de contexto en `docs/investigacion/`: `contexto-problema.md` y `fuentes-de-datos.md`. Decisiones de modelado en `docs/decisions/` (ADR-003).
 
 ## 4. Alcance del MVP
 
 - **3 fincas ficticias en 3 departamentos de Mendoza, 6 parcelas (2 por finca), 12 nodos (2 por parcela)**, 3 variables (temperatura, humedad de suelo, humedad de aire), 2 tipos de alerta (helada y riego).
-- Colecciones: `fincas`, `parcelas`, `nodos`, `lecturas`, `alertas`, `riegos`, `eventos_climaticos`.
+- Colecciones: `fincas`, `parcelas`, `nodos`, `lecturas`, `alertas`, `riegos`, `eventos_climaticos`, más la colección de configuración `umbrales_fenologia` (ADR-003).
 - Historia simulada: 30 días, 1 lectura cada 5 minutos por nodo, unas 103.680 lecturas.
 - **Dashboard web de escritorio con Streamlit: obligatorio.** 4 pantallas, tema oscuro, noche de helada precargada.
 - **Opcional (primero que se recorta):** simulación de la noche en vivo desde el dashboard (RF-14 y RF-15).
@@ -105,7 +105,7 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001, ADR-002
+│   ├── decisions/             # ADR-001 a ADR-003
 │   └── sprints/
 ├── db/
 │   ├── schemas/
@@ -176,7 +176,7 @@ Reglas:
 ## 13. Pendientes conocidos
 
 - Confirmar con el docente si las series temporales entran en el alcance (ADR-001).
-- Copiar los informes a `docs/investigacion/`, quitando datos de contacto personales.
-- Verificar si el lunes 12/10 es feriado.
-- Confirmar los departamentos de las 3 fincas ficticias y el reparto entre integrantes.
+- Definir los estados fenológicos de las 6 parcelas, con investigación, para el caso más real posible.
+- Definir la herramienta de wireframes.
+- Definir la hora de referencia para Q5 y Q6 (la historia simulada termina el 30/9/2026).
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).
