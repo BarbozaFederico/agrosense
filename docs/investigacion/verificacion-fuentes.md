@@ -130,3 +130,93 @@ Los valores de la Tabla 4.8 de la FAO coinciden con el original (en °F; convers
 | Hectáreas de Malbec por departamento | Leídas en un buscador | Confirmadas | con fuente (INV) |
 | Umbrales de Concord (EB1615) | Vía FAO | Confirmados en el original | con fuente |
 | Conducción y densidad de plantación | Supuesto | Sigue como supuesto (no está en el INV) | supuesto |
+
+---
+
+# Segunda ronda de verificación (8/10/2026)
+
+Se leyeron completos cuatro documentos que las investigaciones solo conocían por fragmentos.
+
+| Documento | Referencia |
+|---|---|
+| INIA, FDF, Vinos de Chile y DMC, *Heladas: tipos, medidas de prevención y manejos posteriores al daño* (2016, proyecto PYT 2015-0305) | http://www.fdf.cl/biblioteca/publicaciones/2016/heladas.pdf |
+| Morábito, J. A., *Desempeño del riego por superficie en el área de riego del río Mendoza*, tesis de Magister en Riego y Drenaje (UNCuyo, INA, INTA) | https://bdigital.uncu.edu.ar/objetos_digitales/4137/morabito.pdf |
+| Zuccardi, *Guía del terroir del Valle de Uco* (edición 04/2024) | https://zuccardiwines.com/wp-content/uploads/2024/05/Zuccardi-Guia-Terroir-Valle-de-Uco-ESP.pdf |
+| Fernández Long et al., *Heladas en la Argentina* (Portal de Heladas, FAUBA) | https://heladas.agro.uba.ar/mendoza_3.htm |
+
+## 4. Umbral de helada en floración y cuaje (FDF / INIA, 2016)
+
+**Confirmado en el original (p. 4, sección 1.2):**
+
+- En la vid, **0 °C es la temperatura crítica desde el inicio de la floración hasta el fruto pequeño**.
+- En brotación, la temperatura crítica **oscila entre −2 y −4 °C**.
+- Las etapas más sensibles son las que van desde el botón floral hasta el fruto pequeño.
+
+Es una guía técnica chilena (regiones de O'Higgins y Maule), no una medición de laboratorio: no da porcentajes de daño. Marca: **con fuente (vid general, Chile)**. Respalda usar 0 °C, o un valor cercano, como umbral de alerta para BBCH 60 a 71.
+
+## 5. Riego por superficie en el río Mendoza (Morábito)
+
+**Confirmado en el original** (resumen, pp. 2-3; Cuadro 8, p. 36). El estudio hizo 101 evaluaciones de campo.
+
+| Dato | Valor |
+|---|---|
+| Eficiencia de aplicación media del área | **59 %**, calificación "Mala" |
+| Eficiencia por método | Surcos sin desagüe 67 %; melgas sin desagüe 69 %; con desagüe 39 % |
+| Eficiencia por cultivo | Frutales (incluye vid) 62 %; hortalizas 47 % |
+| Eficiencia alcanzable | 61 % (manteniendo la salinidad actual), 71 % (90 % de la producción máxima), 79 % (optimizando el manejo) |
+| Eficiencia potencial para la vid (Cuadro 34-a) | 63 % ± 6,3 |
+
+**Láminas de riego por evento (Cuadro 8, mm):**
+
+| Grupo | Lámina neta requerida (dn) | Lámina bruta (db) | Lámina infiltrada | Lámina almacenada |
+|---|---|---|---|---|
+| Surcos sin desagüe | — | **76** | 76 | 43 |
+| Surcos con desagüe | — | **152** | 36 | 28 |
+| Melgas sin desagüe | — | 117 | 113 | 66 |
+| Cultivos frutícolas (vid, frutales, olivo) | 77 | 117 | 84 | 52 |
+| Primavera | 54 | 136 | 78 | 42 |
+| Verano | 86 | 103 | 81 | 53 |
+
+**Para el simulador:** un riego por surco sin desagüe aplica unos 76 mm brutos (760.000 L/ha), de los que quedan almacenados unos 43 mm en la zona de raíces. Marca: **con fuente (Mendoza)**. El año de la tesis no figura en el texto extraído; la segunda investigación la fecha en 2003.
+
+## 6. Suelos de Tupungato (Zuccardi, 2024)
+
+**Confirmado en el original (pp. 6-12):**
+
+- En Tupungato la altitud pasa de **900 a 1.800 m en 35 km**.
+- Las zonas altas (Gualtallary, San Pablo) tienen **suelos pedregosos con importante carbonato de calcio** (caliche).
+- Las texturas mapeadas en el Valle de Uco incluyen: franco arenoso y franco limoso de 80 a más de 150 cm de profundidad; arenosos de 80 a 100 cm; capas de arena de 40 a 70 cm sobre gravas arenosas; y pedregosos con capa de piedra calcárea.
+
+Es una fuente de bodega (mapas propios), útil como descripción. Marca: **con fuente (secundaria)**. Para una parcela ficticia de Tupungato, "franco arenoso" o "pedregoso" son elecciones defendibles.
+
+## 7. Fechas de heladas por estación (Portal de Heladas FAUBA)
+
+**Confirmado en el original.** "Helada meteorológica": mínima ≤ 0 °C en abrigo. "Helada agrometeorológica": mínima ≤ 3 °C en abrigo, que se usa como aproximación de la helada a nivel del cultivo.
+
+| Estación (período) | Umbral | Última helada media | Última helada con 20 % de probabilidad | Última helada más tardía | Días con helada por año | Mínima absoluta anual media |
+|---|---|---|---|---|---|---|
+| San Rafael Aero (1957-2012) | 0 °C | **16-sep** | 4-oct | 14-nov (2000) | 36 | −6,2 °C |
+| San Rafael Aero (1957-2012) | 3 °C | 22-oct | 7-nov | 12-dic (1970) | 85 | −6,2 °C |
+| San Martín, Mendoza (1956-2012) | 0 °C | **9-sep** | 22-sep | 4-nov (1992) | 27 | −5,3 °C |
+| San Martín, Mendoza (1956-2012) | 3 °C | 2-oct | 26-oct | 4-dic (1971) | 68 | −5,3 °C |
+| La Consulta INTA, Valle de Uco (1970-2011) | 0 °C | **1-oct** | 17-oct | 14-nov (1987) | 65 | −7,3 °C |
+| La Consulta INTA, Valle de Uco (1970-2011) | 3 °C | 5-nov | 17-nov | 16-dic (2003) | 116 | −7,3 °C |
+| Mendoza Aero (1960-2012), referencia | 3 °C | 17-sep | 3-oct | 4-nov (1992) | 63 | −4,6 °C |
+
+La "mínima absoluta anual media" es el promedio, año por año, de la temperatura más baja del año (casi siempre en invierno), no la de septiembre.
+
+**Qué significa para el simulador:**
+- Las heladas de primavera son más tardías y frecuentes en el Valle de Uco (La Consulta, como referencia para Tupungato) que en San Rafael, y en San Rafael más que en San Martín.
+- Concuerda con las 6 a 8 noches de helada entre septiembre y noviembre: casi todas en septiembre, alguna en octubre y, en Tupungato, posible hasta mediados de noviembre.
+- La Consulta está en San Carlos (unos 940 m), no en Tupungato: es la estación con ficha de heladas más cercana del Valle de Uco. Marca para Tupungato: **adaptado**.
+
+## Resumen de la segunda ronda
+
+| Dato | Antes | Ahora | Marca |
+|---|---|---|---|
+| Umbral de helada en floración y cuaje (BBCH 60-71) | Fragmento | **0 °C**, confirmado en el original | con fuente (vid general, Chile) |
+| Umbral en brotación | Concord y Pinot noir | Además, rango de campo de −2 a −4 °C | con fuente (vid general, Chile) |
+| Lámina por riego por surco | Resumen | **76 mm** sin desagüe, 152 mm con desagüe | con fuente (Mendoza) |
+| Eficiencia del riego | Resumen | 59 % media; 62 % en frutales; 63 % potencial en vid | con fuente (Mendoza) |
+| Suelo de Tupungato | Fragmento | Franco arenoso o pedregoso calcáreo | con fuente (secundaria) |
+| Última helada por departamento | Solo Mendoza Aero | San Rafael 16-sep; San Martín 9-sep; Valle de Uco (La Consulta) 1-oct | con fuente (FAUBA) |
