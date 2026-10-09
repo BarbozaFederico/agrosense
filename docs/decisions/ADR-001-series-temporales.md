@@ -1,26 +1,24 @@
 # ADR-001: Series temporales para las lecturas
 
-**Estado:** Propuesto (pendiente de confirmar con el docente).
+**Estado:** Aceptado (8/10/2026).
 
 ## Contexto
 
-Las lecturas de sensores son documentos muy numerosos, con la misma forma y ordenados en el tiempo. MongoDB ofrece colecciones de series temporales pensadas para ese caso. No sabemos si el docente considera ese tema dentro del alcance de la materia, y la combinación con índices geoespaciales debe probarse en la versión instalada.
+Las lecturas de sensores son documentos muy numerosos (unas 732.700 en la temporada simulada), con la misma forma y ordenados en el tiempo. MongoDB ofrece colecciones de series temporales pensadas exactamente para ese caso.
 
-## Decisión provisional
+## Decisión
 
-Usar una colección de series temporales para `lecturas` (`timeField: ts`, `metaField: meta`).
-
-## Regla de decisión por defecto
-
-Si antes de cerrar el Sprint A el docente no lo confirma, o si la prueba con la versión instalada falla, `lecturas` se implementa como **colección común con índice compuesto** (`meta.parcela_id` y `ts`).
+Usar una colección de series temporales para `lecturas` (`timeField: ts`, `metaField: meta`). Es la decisión lógica para el tipo de dato: el motor está optimizado para guardar y consultar mediciones ordenadas en el tiempo.
 
 ## Alternativas
 
 | Alternativa | Ventaja | Desventaja |
 |---|---|---|
-| Serie temporal | Almacenamiento y consultas optimizados para datos temporales | Posibles limitaciones con índices y operaciones; puede salir del alcance de la materia |
-| Colección común con índice compuesto | Simple y dentro del alcance seguro | Menos eficiente con grandes volúmenes |
+| **Serie temporal (elegida)** | Almacenamiento y consultas optimizados para datos temporales | Limitaciones en actualizaciones, borrados y algunos índices |
+| Colección común con índice compuesto | Simple, sin limitaciones especiales | Menos eficiente con grandes volúmenes |
 
 ## Consecuencias
 
-*A completar al cerrar la decisión.*
+- `lecturas` se crea como serie temporal, con `meta` = `nodo_id`, `parcela_id` y `finca_id` (ADR-003).
+- Hay que verificar en la versión instalada de MongoDB las limitaciones de actualización y borrado (afecta a RF-15, "Reiniciar demo") y la combinación con índices geoespaciales.
+- `performance.md` documenta el rendimiento de las consultas sobre la serie temporal.

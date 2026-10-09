@@ -4,8 +4,8 @@
 
 | Integrante | GitHub | Rol principal |
 |---|---|---|
-| Federico Daniel Barboza Araya | [@BarbozaFederico](https://github.com/BarbozaFederico) | Integrante 1: monitoreo y helada *(a confirmar)* |
-| FERNANDEZ ACTIS, Luciano Agustín | [@lufernandez-um](https://github.com/lufernandez-um) | Integrante 2: geoespacial y riego *(a confirmar)* |
+| Federico Daniel Barboza Araya | [@BarbozaFederico](https://github.com/BarbozaFederico) | Integrante 1: monitoreo y helada |
+| FERNANDEZ ACTIS, Luciano Agustín | [@lufernandez-um](https://github.com/lufernandez-um) | Integrante 2: geoespacial y riego |
 
 ## Reparto por funcionalidad completa
 
@@ -28,4 +28,4 @@ Cada integrante toma funcionalidades de punta a punta, de la base de datos al da
 
 La evaluación es individual: cada integrante debe poder explicar **todo** el modelo, las consultas, los índices y el backup, no solo su parte. Por eso el modelado se trabaja en conjunto y se revisan mutuamente los cambios.
 
-El reparto es una propuesta inicial y se ajusta entre ambos.
+El reparto fue confirmado por el equipo el 8/10/2026.

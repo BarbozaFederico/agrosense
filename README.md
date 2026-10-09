@@ -26,7 +26,9 @@ El foco del proyecto es la **capa de datos**: modelado documental, carga masiva,
 | Parcelas y nodos | 6 parcelas y 12 nodos simulados |
 | Variables | Temperatura, humedad de suelo y humedad de aire |
 | Alertas | Helada y riego |
-| Consultas avanzadas | 8 (Q1 a Q8) |
+| Variedad | Malbec (variedad simulada adicional, opcional) |
+| Temporada simulada | 1/9/2026 a 31/3/2027 |
+| Consultas avanzadas | 10 (Q1 a Q10) |
 | Interfaz | Dashboard web de escritorio con 4 pantallas |
 
 ## Tecnologías
@@ -66,7 +68,7 @@ agrosense/
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR) |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-005) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta
@@ -74,7 +76,7 @@ agrosense/
 | Sprint | Fechas | Foco |
 |---|---|---|
 | A | 6/10 a 12/10 | Repo, documentación, modelado, simulador base |
-| B | 13/10 a 19/10 | Carga de datos, consultas Q1 a Q8, índices medidos |
+| B | 13/10 a 19/10 | Carga de datos, consultas Q1 a Q10, índices medidos |
 | C | 20/10 a 26/10 | Dashboard, backup y roles |
 | Cierre | 27/10 y 28/10 | Congelar, ensayar la demo, entrega |
 

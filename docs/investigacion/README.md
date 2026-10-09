@@ -6,6 +6,9 @@ Material de contexto del proyecto.
 |---|---|---|
 | `contexto-problema.md` | Problemática de viñateros y contratistas de Mendoza (2020 a octubre de 2026) | Copiado (sin datos de contacto) |
 | `fuentes-de-datos.md` | Fuentes públicas de datos meteorológicos y de riego | Copiado (sin datos de contacto) |
+| `vid-malbec.md` | Parámetros del Malbec en Mendoza para el simulador: grados-día, umbrales de helada, índice de riesgo, humedad de suelo, riego y clima | Copiado |
+| `vid-malbec-complemento.md` | Segunda investigación: datos faltantes y reemplazos de supuestos del informe anterior | Copiado |
+| `verificacion-fuentes.md` | Verificación en los originales (SMN 1991-2020, INV Malbec 2025, WSU EB1615); prevalece sobre los dos informes anteriores | Verificado |
 
 ## Antes de copiarlos (el repositorio es público)
 

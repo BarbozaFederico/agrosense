@@ -40,7 +40,7 @@ git switch main && git pull
 git switch -c feat/simulador-base
 # ...trabajo...
 git add simulator/
-git commit -m "feat(simulador): genera lecturas de 30 días (#8)"
+git commit -m "feat(simulador): genera lecturas de la temporada (#8)"
 git push -u origin feat/simulador-base
 ```
 
