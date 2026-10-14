@@ -220,3 +220,75 @@ La "mínima absoluta anual media" es el promedio, año por año, de la temperatu
 | Eficiencia del riego | Resumen | 59 % media; 62 % en frutales; 63 % potencial en vid | con fuente (Mendoza) |
 | Suelo de Tupungato | Fragmento | Franco arenoso o pedregoso calcáreo | con fuente (secundaria) |
 | Última helada por departamento | Solo Mendoza Aero | San Rafael 16-sep; San Martín 9-sep; Valle de Uco (La Consulta) 1-oct | con fuente (FAUBA) |
+
+---
+
+# Tercera ronda: artículo original de Zapata et al. 2017 (11/10/2026)
+
+Se leyó completo el artículo que respalda los grados-día de la consulta Q9. Hasta ahora solo se conocía por copias de terceros.
+
+| Documento | Referencia |
+|---|---|
+| Zapata, D., Salazar-Gutiérrez, M., Chaves, B., Keller, M. y Hoogenboom, G., "Predicting Key Phenological Stages for 17 Grapevine Cultivars (*Vitis vinifera* L.)", *Am. J. Enol. Vitic.* 68(1):60-72 (2017) | doi: 10.5344/ajev.2016.15077. Datos de 23 años (1990-2013) en Prosser, Washington (EE. UU.) |
+
+## 8. Grados-día del Malbec (Tabla 5, p. 66)
+
+**Confirmado:**
+
+| Tramo | Grados-día en base 10 °C, contados desde el 1 de abril (GDD10) | Temperatura base propia estimada | Grados-día con esa base, desde el 1 de enero (GDDest) |
+|---|---|---|---|
+| Hasta brotación | 18 | 7,7 °C | 78 |
+| Brotación → floración | **260** | 8,8 °C | 317 |
+| Floración → envero | **712** | 11,0 °C | 644 |
+
+**Método (p. 62), confirmado:**
+- Temperatura del día = (Tmáx + Tmín) / 2. Si es menor que la base, ese día suma 0.
+- **Tope superior de 32 °C:** por encima de 32 °C el día se cuenta como 32, porque más calor estresa a la planta.
+- El juego de parámetros con base fija de 10 °C (el que usa el proyecto) empieza a contar el **1 de abril** del hemisferio norte. Para Mendoza se adapta al **1 de octubre**, seis meses después. El proyecto empieza el 1 de septiembre y reinicia la cuenta en la brotación, así que la diferencia no afecta a los tramos de 260 y 712, que se cuentan desde la etapa anterior.
+
+**Qué etapa es cada una (p. 62):**
+
+| Etapa del artículo | Definición | Equivalente |
+|---|---|---|
+| Budbreak | Tejido verde visible en el 50 % de las yemas | E-L 4 ≈ BBCH 07-09 |
+| Bloom | 50 % de las capuchas de las flores caídas | E-L 23 ≈ BBCH 65 |
+| Veraison | Ablandamiento o cambio de color en el 50 % de las bayas | E-L 35 ≈ BBCH 81-83 |
+
+## 9. Fechas y duraciones del Malbec en Washington (Tablas 3 y 4, p. 64)
+
+| Dato | Media | Rango observado |
+|---|---|---|
+| Brotación (día del año) | 107 (17 de abril) | 98 a 115 |
+| Floración (día del año) | 161 (10 de junio) | 151 a 175 |
+| Envero (día del año) | 225 (13 de agosto) | 209 a 236 |
+| Días de brotación a floración | **54** | 43 a 60 |
+| Días de floración a envero | **66** | 55 a 74 |
+| Días de brotación a envero | **120** | 111 a 131 |
+
+El texto dice "106 días (Malbec)" de brotación a envero, pero la Tabla 4 da 120 días: se usa la tabla.
+
+**Para el simulador:** 54 días de brotación a floración y 66 de floración a envero sirven para controlar que las fechas simuladas sean razonables. En Washington el clima es más fresco que en Mendoza, así que en Mendoza los tramos deberían ser algo más cortos.
+
+## 10. Precisión del modelo para el Malbec (Tablas 6 y 7, p. 67)
+
+Error de predicción (RMSE, en días) con base fija de 10 °C (el juego "Set 1", el que usa el proyecto):
+
+| Etapa | Calibración | Evaluación |
+|---|---|---|
+| Brotación | 6,1 | 6,6 |
+| Floración | 2,1 | 2,1 |
+| Envero | 7,1 | 4,9 |
+
+**Corrección:** la segunda investigación citaba errores de 6,4 / 2,4 / 5,8 días. Esos valores corresponden a otro juego de parámetros ("Set 5", con temperatura base propia de cada etapa), no al de base 10 °C. Con base 10 °C la floración se predice con unos **2 días de error**, el mejor resultado de las tres etapas.
+
+**Qué significa:** el modelo de grados-día predice muy bien la floración y no tan bien la brotación ni el envero. Eso justifica la decisión del ADR-004: estimar la etapa con grados-día y **corregirla con observaciones manuales**.
+
+## Resumen de la tercera ronda
+
+| Dato | Antes | Ahora | Marca |
+|---|---|---|---|
+| 260 y 712 grados-día del Malbec (base 10 °C) | Copia de terceros | Confirmados en la Tabla 5 del original | con fuente (Malbec, EE. UU.) |
+| Tope superior de 32 °C | Cita indirecta | Confirmado en el método | con fuente |
+| Inicio de la cuenta con base 10 °C | "1 de abril" sin verificar | Confirmado: 1 de abril en el hemisferio norte | con fuente |
+| Error de predicción del Malbec | 6,4 / 2,4 / 5,8 días (otro juego de parámetros) | 6,6 / 2,1 / 4,9 días con base 10 °C (evaluación) | con fuente |
+| Duración de las etapas del Malbec | Parcial | 54 días de brotación a floración y 66 de floración a envero | con fuente |
