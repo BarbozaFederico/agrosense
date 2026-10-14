@@ -53,7 +53,22 @@ Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informe
 | Móvil | Fuera de alcance |
 | Licencia | MIT |
 
-Precaución: probar temprano cómo se combinan índices geoespaciales y series temporales en la versión instalada. Si no se pueden combinar, `eventos_climaticos` va como colección común.
+Precaución: probar temprano cómo se combinan índices geoespaciales y series temporales en la versión instalada. Si no se pueden combinar, `eventos_climaticos` va como colección común. También verificar las limitaciones de borrado en series temporales (afecta a RF-15, "Reiniciar demo").
+
+### Decisiones registradas (ADR)
+
+| ADR | Decisión |
+|---|---|
+| ADR-001 | `lecturas` es una colección de series temporales (`timeField: ts`, `metaField: meta`) |
+| ADR-002 | Dashboard con Streamlit + Plotly; toda consulta en `dashboard/data.py` |
+| ADR-003 | `alertas` guarda solo referencias (`parcela_id`): el departamento se obtiene con `$lookup` alertas → parcelas → fincas (Q8). `lecturas.meta` lleva `nodo_id`, `parcela_id` y `finca_id`. La alerta de riego se dispara por umbral de humedad de suelo |
+| ADR-004 | Malbec, temporada 1/9/2026 a 31/3/2027, etapa BBCH combinada (grados-día + observaciones), índice de riesgo, riego mixto, selector de fecha de referencia, observaciones solo en el seed |
+| ADR-005 | Temperatura del brote (sensor − 2 °C), umbrales de vid por etapa, índice de riesgo con agravantes, riego y suelo por finca |
+
+### Entorno
+
+- MongoDB Server 9.0 instalado como servicio de Windows. `mongosh` y MongoDB Database Tools se instalan aparte y deben estar en el PATH.
+- Dependencias de Python en `requirements.txt` (raíz, versiones fijas). `install.sh` crea `.venv` e instala todo: en PowerShell se ejecuta con `bash install.sh`.
 
 ## 6. Reglas de dominio
 
@@ -61,9 +76,11 @@ Precaución: probar temprano cómo se combinan índices geoespaciales y series t
 - **Umbral de helada por etapa BBCH, configurable** (colección `variedades`, ADR-005). Se compara con la **temperatura estimada en el brote** = sensor − Δ (Δ = 2 °C, supuesto configurable). Valores del Malbec: yema dormida −10,6 °C; yema hinchada −6,1 °C; brotación −3,9 °C; primera hoja −2,8 °C; 2 a 5 hojas −2,2 °C; racimos visibles −1,2 °C; floración y cuaje 0 °C. Los valores IDR + DACC (−1,1 y −0,6 °C) son de **frutales** y no se usan.
 - **Nodo inactivo:** sin lecturas durante un tiempo configurable (inicial: 30 minutos).
 - **Alerta de helada:** se abre al superar el umbral y se cierra al recuperarse, guardando inicio, fin y mínima.
-- **Etapa fenológica:** se guarda en escala BBCH. Se estima por grados-día (Q9) y se corrige con observaciones manuales; si hay observación, manda la observación.
+- **Etapa fenológica:** se guarda en escala BBCH (numérica, permite consultas por rango); Baggiolini solo se muestra como equivalencia en el dashboard. Se estima por grados-día (Q9: base 10 °C, (Tmáx + Tmín)/2, tope de 32 °C, desde el 1/9; 260 grados-día de brotación a floración y 712 de floración a envero, Zapata 2017) y se corrige con observaciones manuales; si hay observación, manda la observación (ADR-004).
 - **Índice de riesgo de helada:** nivel base por el margen entre la mínima del brote y el umbral (bajo > 2 °C, medio 0 a 2 °C, alto ≤ 0 °C); sube un nivel por 2 h o más cerca del umbral, por aire seco (< 60 %) o por suelo seco. No es un porcentaje de daño (ADR-005).
 - **Riego y suelo por finca:** San Rafael surco y suelo franco; San Martín surco y franco arenoso; Tupungato goteo y pedregoso (ADR-005).
+- **Riego simulado mixto:** turnos fijos más riegos extra cuando se abre la alerta de riego. Surco: 76 mm brutos cada 7 días; goteo: 1,5 a 3,5 mm por día según el mes (ADR-004 y ADR-005).
+- **Alerta de riego:** se abre cuando la humedad de suelo baja del umbral del suelo de la finca en ese período (por ejemplo, franco ~21 % en septiembre y octubre). Los umbrales son adaptados de la FAO-56 (ADR-003 y ADR-005).
 
 ## 7. Consultas que el modelo debe resolver
 
@@ -116,8 +133,11 @@ agrosense/
 │   ├── seeds/
 │   └── queries/
 ├── simulator/
-├── dashboard/                 # data.py, app.py, requirements.txt
-└── scripts/
+├── dashboard/                 # data.py, app.py
+├── scripts/
+├── requirements.txt           # dependencias de Python (versiones fijas)
+├── install.sh                 # crea .venv e instala requirements.txt
+└── .gitattributes             # los .sh con fin de línea LF
 ```
 
 ## 9. Flujo de Git
@@ -150,8 +170,7 @@ Detalle completo en `docs/ux/pantallas.md`.
 ```
 dashboard/
 ├── app.py            # pantallas (solo presentación)
-├── data.py           # una función por consulta, con pymongo
-└── requirements.txt  # versiones fijas
+└── data.py           # una función por consulta, con pymongo
 ```
 
 Reglas:
@@ -161,7 +180,7 @@ Reglas:
 - Cachear la conexión (`st.cache_resource`) y las consultas pesadas (`st.cache_data`).
 - Layout de escritorio (`layout="wide"`).
 - Mapa **sin mapa base**: polígonos de parcelas en Plotly (longitud y latitud). Sin dependencias de internet; probar con el wifi apagado.
-- Verificar las versiones instaladas de Streamlit y Plotly antes de escribir código y fijarlas en `requirements.txt`.
+- Verificar las versiones instaladas de Streamlit y Plotly antes de escribir código y fijarlas en el `requirements.txt` de la raíz.
 - Probar cada pantalla con datos del seed y correr la app antes de dar algo por terminado.
 - Pantallas: resumen de finca (con selector de finca), detalle de parcela, alertas, estado de nodos.
 - Selector de **fecha de referencia** en la barra lateral: es el "ahora" de Q5 y Q6, que lo reciben como parámetro (ADR-004).
