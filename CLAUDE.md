@@ -53,13 +53,16 @@ Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informe
 | Móvil | Fuera de alcance |
 | Licencia | MIT |
 
-Precaución: probar temprano cómo se combinan índices geoespaciales y series temporales en la versión instalada. Si no se pueden combinar, `eventos_climaticos` va como colección común. También verificar las limitaciones de borrado en series temporales (afecta a RF-15, "Reiniciar demo").
+Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-series-temporales.md)):
+
+- En series temporales **se puede borrar con cualquier filtro**, pero **solo se actualizan campos de `meta`** (con `updateMany`). Las lecturas no se corrigen: se borran y se vuelven a insertar.
+- El índice `2dsphere` en series temporales **solo acepta puntos**. Por eso `eventos_climaticos` (polígonos) es una **colección común**, y la ubicación vive en `nodos` y `parcelas` (colecciones comunes), no en cada lectura.
 
 ### Decisiones registradas (ADR)
 
 | ADR | Decisión |
 |---|---|
-| ADR-001 | `lecturas` es una colección de series temporales (`timeField: ts`, `metaField: meta`) |
+| ADR-001 | `lecturas` es una colección de series temporales (`timeField: ts`, `metaField: meta`); verificado con el spike del 14/10/2026 |
 | ADR-002 | Dashboard con Streamlit + Plotly; toda consulta en `dashboard/data.py` |
 | ADR-003 | `alertas` guarda solo referencias (`parcela_id`): el departamento se obtiene con `$lookup` alertas → parcelas → fincas (Q8). `lecturas.meta` lleva `nodo_id`, `parcela_id` y `finca_id`. La alerta de riego se dispara por umbral de humedad de suelo |
 | ADR-004 | Malbec, temporada 1/9/2026 a 31/3/2027, etapa BBCH combinada (grados-día + observaciones), índice de riesgo, riego mixto, selector de fecha de referencia, observaciones solo en el seed |
@@ -72,7 +75,7 @@ Precaución: probar temprano cómo se combinan índices geoespaciales y series t
 
 ## 6. Reglas de dominio
 
-- **Datos sintéticos.** Nodos y lecturas son simulados. Los documentos llevan `fuente` (por ejemplo, `simulado`) y, si fueron generados por una simulación en vivo, `escenario_id`.
+- **Datos sintéticos.** Nodos y lecturas son simulados. Los documentos llevan `fuente` (por ejemplo, `simulado`) y, si fueron generados por una simulación en vivo, `escenario_id`. En `lecturas`, `escenario_id` va **dentro de `meta`** (junto con `nodo_id`, `parcela_id` y `finca_id`), para que "Reiniciar demo" pueda borrar con `deleteMany({ "meta.escenario_id": ... })`.
 - **Umbral de helada por etapa BBCH, configurable** (colección `variedades`, ADR-005). Se compara con la **temperatura estimada en el brote** = sensor − Δ (Δ = 2 °C, supuesto configurable). Valores del Malbec: yema dormida −10,6 °C; yema hinchada −6,1 °C; brotación −3,9 °C; primera hoja −2,8 °C; 2 a 5 hojas −2,2 °C; racimos visibles −1,2 °C; floración y cuaje 0 °C. Los valores IDR + DACC (−1,1 y −0,6 °C) son de **frutales** y no se usan.
 - **Nodo inactivo:** sin lecturas durante un tiempo configurable (inicial: 30 minutos).
 - **Alerta de helada:** se abre al superar el umbral y se cierra al recuperarse, guardando inicio, fin y mínima.
@@ -88,7 +91,7 @@ Precaución: probar temprano cómo se combinan índices geoespaciales y series t
 |---|---|---|
 | Q1 | Horas bajo 0 °C por parcela en una noche | `$group`, `$setWindowFields` |
 | Q2 | Parcelas con mínima bajo el umbral de su estado fenológico | `$lookup` |
-| Q3 | Nodos más cercanos a un punto | `$geoNear` |
+| Q3 | Nodos más cercanos a un punto | `$geoNear` sobre `nodos` (colección común) |
 | Q4 | Parcelas dentro del polígono de un evento climático | `$geoIntersects` |
 | Q5 | Nodos sin reportar en los últimos 30 minutos | `$group` + `$match` |
 | Q6 | Humedad de suelo promedio por hora (últimas 24 h) | agregación |

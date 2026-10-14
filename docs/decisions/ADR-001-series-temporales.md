@@ -20,5 +20,8 @@ Usar una colección de series temporales para `lecturas` (`timeField: ts`, `meta
 ## Consecuencias
 
 - `lecturas` se crea como serie temporal, con `meta` = `nodo_id`, `parcela_id` y `finca_id` (ADR-003).
-- Hay que verificar en la versión instalada de MongoDB las limitaciones de actualización y borrado (afecta a RF-15, "Reiniciar demo") y la combinación con índices geoespaciales.
+- **Verificado en MongoDB 9.0.2** ([spike del 14/10/2026](../spikes/spike-adr001-series-temporales.md)):
+  - Borrar se puede con cualquier filtro: "Reiniciar demo" (RF-15) borra por `meta.escenario_id`, así que `escenario_id` va dentro de `meta`.
+  - Actualizar solo se puede con `updateMany` y sobre campos de `meta`: las lecturas no se corrigen, se borran y se vuelven a insertar.
+  - El índice `2dsphere` en series temporales solo acepta puntos: `eventos_climaticos` (polígonos) va como colección común, y Q3 usa `$geoNear` sobre la colección `nodos`.
 - `performance.md` documenta el rendimiento de las consultas sobre la serie temporal.
