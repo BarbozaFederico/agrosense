@@ -26,13 +26,13 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-005).
+Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-006).
 
 ## 4. Alcance del MVP
 
 - **3 fincas ficticias en 3 departamentos de Mendoza, 6 parcelas (2 por finca), 12 nodos (2 por parcela)**, 3 variables (temperatura, humedad de suelo, humedad de aire), 2 tipos de alerta (helada y riego).
 - Variedad: **Malbec** en las 6 parcelas; una "variedad simulada X" es opcional al final (ADR-004).
-- Colecciones: `fincas`, `parcelas`, `nodos`, `lecturas`, `alertas`, `riegos`, `eventos_climaticos`, `observaciones_fenologicas` y la colección de configuración `variedades` (ADR-003 y ADR-004).
+- Colecciones: `fincas`, `parcelas`, `nodos`, `lecturas`, `alertas`, `riegos`, `eventos_climaticos`, `observaciones_fenologicas` y las colecciones de configuración `variedades` y `configuracion` (ADR-003, ADR-004 y ADR-006). Campos, tipos y relaciones en `docs/modelo-datos.md`.
 - Temporada simulada: 1/9/2026 a 31/3/2027, 1 lectura cada 5 minutos por nodo, unas 732.700 lecturas; 6 a 8 noches de helada entre septiembre y noviembre.
 - **Dashboard web de escritorio con Streamlit: obligatorio.** 4 pantallas, tema oscuro, noche de helada precargada.
 - **Opcional (primero que se recorta):** simulación de la noche en vivo desde el dashboard (RF-14 y RF-15).
@@ -67,6 +67,7 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 | ADR-003 | `alertas` guarda solo referencias (`parcela_id`): el departamento se obtiene con `$lookup` alertas → parcelas → fincas (Q8). `lecturas.meta` lleva `nodo_id`, `parcela_id` y `finca_id`. La alerta de riego se dispara por umbral de humedad de suelo |
 | ADR-004 | Malbec, temporada 1/9/2026 a 31/3/2027, etapa BBCH combinada (grados-día + observaciones), índice de riesgo, riego mixto, selector de fecha de referencia, observaciones solo en el seed |
 | ADR-005 | Temperatura del brote (sensor − 2 °C), umbrales de vid por etapa, índice de riesgo con agravantes, riego y suelo por finca |
+| ADR-006 | IDs legibles (`F-SR`, `P-SR-1`, `N-SR-1-A`), etapas embebidas en `variedades`, colección `configuracion`, alerta abierta con `fin: null`, etapa calculada (no guardada), riesgo guardado al cerrar la alerta, riegos en mm y litros, campos con unidad (`temperatura_c`), validación estricta (`error` y esquema cerrado) |
 
 ### Entorno
 
@@ -128,7 +129,7 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001 a ADR-005
+│   ├── decisions/             # ADR-001 a ADR-006
 │   └── sprints/
 ├── db/
 │   ├── schemas/
