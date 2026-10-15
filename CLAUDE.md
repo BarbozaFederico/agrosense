@@ -26,7 +26,7 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-006).
+Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-007).
 
 ## 4. Alcance del MVP
 
@@ -46,16 +46,17 @@ Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informe
 | Consola y GUI | `mongosh` y MongoDB Compass |
 | Lecturas | Serie temporal (`timeField: ts`, `metaField: meta`). Decisión firme, ver ADR-001 |
 | Geoespacial | GeoJSON + índices `2dsphere` |
-| Validación | `$jsonSchema` en todas las colecciones |
+| Validación | `$jsonSchema` en las colecciones comunes (esquema cerrado, con `_id` declarado). `lecturas` se valida en el simulador y con una consulta de auditoría. Ver ADR-007 |
 | Simulador | Python + `pymongo`, en `simulator/`, con funciones importables |
 | Backup | `mongodump` y `mongorestore`, scripts en `scripts/` |
 | Interfaz | Streamlit + Plotly, web de escritorio; toda consulta en `dashboard/data.py`. Ver ADR-002 |
 | Móvil | Fuera de alcance |
 | Licencia | MIT |
 
-Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-series-temporales.md)):
+Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-series-temporales.md) y spike de esquemas del 15/10/2026):
 
 - En series temporales **se puede borrar con cualquier filtro**, pero **solo se actualizan campos de `meta`** (con `updateMany`). Las lecturas no se corrigen: se borran y se vuelven a insertar.
+- Las series temporales **no admiten validador** (`$jsonSchema`), ni al crearlas ni con `collMod`; el mismo esquema sí funciona como filtro de búsqueda ([spike de esquemas del 15/10/2026](docs/spikes/spike-esquemas-validacion.md)).
 - El índice `2dsphere` en series temporales **solo acepta puntos**. Por eso `eventos_climaticos` (polígonos) es una **colección común**, y la ubicación vive en `nodos` y `parcelas` (colecciones comunes), no en cada lectura.
 
 ### Decisiones registradas (ADR)
@@ -68,6 +69,7 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 | ADR-004 | Malbec, temporada 1/9/2026 a 31/3/2027, etapa BBCH combinada (grados-día + observaciones), índice de riesgo, riego mixto, selector de fecha de referencia, observaciones solo en el seed |
 | ADR-005 | Temperatura del brote (sensor − 2 °C), umbrales de vid por etapa, índice de riesgo con agravantes, riego y suelo por finca |
 | ADR-006 | IDs legibles (`F-SR`, `P-SR-1`, `N-SR-1-A`), etapas embebidas en `variedades`, colección `configuracion`, alerta abierta con `fin: null`, etapa calculada (no guardada), riesgo guardado al cerrar la alerta, riegos en mm y litros, campos con unidad (`temperatura_c`), validación estricta (`error` y esquema cerrado) |
+| ADR-007 | `lecturas` no admite validador: se valida en el simulador y con una consulta de auditoría (`$nor` + `$jsonSchema`) |
 
 ### Entorno
 
@@ -129,7 +131,7 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001 a ADR-006
+│   ├── decisions/             # ADR-001 a ADR-007
 │   └── sprints/
 ├── db/
 │   ├── schemas/

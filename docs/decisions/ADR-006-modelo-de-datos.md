@@ -27,4 +27,5 @@ Antes de escribir los `$jsonSchema` hacía falta definir los campos de cada cole
 - Se agrega la colección de configuración **`configuracion`** al modelo (total: 8 colecciones de dominio y 2 de configuración).
 - `lecturas.meta` incluye también `fuente`.
 - Los esquemas cerrados obligan a actualizar `db/schemas/` antes de agregar cualquier campo.
+- **Ajustado por [ADR-007](ADR-007-validacion-lecturas.md):** `lecturas` (serie temporal) no admite validador en MongoDB 9.0.2; se valida en el simulador y con una consulta de auditoría. En todos los esquemas cerrados hay que declarar `_id`.
 - El simulador calcula `litros` al insertar cada riego, con la superficie de la parcela.

@@ -1,6 +1,6 @@
 # Modelo de datos
 
-**Estado:** v1.0 (14/10/2026). Decisiones en [ADR-001](decisions/ADR-001-series-temporales.md), [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md), [ADR-004](decisions/ADR-004-temporada-malbec.md), [ADR-005](decisions/ADR-005-parametros-simulacion.md) y [ADR-006](decisions/ADR-006-modelo-de-datos.md). Parámetros y fuentes en [`investigacion/verificacion-fuentes.md`](investigacion/verificacion-fuentes.md).
+**Estado:** v1.0 (14/10/2026). Decisiones en [ADR-001](decisions/ADR-001-series-temporales.md), [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md), [ADR-004](decisions/ADR-004-temporada-malbec.md), [ADR-005](decisions/ADR-005-parametros-simulacion.md), [ADR-006](decisions/ADR-006-modelo-de-datos.md) y [ADR-007](decisions/ADR-007-validacion-lecturas.md). Parámetros y fuentes en [`investigacion/verificacion-fuentes.md`](investigacion/verificacion-fuentes.md).
 
 ## 1. Consultas que guían el modelo
 
@@ -15,7 +15,7 @@ Ver Q1 a Q10 en [`requisitos.md`](requisitos.md). El modelo es adecuado si las r
 | Fechas | Tipo `date`, en UTC. El dashboard las muestra en hora de Argentina (UTC−3) |
 | Geometrías | GeoJSON en WGS84, orden `[longitud, latitud]` |
 | Identificadores | Códigos legibles para fincas, parcelas y nodos (`F-SR`, `P-SR-1`, `N-SR-1-A`); `ObjectId` automático para los eventos (alertas, riegos, observaciones, eventos climáticos) |
-| Validación | `$jsonSchema` en todas las colecciones, `validationAction: "error"`, esquema cerrado (`additionalProperties: false`) |
+| Validación | `$jsonSchema` con `validationAction: "error"` y esquema cerrado (`additionalProperties: false`) en las colecciones comunes; `lecturas` se valida en el simulador y con una consulta de auditoría (ADR-007) |
 | Origen del dato | `fuente`: `"simulado"`, `"simulacion_en_vivo"` o `"seed"`. Lo generado en vivo lleva además `escenario_id` |
 
 ## 3. Colecciones
@@ -216,7 +216,12 @@ erDiagram
 
 ## 7. Validaciones
 
-Un archivo por colección en `db/schemas/` con su `$jsonSchema` (`validationAction: "error"`, `additionalProperties: false`). En las series temporales el esquema también se aplica.
+Un archivo por colección en `db/schemas/` con su `$jsonSchema` (`validationAction: "error"`, `additionalProperties: false`, con `_id` declarado en `properties`).
+
+**Excepción: `lecturas`.** En MongoDB 9.0.2 las series temporales no admiten validador ([spike de esquemas](spikes/spike-esquemas-validacion.md)). Su esquema se escribe igual, pero se usa de dos formas ([ADR-007](decisions/ADR-007-validacion-lecturas.md)):
+
+1. El simulador valida cada lectura antes de insertarla.
+2. Una consulta de auditoría, `find({ $nor: [{ $jsonSchema: esquema }] })`, cuenta las lecturas que no cumplen el esquema después de cada carga (resultado esperado: 0).
 
 ## 8. Índices (propuesta, se miden en el Sprint B)
 
