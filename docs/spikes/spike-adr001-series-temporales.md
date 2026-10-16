@@ -1,6 +1,6 @@
 # Spike ADR-001: series temporales en MongoDB 9.0
 
-**Fecha:** 14/10/2026 · **Versión probada:** MongoDB Server 9.0.2, `mongosh` 2.13.0 · **ADR:** [ADR-001](../decisions/ADR-001-series-temporales.md)
+**Fecha:** 14/10/2026 · **Versión probada:** MongoDB Server 9.0.2, `mongosh` 2.13.0 (original) y Python 3.13 con `pymongo` 4.18.3 (16/10/2026) · **ADR:** [ADR-001](../decisions/ADR-001-series-temporales.md)
 
 ## Pregunta a responder
 
@@ -12,18 +12,20 @@
 
 ## Cómo se probó
 
-Tres scripts de `mongosh` en [`scripts/spike-adr001/`](../../scripts/spike-adr001/). Usan una base de **prueba** llamada `spike_agrosense`, que borran y vuelven a crear en cada ejecución, con datos inventados.
+Tres scripts de Python (`pymongo`) en [`scripts/spike-adr001/`](../../scripts/spike-adr001/). Usan una base de **prueba** llamada `spike_agrosense`, que borran y vuelven a crear en cada ejecución, con datos inventados. Se corren desde la raíz del repositorio, con el entorno virtual activado.
+
+> Las pruebas se hicieron primero con `mongosh` (14/10/2026) y los scripts se pasaron a Python el 16/10/2026 ([ADR-008](../decisions/ADR-008-esquemas-en-python.md)). Los resultados fueron **idénticos** en los dos lenguajes, porque quien acepta o rechaza cada operación es el servidor de MongoDB. En Python los métodos se llaman `update_one`, `delete_many`, etc., en lugar de `updateOne`, `deleteMany`.
 
 ```bash
-mongosh --file scripts/spike-adr001/01_crear_serie_temporal.js
+python scripts/spike-adr001/01_crear_serie_temporal.py
 ```
 
 ```bash
-mongosh --file scripts/spike-adr001/02_actualizar_y_borrar.js
+python scripts/spike-adr001/02_actualizar_y_borrar.py
 ```
 
 ```bash
-mongosh --file scripts/spike-adr001/03_indice_2dsphere.js
+python scripts/spike-adr001/03_indice_2dsphere.py
 ```
 
 ## Resultados
