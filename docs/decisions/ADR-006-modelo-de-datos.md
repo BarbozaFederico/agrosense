@@ -1,6 +1,6 @@
 # ADR-006: Detalle del modelo de datos y de la validación
 
-**Estado:** Aceptado (14/10/2026). Completa [ADR-003](ADR-003-decisiones-modelado-inicial.md). El modelo completo está en [`modelo-datos.md`](../modelo-datos.md).
+**Estado:** Aceptado (14/10/2026). Ajustado el 16/10/2026 (decisión 12). Completa [ADR-003](ADR-003-decisiones-modelado-inicial.md). El modelo completo está en [`modelo-datos.md`](../modelo-datos.md).
 
 ## Contexto
 
@@ -21,10 +21,21 @@ Antes de escribir los `$jsonSchema` hacía falta definir los campos de cada cole
 | 9 | Acción ante un documento inválido | **`validationAction: "error"`** | `"warn"` | La base nunca guarda datos mal formados y se puede demostrar |
 | 10 | Campos no definidos | **Esquema cerrado** (`additionalProperties: false`) | Esquema abierto | Un error de tipeo falla en lugar de guardarse |
 | 11 | `estado` de un nodo | **Administrativo** (`activo`, `mantenimiento`, `baja`) | Estado de conexión guardado | Si un nodo dejó de reportar se calcula con Q5 y la fecha elegida |
+| 12 | `eventos_climaticos.tipo` (16/10/2026) | **Solo `"helada"`** | `"helada"` y `"granizo"` | Ningún sensor del MVP mide granizo y el MVP solo genera alertas de helada y de riego |
+
+## Aclaración: tipo de evento climático (decisión 12, 16/10/2026)
+
+La primera versión del modelo permitía `"helada"` y `"granizo"` en `eventos_climaticos.tipo`, y el segundo valor estaba marcado "a validar". Se decidió dejar **solo `"helada"`**.
+
+- **Por qué:** los sensores del MVP miden temperatura, humedad de suelo y humedad del aire (CLAUDE.md, sección 4). Ninguno detecta granizo, y las alertas del MVP son solo de helada y de riego. Un tipo que ningún dato del proyecto puede producir ni consultar sería un valor muerto en el esquema.
+- **Qué no cambia:** el granizo sigue siendo parte del **contexto del problema** (`docs/vision.md` y `docs/investigacion/contexto-problema.md`); lo que se descarta es modelarlo como evento.
+- **Cómo se revierte:** si más adelante se incorpora el granizo, se agrega `"granizo"` al `enum` de `db/schemas/eventos_climaticos.py` y se vuelve a correr `python -m db.schemas.crear_colecciones`, que actualiza el validador sin borrar datos. Haría falta además decidir de dónde saldrían esos eventos (por ejemplo, una fuente externa), porque ningún sensor del MVP los mide.
 
 ## Consecuencias
 
 - Se agrega la colección de configuración **`configuracion`** al modelo (total: 8 colecciones de dominio y 2 de configuración).
 - `lecturas.meta` incluye también `fuente`.
 - Los esquemas cerrados obligan a actualizar `db/schemas/` antes de agregar cualquier campo.
+- **Ajustado por [ADR-007](ADR-007-validacion-lecturas.md):** `lecturas` (serie temporal) no admite validador en MongoDB 9.0.2; se valida en el simulador y con una consulta de auditoría. En todos los esquemas cerrados hay que declarar `_id`.
 - El simulador calcula `litros` al insertar cada riego, con la superficie de la parcela.
+- `eventos_climaticos.tipo` solo admite `"helada"` (decisión 12).

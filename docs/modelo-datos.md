@@ -1,6 +1,6 @@
 # Modelo de datos
 
-**Estado:** v1.0 (14/10/2026). Decisiones en [ADR-001](decisions/ADR-001-series-temporales.md), [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md), [ADR-004](decisions/ADR-004-temporada-malbec.md), [ADR-005](decisions/ADR-005-parametros-simulacion.md) y [ADR-006](decisions/ADR-006-modelo-de-datos.md). Parámetros y fuentes en [`investigacion/verificacion-fuentes.md`](investigacion/verificacion-fuentes.md).
+**Estado:** v1.0 (14/10/2026). Decisiones en [ADR-001](decisions/ADR-001-series-temporales.md), [ADR-003](decisions/ADR-003-decisiones-modelado-inicial.md), [ADR-004](decisions/ADR-004-temporada-malbec.md), [ADR-005](decisions/ADR-005-parametros-simulacion.md), [ADR-006](decisions/ADR-006-modelo-de-datos.md) y [ADR-007](decisions/ADR-007-validacion-lecturas.md). Parámetros y fuentes en [`investigacion/verificacion-fuentes.md`](investigacion/verificacion-fuentes.md).
 
 ## 1. Consultas que guían el modelo
 
@@ -15,7 +15,7 @@ Ver Q1 a Q10 en [`requisitos.md`](requisitos.md). El modelo es adecuado si las r
 | Fechas | Tipo `date`, en UTC. El dashboard las muestra en hora de Argentina (UTC−3) |
 | Geometrías | GeoJSON en WGS84, orden `[longitud, latitud]` |
 | Identificadores | Códigos legibles para fincas, parcelas y nodos (`F-SR`, `P-SR-1`, `N-SR-1-A`); `ObjectId` automático para los eventos (alertas, riegos, observaciones, eventos climáticos) |
-| Validación | `$jsonSchema` en todas las colecciones, `validationAction: "error"`, esquema cerrado (`additionalProperties: false`) |
+| Validación | `$jsonSchema` con `validationAction: "error"` y esquema cerrado (`additionalProperties: false`) en las colecciones comunes; `lecturas` se valida en el simulador y con una consulta de auditoría (ADR-007) |
 | Origen del dato | `fuente`: `"simulado"`, `"simulacion_en_vivo"` o `"seed"`. Lo generado en vivo lleva además `escenario_id` |
 
 ## 3. Colecciones
@@ -121,7 +121,7 @@ Colección común porque guarda polígonos, que las series temporales no indexan
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---|---|
 | `_id` | ObjectId | sí | Automático |
-| `tipo` | string | sí | `"helada"` o `"granizo"` (a validar) |
+| `tipo` | string | sí | `"helada"` (el granizo queda fuera de alcance: ningún sensor del MVP lo mide) |
 | `inicio` | date | sí | Comienzo del evento |
 | `fin` | date | sí | Fin del evento |
 | `area` | Polygon | sí | Zona afectada (Q4) |
@@ -169,6 +169,8 @@ Un único documento con `_id: "general"`.
 |---|---|---|
 | `delta_brote_c` | number | Δ entre sensor y brote: 2 °C (ADR-005, supuesto) |
 | `nodo_inactivo_min` | int | Minutos sin lecturas para considerar un nodo inactivo: 30 |
+| `sospechoso_minimo_c` | objeto | Límite de "sospechoso" de la temperatura del sensor (`temperatura_c`) por departamento (°C), con `maximum: 0`: `san_rafael` −4,5 y `san_martin` −2,8 (récord de septiembre del SMN, [`verificacion-fuentes.md`](investigacion/verificacion-fuentes.md)); `tupungato` en `null`, a validar (sin estación del SMN). Una lectura estrictamente más fría es sospechosa: no se rechaza ni se excluye, solo se cuenta en la auditoría ([ADR-009](decisions/ADR-009-temperatura-sospechosa-y-noche-extrema.md)) |
+| `noche_extrema` | objeto | La única noche que puede superar ese límite (RF-13): `{ finca_id, inicio, fin, minimo_c }`, ventana en UTC. Hoy: San Rafael, primera semana de octubre de 2026, `minimo_c` −6,3 °C (**supuesto**: cifra de prensa −8,3 °C menos Δ; a validar) ([ADR-009](decisions/ADR-009-temperatura-sospechosa-y-noche-extrema.md)) |
 | `riesgo` | objeto | Cortes del índice: `{ margen_bajo_c: 2, margen_alto_c: 0, horas_duracion: 2, margen_duracion_c: 1, aire_seco_pct: 60 }` |
 | `umbrales_riego` | objeto | Umbral de humedad de suelo (%) por tipo de suelo y período (`sep_oct`, `nov`, `dic_ene`, `feb_mar`) |
 
@@ -216,7 +218,14 @@ erDiagram
 
 ## 7. Validaciones
 
-Un archivo por colección en `db/schemas/` con su `$jsonSchema` (`validationAction: "error"`, `additionalProperties: false`). En las series temporales el esquema también se aplica.
+Implementadas y probadas: ver [`esquemas-validacion.md`](esquemas-validacion.md).
+
+Un archivo por colección en `db/schemas/` con su `$jsonSchema` (`validationAction: "error"`, `additionalProperties: false`, con `_id` declarado en `properties`).
+
+**Excepción: `lecturas`.** En MongoDB 9.0.2 las series temporales no admiten validador ([spike de esquemas](spikes/spike-esquemas-validacion.md)). Su esquema se escribe igual, pero se usa de dos formas ([ADR-007](decisions/ADR-007-validacion-lecturas.md)):
+
+1. El simulador valida cada lote antes de insertarlo: MongoDB valida con el mismo esquema, sin guardar (`db/schemas/validar.py`, [ADR-008](decisions/ADR-008-esquemas-en-python.md)).
+2. Una consulta de auditoría, `find({ $nor: [{ $jsonSchema: esquema }] })`, cuenta las lecturas que no cumplen el esquema después de cada carga (resultado esperado: 0).
 
 ## 8. Índices (propuesta, se miden en el Sprint B)
 
@@ -268,12 +277,14 @@ Coordenadas y nombres ficticios.
     { bbch_desde: 7, bbch_hasta: 9, nombre: "Brotación", baggiolini: "C",
       umbral_helada_c: -3.9, gd_desde_brotacion: 0 },
     { bbch_desde: 60, bbch_hasta: 71, nombre: "Floración y cuaje", baggiolini: "I-J",
-      umbral_helada_c: 0, gd_desde_brotacion: 230 }
+      umbral_helada_c: 0, gd_desde_brotacion: 260 }
     /* ... */
   ] }
 
 // configuracion
 { _id: "general", delta_brote_c: 2, nodo_inactivo_min: 30,
+  sospechoso_minimo_c: { san_rafael: -4.5, san_martin: -2.8, tupungato: null /* a validar */ },
+  noche_extrema: { finca_id: "F-SR", inicio: ISODate("2026-10-05T06:00:00Z"), fin: ISODate("2026-10-05T11:00:00Z"), minimo_c: -6.3 /* supuesto */ },
   riesgo: { margen_bajo_c: 2, margen_alto_c: 0, horas_duracion: 2, margen_duracion_c: 1, aire_seco_pct: 60 },
   umbrales_riego: { franco: { sep_oct: 21, nov: 21.5, dic_ene: 18.5, feb_mar: 20 } /* ... */ } }
 ```

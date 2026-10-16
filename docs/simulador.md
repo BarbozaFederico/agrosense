@@ -18,7 +18,8 @@
 | Riego | Mixto: turnos fijos más riegos extra cuando se abre la alerta de riego. San Rafael y San Martín por surco (76 mm cada 7 días); Tupungato por goteo (1,5 a 3,5 mm/día). Ver [ADR-005](decisions/ADR-005-parametros-simulacion.md) |
 | Suelo | San Rafael franco; San Martín franco arenoso; Tupungato pedregoso |
 | Clima | Normales SMN (San Rafael, San Martín) y El Peral DACC (Tupungato); ver `investigacion/verificacion-fuentes.md` |
-| Heladas | Mínimas en el sensor sin pasar los récords de septiembre (San Rafael −4,5 °C; San Martín −2,8 °C); la mínima ocurre al amanecer |
+| Heladas | Las mínimas del sensor no pasan el límite de "sospechoso" de su departamento (`configuracion.sospechoso_minimo_c`: San Rafael −4,5 °C y San Martín −2,8 °C, récord de septiembre del SMN); la mínima ocurre al amanecer. Si el límite de un departamento es `None` (Tupungato, a validar), el simulador **falla con un mensaje claro** en lugar de generar heladas ([ADR-009](decisions/ADR-009-temperatura-sospechosa-y-noche-extrema.md)) |
+| Noche extrema | La noche precargada (RF-13) es la única que puede superar ese límite, solo en San Rafael: primera semana de octubre de 2026, justo después de la brotación estimada, con piso de −6,3 °C en el sensor (**supuesto**, a validar). Se declara en `configuracion.noche_extrema`; las horas exactas las fija el seed, comprobando con Q9 que la parcela esté en BBCH 07 o más |
 | Fincas | San Rafael, Tupungato y San Martín (ficticias) |
 | Etapas fenológicas | Escala BBCH; grados-día base 10 °C desde el 1/9: 260 de brotación a floración y 712 de floración a envero (Zapata 2017); etapas intermedias repartidas en forma pareja (supuesto) |
 

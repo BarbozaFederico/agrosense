@@ -26,7 +26,7 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-006).
+Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-009).
 
 ## 4. Alcance del MVP
 
@@ -46,16 +46,17 @@ Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informe
 | Consola y GUI | `mongosh` y MongoDB Compass |
 | Lecturas | Serie temporal (`timeField: ts`, `metaField: meta`). Decisión firme, ver ADR-001 |
 | Geoespacial | GeoJSON + índices `2dsphere` |
-| Validación | `$jsonSchema` en todas las colecciones |
+| Validación | `$jsonSchema` en las colecciones comunes (esquema cerrado, con `_id` declarado). `lecturas` se valida en el simulador y con una consulta de auditoría. Esquemas en Python (`db/schemas/`). Ver ADR-007, ADR-008 y `docs/esquemas-validacion.md` |
 | Simulador | Python + `pymongo`, en `simulator/`, con funciones importables |
 | Backup | `mongodump` y `mongorestore`, scripts en `scripts/` |
 | Interfaz | Streamlit + Plotly, web de escritorio; toda consulta en `dashboard/data.py`. Ver ADR-002 |
 | Móvil | Fuera de alcance |
 | Licencia | MIT |
 
-Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-series-temporales.md)):
+Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-series-temporales.md) y spike de esquemas del 15/10/2026):
 
 - En series temporales **se puede borrar con cualquier filtro**, pero **solo se actualizan campos de `meta`** (con `updateMany`). Las lecturas no se corrigen: se borran y se vuelven a insertar.
+- Las series temporales **no admiten validador** (`$jsonSchema`), ni al crearlas ni con `collMod`; el mismo esquema sí funciona como filtro de búsqueda ([spike de esquemas del 15/10/2026](docs/spikes/spike-esquemas-validacion.md)).
 - El índice `2dsphere` en series temporales **solo acepta puntos**. Por eso `eventos_climaticos` (polígonos) es una **colección común**, y la ubicación vive en `nodos` y `parcelas` (colecciones comunes), no en cada lectura.
 
 ### Decisiones registradas (ADR)
@@ -68,10 +69,14 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 | ADR-004 | Malbec, temporada 1/9/2026 a 31/3/2027, etapa BBCH combinada (grados-día + observaciones), índice de riesgo, riego mixto, selector de fecha de referencia, observaciones solo en el seed |
 | ADR-005 | Temperatura del brote (sensor − 2 °C), umbrales de vid por etapa, índice de riesgo con agravantes, riego y suelo por finca |
 | ADR-006 | IDs legibles (`F-SR`, `P-SR-1`, `N-SR-1-A`), etapas embebidas en `variedades`, colección `configuracion`, alerta abierta con `fin: null`, etapa calculada (no guardada), riesgo guardado al cerrar la alerta, riegos en mm y litros, campos con unidad (`temperatura_c`), validación estricta (`error` y esquema cerrado) |
+| ADR-007 | `lecturas` no admite validador: se valida en el simulador y con una consulta de auditoría (`$nor` + `$jsonSchema`) |
+| ADR-008 | Esquemas, creación de colecciones, validación previa (`$documents` + `$jsonSchema`) y auditoría en Python (`pymongo`), paquete `db`. Q1 a Q10 siguen en `mongosh` |
+| ADR-009 | Límite de temperatura "sospechosa" por departamento (techo de generación del simulador y aviso de auditoría, sin rechazar ni excluir), noche extrema declarada en `configuracion.noche_extrema` (solo San Rafael, primera semana de octubre, piso −6,3 °C supuesto), y auditoría de dos ceros (mal formadas e inesperadas) |
 
 ### Entorno
 
 - MongoDB Server 9.0 instalado como servicio de Windows. `mongosh` y MongoDB Database Tools se instalan aparte y deben estar en el PATH.
+- Los scripts de `db/` se corren desde la raíz con `python -m`, por ejemplo `python -m db.schemas.crear_colecciones`. La base se elige con `AGROSENSE_BD` (por defecto `agrosense`; las pruebas usan `agrosense_tests`).
 - Dependencias de Python en `requirements.txt` (raíz, versiones fijas). `install.sh` crea `.venv` e instala todo: en PowerShell se ejecuta con `bash install.sh`.
 
 ## 6. Reglas de dominio
@@ -79,6 +84,8 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 - **Datos sintéticos.** Nodos y lecturas son simulados. Los documentos llevan `fuente` (por ejemplo, `simulado`) y, si fueron generados por una simulación en vivo, `escenario_id`. En `lecturas`, `escenario_id` va **dentro de `meta`** (junto con `nodo_id`, `parcela_id` y `finca_id`), para que "Reiniciar demo" pueda borrar con `deleteMany({ "meta.escenario_id": ... })`.
 - **Umbral de helada por etapa BBCH, configurable** (colección `variedades`, ADR-005). Se compara con la **temperatura estimada en el brote** = sensor − Δ (Δ = 2 °C, supuesto configurable). Valores del Malbec: yema dormida −10,6 °C; yema hinchada −6,1 °C; brotación −3,9 °C; primera hoja −2,8 °C; 2 a 5 hojas −2,2 °C; racimos visibles −1,2 °C; floración y cuaje 0 °C. Los valores IDR + DACC (−1,1 y −0,6 °C) son de **frutales** y no se usan.
 - **Nodo inactivo:** sin lecturas durante un tiempo configurable (inicial: 30 minutos).
+- **Temperatura sospechosa** (ADR-009): una lectura de `temperatura_c` estrictamente más fría que `configuracion.sospechoso_minimo_c` de su departamento (San Rafael −4,5 °C, San Martín −2,8 °C, récord de septiembre del SMN; Tupungato `None`, a validar). No se rechaza ni se excluye de las consultas ni de las alertas: es el techo de generación del simulador (que falla si el límite es `None`) y un aviso de la auditoría.
+- **Noche extrema** (ADR-009): la única noche que puede superar ese límite, declarada en `configuracion.noche_extrema` (`finca_id`, `inicio`, `fin`, `minimo_c`): San Rafael, primera semana de octubre de 2026, piso −6,3 °C en el sensor (**supuesto**, a validar). Es la noche de helada precargada (RF-13).
 - **Alerta de helada:** se abre al superar el umbral y se cierra al recuperarse, guardando inicio, fin y mínima.
 - **Etapa fenológica:** se guarda en escala BBCH (numérica, permite consultas por rango); Baggiolini solo se muestra como equivalencia en el dashboard. Se estima por grados-día (Q9: base 10 °C, (Tmáx + Tmín)/2, tope de 32 °C, desde el 1/9; 260 grados-día de brotación a floración y 712 de floración a envero, Zapata 2017) y se corrige con observaciones manuales; si hay observación, manda la observación (ADR-004).
 - **Índice de riesgo de helada:** nivel base por el margen entre la mínima del brote y el umbral (bajo > 2 °C, medio 0 a 2 °C, alto ≤ 0 °C); sube un nivel por 2 h o más cerca del umbral, por aire seco (< 60 %) o por suelo seco. No es un porcentaje de daño (ADR-005).
@@ -129,10 +136,12 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001 a ADR-006
+│   ├── decisions/             # ADR-001 a ADR-009
 │   └── sprints/
-├── db/
-│   ├── schemas/
+├── db/                        # paquete de Python (python -m db.…)
+│   ├── conexion.py            # AGROSENSE_URI y AGROSENSE_BD
+│   ├── departamentos.py       # "San Martín" → san_martin
+│   ├── schemas/               # un esquema por colección, crear, validar y probar (ADR-008)
 │   ├── indexes/
 │   ├── seeds/
 │   └── queries/
