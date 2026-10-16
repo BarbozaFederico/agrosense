@@ -62,13 +62,14 @@ agrosense/
 | [`docs/roadmap.md`](docs/roadmap.md) | Calendario y sprints |
 | [`docs/architecture.md`](docs/architecture.md) | Arquitectura y convenciones |
 | [`docs/modelo-datos.md`](docs/modelo-datos.md) | Modelo de datos |
+| [`docs/esquemas-validacion.md`](docs/esquemas-validacion.md) | Esquemas `$jsonSchema`: cómo se crean, se prueban y se auditan |
 | [`docs/simulador.md`](docs/simulador.md) | Escenarios y parámetros del simulador |
 | [`docs/ux/pantallas.md`](docs/ux/pantallas.md) | Pantallas y comportamiento del dashboard |
 | [`docs/performance.md`](docs/performance.md) | Mediciones de índices |
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-007) |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-009) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta
