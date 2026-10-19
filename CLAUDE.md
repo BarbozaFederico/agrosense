@@ -21,19 +21,20 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 - Idioma: **español** para documentación, comentarios, commits y explicaciones. Identificadores y nombres de colecciones y campos en español, `snake_case`, sin tildes ni eñes (`viñedo` → `vinedo`).
 - No inventes datos ni cifras. Todo dato lleva una de dos marcas: **con fuente** (con la cita) o **supuesto adoptado** (decisión del equipo por falta de datos o de tiempo, registrada en un ADR; ver ADR-012). No dejes datos "a validar": si no hay fuente, se propone una opción y se adopta.
 - **Repo público:** nunca subas credenciales, cadenas de conexión con contraseña, `.env`, backups ni datos personales.
+- **Mantené la documentación al día, siempre, en el mismo cambio** (regla permanente): `CLAUDE.md` (tabla de ADR, estructura del repo, entorno, reglas de dominio y estado actual), `README.md` (índice de ADR y "Cómo ejecutarlo") y `CHANGELOG.md`. Si agregás un ADR, un módulo, un comando o un dato de configuración, actualizá esos archivos antes de pedir el commit. Si ves que alguno quedó atrasado, avisalo y corregilo.
 
 ## 3. Documentos del repo
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-009).
+Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-013).
 
 ## 4. Alcance del MVP
 
 - **3 fincas ficticias en 3 departamentos de Mendoza, 6 parcelas (2 por finca), 12 nodos (2 por parcela)**, 3 variables (temperatura, humedad de suelo, humedad de aire), 2 tipos de alerta (helada y riego).
 - Variedad: **Malbec** en las 6 parcelas; una "variedad simulada X" es opcional al final (ADR-004).
 - Colecciones: `fincas`, `parcelas`, `nodos`, `lecturas`, `alertas`, `riegos`, `eventos_climaticos`, `observaciones_fenologicas` y las colecciones de configuración `variedades` y `configuracion` (ADR-003, ADR-004 y ADR-006). Campos, tipos y relaciones en `docs/modelo-datos.md`.
-- Temporada simulada: 1/9/2026 a 31/3/2027, 1 lectura cada 5 minutos por nodo, unas 732.700 lecturas; 6 a 8 noches de helada entre septiembre y noviembre.
+- Temporada simulada: 1/9/2026 a 31/3/2027, 1 lectura cada 5 minutos por nodo, 727.980 lecturas (12 × 61.056 = 732.672, menos los cortes de reporte y un nodo en mantenimiento); 8 noches de helada entre septiembre y octubre (San Rafael 3, San Martín 2, Tupungato 3), 5 con alerta.
 - **Dashboard web de escritorio con Streamlit: obligatorio.** 4 pantallas, tema oscuro, noche de helada precargada.
 - **Opcional (primero que se recorta):** simulación de la noche en vivo desde el dashboard (RF-14 y RF-15).
 - **Fuera de alcance:** siniestros, seguros, contratistas, cosechas, costos, hidrología, estaciones reales, versión móvil, alerta temprana y pronóstico climático, Docker y Atlas. Descartados en ADR-004: variable de altura y daño en porcentaje por etapa.
@@ -72,12 +73,17 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 | ADR-007 | `lecturas` no admite validador: se valida en el simulador y con una consulta de auditoría (`$nor` + `$jsonSchema`) |
 | ADR-008 | Esquemas, creación de colecciones, validación previa (`$documents` + `$jsonSchema`) y auditoría en Python (`pymongo`), paquete `db`. Q1 a Q10 siguen en `mongosh` |
 | ADR-009 | Límite de temperatura "sospechosa" por departamento (techo de generación del simulador y aviso de auditoría, sin rechazar ni excluir), noche extrema declarada en `configuracion.noche_extrema` (solo San Rafael, primera semana de octubre, piso −6,3 °C supuesto), y auditoría de dos ceros (mal formadas e inesperadas) |
+| ADR-010 | Seed base en `db/seeds/`: cargador único repetible, geometrías ficticias (rectángulos de 2 ha), etapas BBCH continuas de 0 a 99 con corte a la mitad entre yema dormida e hinchada |
+| ADR-011 | Umbrales de riego con la FAO-56 (`θFC − p × (θFC − θWP)`, p = 0,45, punto medio de la Tabla 19): franco 19,2 %, franco arenoso 17,6 %, pedregoso 7,8 % (loamy sand con 30 % de gravas, supuesto) |
+| ADR-012 | Cierre de supuestos: dos marcas, **con fuente** y **supuesto adoptado** (desaparece "a validar"); Tupungato −5,6 °C; parámetros del simulador |
+| ADR-013 | Diseño del simulador: noche extrema de ~7 h bajo cero, calendario de heladas según la etapa, 10 alertas de helada (5 noches × 2 parcelas), cierres con 1 h de histéresis, regla de grados-día de Q9 |
 
 ### Entorno
 
 - MongoDB Server 9.0 instalado como servicio de Windows. `mongosh` y MongoDB Database Tools se instalan aparte y deben estar en el PATH.
 - Los scripts de `db/` se corren desde la raíz con `python -m`, por ejemplo `python -m db.schemas.crear_colecciones`. La base se elige con `AGROSENSE_BD` (por defecto `agrosense`; las pruebas usan `agrosense_tests`).
 - Dependencias de Python en `requirements.txt` (raíz, versiones fijas). `install.sh` crea `.venv` e instala todo: en PowerShell se ejecuta con `bash install.sh`.
+- Para reconstruir los datos: `python -m db.seeds.cargar` (fincas, parcelas, nodos y configuración) y después `python -m simulator.generar` (la temporada, ~25 s). Pruebas: `python -m db.schemas.probar_esquemas` y `python -m simulator.probar_simulador` (usan `agrosense_tests`). Ver `docs/simulador.md`.
 
 ## 6. Reglas de dominio
 
@@ -87,7 +93,7 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 - **Temperatura sospechosa** (ADR-009): una lectura de `temperatura_c` estrictamente más fría que `configuracion.sospechoso_minimo_c` de su departamento (San Rafael −4,5 °C y San Martín −2,8 °C, récord de septiembre del SMN; Tupungato −5,6 °C, supuesto adoptado calculado con La Consulta, ADR-012). No se rechaza ni se excluye de las consultas ni de las alertas: es el techo de generación del simulador (que falla con un mensaje claro si algún límite es `None`) y un aviso de la auditoría.
 - **Noche extrema** (ADR-009): la única noche que puede superar ese límite, declarada en `configuracion.noche_extrema` (`finca_id`, `inicio`, `fin`, `minimo_c`): San Rafael, 5/10/2026 de 03:00 a 08:00 hora de Argentina, piso −6,3 °C en el sensor (supuesto adoptado, ADR-012). Es la noche de helada precargada (RF-13).
 - **Alerta de helada:** se abre al superar el umbral y se cierra al recuperarse, guardando inicio, fin y mínima.
-- **Etapa fenológica:** se guarda en escala BBCH (numérica, permite consultas por rango); Baggiolini solo se muestra como equivalencia en el dashboard. Se estima por grados-día (Q9: base 10 °C, (Tmáx + Tmín)/2, tope de 32 °C, desde el 1/9; 260 grados-día de brotación a floración y 712 de floración a envero, Zapata 2017) y se corrige con observaciones manuales; si hay observación, manda la observación (ADR-004).
+- **Etapa fenológica:** se guarda en escala BBCH (numérica, permite consultas por rango); Baggiolini solo se muestra como equivalencia en el dashboard. Se estima por grados-día (Q9: base 10 °C, (Tmáx + Tmín)/2, tope de 32 °C, desde el 1/9; 260 grados-día de brotación a floración y 712 de floración a envero, Zapata 2017) y se corrige con observaciones manuales; si hay observación, manda la observación (ADR-004). La regla exacta (promedio de los 2 nodos, día local, grados-día hasta el día anterior) está en `docs/simulador.md` y Q9 tiene que usarla igual.
 - **Índice de riesgo de helada:** nivel base por el margen entre la mínima del brote y el umbral (bajo > 2 °C, medio 0 a 2 °C, alto ≤ 0 °C); sube un nivel por 2 h o más cerca del umbral, por aire seco (< 60 %) o por suelo seco. No es un porcentaje de daño (ADR-005).
 - **Riego y suelo por finca:** San Rafael surco y suelo franco; San Martín surco y franco arenoso; Tupungato goteo y pedregoso (ADR-005).
 - **Riego simulado mixto:** turnos fijos más riegos extra cuando se abre la alerta de riego. Surco: 76 mm brutos cada 7 días; goteo: 1,5 a 3,5 mm por día según el mes (ADR-004 y ADR-005).
@@ -136,17 +142,17 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001 a ADR-009
+│   ├── decisions/             # ADR-001 a ADR-013
 │   └── sprints/
 ├── db/                        # paquete de Python (python -m db.…)
 │   ├── conexion.py            # AGROSENSE_URI y AGROSENSE_BD
 │   ├── departamentos.py       # "San Martín" → san_martin
 │   ├── schemas/               # un esquema por colección, crear, validar y probar (ADR-008)
 │   ├── indexes/
-│   ├── seeds/
-│   └── queries/
-├── simulator/
-├── dashboard/                 # data.py, app.py
+│   ├── seeds/                 # cargador y datos fijos (python -m db.seeds.cargar), ADR-010
+│   └── queries/               # auditoría de lecturas y, pendientes, qN_nombre.js
+├── simulator/                 # temporada simulada (python -m simulator.generar), ADR-013
+├── dashboard/                 # data.py, app.py (pendiente)
 ├── scripts/
 ├── requirements.txt           # dependencias de Python (versiones fijas)
 ├── install.sh                 # crea .venv e instala requirements.txt
@@ -204,12 +210,17 @@ Reglas:
 
 - [ ] Hace lo que pide el issue y está dentro del alcance.
 - [ ] Probado (consulta ejecutada, resultado verificado o script corrido).
-- [ ] Documentación actualizada (`docs/`, comentario o ADR).
+- [ ] Documentación actualizada (`docs/`, comentario o ADR) y también `CLAUDE.md`, `README.md` y `CHANGELOG.md` (regla de la sección 2).
 - [ ] Commit con mensaje convencional y PR enlazado al issue.
 - [ ] Revisado por la otra persona del equipo.
 - [ ] Quien lo hizo entiende el cambio y puede explicarlo.
 - [ ] Sin credenciales ni datos sensibles (el repo es público).
 
-## 13. Pendientes conocidos
+## 13. Estado actual y pendientes
 
+**Hecho (19/10/2026):** documentación y ADR-001 a ADR-013; esquemas `$jsonSchema` de las 10 colecciones con 62 pruebas; seed base; umbrales de riego; simulador de la temporada (727.980 lecturas, alertas, riegos y observaciones, con 51 pruebas); base `agrosense` cargada y auditada.
+
+**Falta:** consultas Q1 a Q10 en `db/queries/`; índices y mediciones con `explain` en `docs/performance.md`; dashboard con 4 pantallas; backup con restauración y roles; opcionales (variedad simulada X, simulación en vivo).
+
+**Pendientes conocidos:**
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).

@@ -38,18 +38,9 @@ Quedaban unas 60 marcas "a validar" en código y documentos. Con la entrega el 2
 | 14 | Observaciones fenológicas | 42: una por parcela el día 15 de cada mes, de setiembre a marzo. La etapa es la de Q9 salvo en 2, que difieren en una etapa y muestran que la observación manda (ADR-004). El observador alterna entre `tecnico` y `encargado` |
 | 15 | Fecha de referencia inicial del dashboard | **5/10/2026 06:30** hora de Argentina, con la alerta de la noche extrema abierta |
 
-## Calendario propuesto de las 8 noches (las fechas exactas las fija el simulador)
+## Calendario de las 8 noches
 
-| Finca | Noche | Mínima del sensor | Resultado |
-|---|---|---|---|
-| San Rafael | 5/10 (extrema) | −6,3 °C | Alerta |
-| San Rafael | 1 en setiembre | ≈ −4,3 °C | Alerta (yema hinchada, umbral −6,1 °C del brote) |
-| San Rafael | 1 en setiembre | ≈ −3 °C | Sin cruzar, riesgo "medio" |
-| San Martín | 1 después del 18/9 | ≤ −2 °C | Alerta (brotación, umbral −3,9 °C) |
-| San Martín | 1 después del 18/9 | ≈ −1 °C | Sin cruzar, riesgo "medio" |
-| Tupungato | 1 en setiembre | ≈ −4,5 °C | Alerta (yema hinchada) |
-| Tupungato | 1 en setiembre | ≈ −1,5 °C | Sin cruzar, riesgo "bajo" |
-| Tupungato | 1 en octubre, después de la brotación (~3/10) | ≤ −2 °C | Alerta |
+El calendario orientativo que figuraba acá se reemplazó al implementar el simulador: las fechas dependen de la etapa de cada finca (por ejemplo, en Tupungato la yema está dormida hasta mediados de setiembre y no puede haber alerta). Las fechas finales y la explicación están en [ADR-013](ADR-013-diseno-del-simulador.md) y en [`simulador.md`](../simulador.md). Se mantiene el reparto (San Rafael 3, San Martín 2, Tupungato 3; 5 noches con alerta y 3 que quedan cerca del umbral sin cruzarlo: 2 "medio" y 1 "bajo").
 
 Ningún valor supera el límite de "sospechoso" de su departamento, salvo la noche extrema de San Rafael (ADR-009).
 
