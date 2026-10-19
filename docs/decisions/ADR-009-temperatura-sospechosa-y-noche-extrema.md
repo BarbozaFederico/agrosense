@@ -6,7 +6,7 @@
 
 El campo `configuracion.sospechoso_minimo_c` se había agregado como el límite de temperatura "sospechosa" por departamento (récord de septiembre del SMN), pero **ningún componente lo usaba**: solo la documentación del simulador lo mencionaba, como techo de frío para generar las noches de helada.
 
-Al revisarlo apareció un conflicto: el propio proyecto documenta heladas de septiembre de 2026 en el departamento de San Rafael de −7,4 a −8,3 °C (prensa, a validar), mucho más frías que el límite de −4,5 °C. Y la noche de helada precargada (RF-13) tiene que verse en el dashboard con alerta, lo que depende de la etapa de la planta ese día.
+Al revisarlo apareció un conflicto: el propio proyecto documenta heladas de septiembre de 2026 en el departamento de San Rafael de −7,4 a −8,3 °C (prensa; cifras sin verificación independiente, ADR-012), mucho más frías que el límite de −4,5 °C. Y la noche de helada precargada (RF-13) tiene que verse en el dashboard con alerta, lo que depende de la etapa de la planta ese día.
 
 ## Decisiones
 
@@ -18,7 +18,7 @@ Al revisarlo apareció un conflicto: el propio proyecto documenta heladas de sep
 | 2 | Con qué se compara | Con `temperatura_c`, la lectura del sensor (abrigo), igual que el récord del SMN. Es sospechosa si es **estrictamente menor** que el límite | Compararla con la temperatura del brote (mezclaría alturas) |
 | 3 | Rango del campo | Solo `maximum: 0` en el esquema. Una prueba verifica que cada límite sea más cálido que el mínimo "imposible" de `lecturas.py`, sin copiar ese valor | Rango −40 a 0 en el esquema (repite un valor provisional); sin rango |
 | 4 | Un valor o uno por mes | **Un valor por departamento**: el récord de septiembre, el mes más frío de la temporada | Un valor por departamento y por mes (21 valores, uno de ellos sin fuente) |
-| 5 | Tupungato | `null` (a validar). El simulador **falla con un mensaje claro** si intenta generar heladas allí sin valor, y la auditoría avisa "no auditado" sin contarlo como falla | Valor provisional de un pronóstico del INTA; copiar el de otro departamento (ambos serían inventar) |
+| 5 | Tupungato | `null` (**reemplazado por [ADR-012](ADR-012-cierre-de-supuestos.md): −5,6 °C**). El simulador **falla con un mensaje claro** si intenta generar heladas allí sin valor, y la auditoría avisa "no auditado" sin contarlo como falla | Valor provisional de un pronóstico del INTA; copiar el de otro departamento (ambos serían inventar) |
 
 **La noche extrema**
 
@@ -27,7 +27,7 @@ Al revisarlo apareció un conflicto: el propio proyecto documenta heladas de sep
 | 6 | Qué noches pueden superar el límite | **Una sola noche, en San Rafael**, donde el evento de 2026 está documentado | La noche precargada en las tres fincas (dos no tienen cifra); cualquier noche "severa" |
 | 7 | Cómo se declara | En `configuracion.noche_extrema`: `{finca_id, inicio, fin, minimo_c}`, objeto único, con ventana explícita en UTC. El seed genera de ahí el evento climático | Declararla solo como evento climático (la auditoría se complica y no impone el alcance); no declararla (una anomalía real se confundiría con la noche extrema) |
 | 8 | Cuándo | **Primera semana de octubre de 2026** (3 al 10), justo después de la brotación estimada (~1/10), cuando el umbral es −3,9 °C y la alerta se ve. El seed fija las horas y comprueba la etapa con Q9 | La fecha real del evento (7/9): según el modelo la planta está en yema dormida o hinchada y la alerta puede no verse |
-| 9 | Piso | **−6,3 °C** en el sensor: la cifra de prensa (−8,3 °C) menos Δ (2 °C), **supuesto** (se presume que la prensa informó nivel del cultivo y no abrigo). A validar | Esperar la investigación con `null`; usar −8,3 °C tal cual |
+| 9 | Piso | **−6,3 °C** en el sensor: la cifra de prensa (−8,3 °C) menos Δ (2 °C), **supuesto** (se presume que la prensa informó nivel del cultivo y no abrigo); confirmado como supuesto adoptado en [ADR-012](ADR-012-cierre-de-supuestos.md) | Esperar la investigación con `null`; usar −8,3 °C tal cual |
 
 **La auditoría** (`db/queries/auditoria_lecturas.py`)
 
@@ -43,6 +43,6 @@ Al revisarlo apareció un conflicto: el propio proyecto documenta heladas de sep
 - Las reglas que el esquema no puede expresar (porque comparan dos campos) están en `configuracion.verificar_coherencia()`: cada límite más cálido que el mínimo imposible, `inicio < fin`, y piso de la noche extrema más frío que el límite de su finca. La usan las pruebas y la va a usar el seed.
 - El "resultado esperado: 0" del ADR-007 pasa a ser **dos ceros**: mal formadas e inesperadas.
 - La fecha exacta de la noche extrema, y la comprobación de que la parcela esté en BBCH 07 o más ese día, se resuelven al armar el seed.
-- **El seed completo espera a Tupungato:** con su límite en `null` el simulador no genera heladas allí. Se desbloquea con la investigación de Tupungato (`docs/investigacion/`).
-- **Pendientes a validar:** el piso de −6,3 °C (depende de si la prensa informó abrigo o nivel del cultivo), el límite de Tupungato y que las cifras de prensa del evento de 2026 sean confiables.
+- **Tupungato quedó resuelto en [ADR-012](ADR-012-cierre-de-supuestos.md):** con el límite en −5,6 °C el simulador ya puede generar heladas allí.
+- **Supuestos cerrados por [ADR-012](ADR-012-cierre-de-supuestos.md):** el piso de −6,3 °C (se presume que la prensa informó nivel del cultivo y no abrigo), el límite de Tupungato (−5,6 °C) y las cifras de prensa del evento de 2026, que se usan sin verificación independiente.
 - Se agregó `db/departamentos.py` para traducir `"San Martín"` a la clave `san_martin`.

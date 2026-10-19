@@ -14,7 +14,7 @@ Antes del simulador hace falta cargar los datos que no cambian durante la tempor
 | 2 | Geometrías | **Rectángulos calculados desde un centro ficticio**: cada parcela mide unas 2 ha (~141 × 141 m), la finca es el rectángulo que envuelve sus 2 parcelas y los nodos caen dentro de su parcela | Polígonos irregulares escritos a mano (más trabajo y riesgo de nodos fuera de su parcela) |
 | 3 | Etapas previas a la brotación | **Etapas BBCH continuas de 0 a 99.** Los 70 grados-día desde el 1/9 hasta la brotación se parten a la mitad: yema dormida de 0 a 35 y yema hinchada de 35 a 70. Las etapas sin umbral con fuente llevan `umbral_helada_c: null` | Solo las 7 etapas con umbral (huecos en Q9); pre-brotación como una sola etapa (pierde el −10,6 °C documentado) |
 
-## Supuestos que introduce (a validar)
+## Supuestos que introduce (adoptados en ADR-012)
 
 - El corte de 35 grados-día entre yema dormida e yema hinchada es **supuesto**: ninguna fuente lo da. Los 70 grados-día hasta la brotación ya eran un supuesto (`vid-malbec.md`, calibrado con Chacras de Coria).
 - Las coordenadas de las fincas son **ficticias**: no representan fincas reales.

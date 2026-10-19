@@ -32,7 +32,7 @@ def documentos() -> list[dict]:
         "inicio": NOCHE_EXTREMA["inicio"],
         "fin": NOCHE_EXTREMA["fin"],
         "area": rectangulo(CENTROS_FINCA[NOCHE_EXTREMA["finca_id"]], ancho, alto),
-        "temperatura_minima_c": NOCHE_EXTREMA["minimo_c"],   # supuesto, a validar (ADR-009)
+        "temperatura_minima_c": NOCHE_EXTREMA["minimo_c"],   # supuesto adoptado (ADR-012)
         "descripcion": "Noche de helada precargada (RF-13), San Rafael. Datos simulados.",
         "fuente": "seed",
     }]

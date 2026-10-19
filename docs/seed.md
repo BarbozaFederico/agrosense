@@ -54,13 +54,15 @@ Con umbrales de riego de prueba (no verificados, solo para ejercitar el flujo):
 - Casos negativos detectados: hueco en las etapas, nodo con la finca de otra parcela, noche extrema en una finca sin límite, nodo fuera de su parcela.
 - Una parcela mide 141,5 × 141,4 m (2,00 ha). El evento de la noche extrema toca `P-SR-1` y `P-SR-2` y ninguna otra parcela.
 
-## Supuestos y pendientes
+## Supuestos adoptados
 
-- Coordenadas de los centros de las fincas: ficticias, a validar que caigan dentro de cada departamento.
+Ninguno queda pendiente: todos son decisiones del equipo por falta de datos o de tiempo ([ADR-012](decisions/ADR-012-cierre-de-supuestos.md)).
+
+- Coordenadas de los centros de las fincas: ficticias, cerca de cada departamento.
 - Altitudes: las de las estaciones de referencia, aproximadas.
 - Conducción (espaldero), densidad (4.000 plantas/ha) y superficie (2 ha): supuestos.
 - Corte de 35 grados-día entre yema dormida e hinchada y 70 hasta la brotación: supuestos (ADR-010).
 - Grados-día de las etapas intermedias: supuestos e interpolación; con fuente solo 260 (floración) y 972 (envero).
-- Límite de "sospechoso" de Tupungato: `None`, a validar (ADR-009).
-- Piso de −6,3 °C de la noche extrema: supuesto, a validar.
+- Límite de "sospechoso" de Tupungato: −5,6 °C, calculado con La Consulta (ADR-012).
+- Piso de −6,3 °C de la noche extrema: cifra de prensa menos Δ de 2 °C (ADR-012).
 - `umbrales_riego`: franco 19,2 %, franco arenoso 17,6 % y pedregoso 7,8 %. El pedregoso se apoya en dos supuestos (loamy sand y 30 % de gravas, inventado); el punto medio de la Tabla 19 es un cálculo propio (ADR-011).

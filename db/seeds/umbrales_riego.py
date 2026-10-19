@@ -25,7 +25,7 @@ Datos y fuentes (ADR-011):
     pedregoso (SUPUESTO)   Loamy sand               0,11 – 0,19   0,03 – 0,10  0,15 / 0,065 × (1 − 0,30)
 
 Pedregoso: la FAO no tiene una clase "pedregoso" (las piedras no son una textura). DOS
-SUPUESTOS, A VALIDAR (ADR-011):
+SUPUESTOS ADOPTADOS (ADR-011 y ADR-012):
     1. La tierra fina se trata como loamy sand. La elección se apoya en descripciones de
        bodegas (Zuccardi 2024), que solo sirven de contexto.
     2. Las gravas ocupan el 30 % del volumen (RV_PEDREGOSO = 0,30), valor INVENTADO e
@@ -51,7 +51,7 @@ RV_PEDREGOSO = Decimal("0.30")
 SUELOS = {
     "franco": (Decimal("0.25"), Decimal("0.12")),             # Loam
     "franco_arenoso": (Decimal("0.23"), Decimal("0.11")),     # Sandy loam
-    # Loamy sand (punto medio 0,15 / 0,065) menos las gravas: SUPUESTO, a validar.
+    # Loamy sand (punto medio 0,15 / 0,065) menos las gravas: supuesto adoptado.
     "pedregoso": (Decimal("0.15") * (1 - RV_PEDREGOSO), Decimal("0.065") * (1 - RV_PEDREGOSO)),
 }
 

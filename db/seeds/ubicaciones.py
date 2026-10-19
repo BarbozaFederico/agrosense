@@ -5,7 +5,7 @@ así la finca contiene a sus parcelas y cada nodo cae dentro de su parcela por
 construcción.
 
 TODO ES FICTICIO: los centros son coordenadas aproximadas dentro de cada departamento,
-no representan fincas reales. A validar: que el punto quede dentro del departamento.
+no representan fincas reales. Supuesto adoptado (ADR-012): el punto cae cerca del departamento.
 
 Esquema de cada finca (vista desde arriba, el este a la derecha):
 

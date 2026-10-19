@@ -1,7 +1,7 @@
 """Datos de `fincas` (3 fincas ficticias). Esquema: db/schemas/fincas.py.
 
 Sistema de riego y suelo por finca: ADR-005 (decisiones 4 y 5).
-Altitud: la de la estación de referencia de cada zona, aproximada (a validar):
+Altitud: la de la estación de referencia de cada zona, aproximada (supuesto adoptado, ADR-012):
     San Rafael Aero (SMN) 751 m · San Martín (SMN) 653 m · El Peral (DACC) 1.300 m
     (docs/investigacion/verificacion-fuentes.md).
 """

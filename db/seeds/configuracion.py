@@ -11,9 +11,9 @@ NOMBRE = "configuracion"
 
 # Noche extrema precargada (RF-13, ADR-009). San Rafael, primera semana de octubre de 2026.
 #   inicio y fin: 5/10/2026 de 03:00 a 08:00 hora de Argentina (UTC-3), o sea 06:00 a 11:00 UTC.
-#     PROVISORIO: las horas exactas se fijan cuando exista el simulador, comprobando con Q9
-#     que las parcelas de San Rafael estén en BBCH 07 o más esa noche (ADR-009, decisión 8).
-#   minimo_c: -6,3 °C en el sensor. SUPUESTO, a validar: la cifra de prensa (-8,3 °C) menos
+#     Fijadas en ADR-012 (decisión 3): el simulador calibra el clima de setiembre de San Rafael
+#     para que las parcelas estén en BBCH 07 o más esa noche, y se comprueba con Q9.
+#   minimo_c: -6,3 °C en el sensor. Supuesto adoptado (ADR-012): la cifra de prensa (-8,3 °C) menos
 #     delta_brote_c (2 °C), porque se presume que la prensa informó nivel del cultivo.
 NOCHE_EXTREMA = {
     "finca_id": "F-SR",
@@ -38,7 +38,7 @@ def documentos(umbrales=None) -> list[dict]:
         "sospechoso_minimo_c": {               # récord de septiembre de las normales 1991-2020 del SMN
             "san_rafael": -4.5,                # San Rafael Aero (verificacion-fuentes.md, sección 1)
             "san_martin": -2.8,                # San Martín
-            "tupungato": None,                 # sin estación del SMN: A VALIDAR (ADR-009, decisión 5)
+            "tupungato": -5.6,                 # sin estación del SMN: supuesto adoptado (ADR-012, decisión 2)
         },
         "noche_extrema": NOCHE_EXTREMA,
         "riesgo": {                            # cortes del índice de riesgo, adaptados de la FAO (ADR-005)

@@ -25,7 +25,7 @@ Antes de escribir los `$jsonSchema` hacía falta definir los campos de cada cole
 
 ## Aclaración: tipo de evento climático (decisión 12, 16/10/2026)
 
-La primera versión del modelo permitía `"helada"` y `"granizo"` en `eventos_climaticos.tipo`, y el segundo valor estaba marcado "a validar". Se decidió dejar **solo `"helada"`**.
+La primera versión del modelo permitía `"helada"` y `"granizo"` en `eventos_climaticos.tipo`, y el segundo valor estaba marcado como pendiente. Se decidió dejar **solo `"helada"`**.
 
 - **Por qué:** los sensores del MVP miden temperatura, humedad de suelo y humedad del aire (CLAUDE.md, sección 4). Ninguno detecta granizo, y las alertas del MVP son solo de helada y de riego. Un tipo que ningún dato del proyecto puede producir ni consultar sería un valor muerto en el esquema.
 - **Qué no cambia:** el granizo sigue siendo parte del **contexto del problema** (`docs/vision.md` y `docs/investigacion/contexto-problema.md`); lo que se descarta es modelarlo como evento.

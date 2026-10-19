@@ -19,7 +19,7 @@ La alerta compara el umbral con la **temperatura estimada en el brote**, no con 
 | **Temperatura estimada en el brote.** En noches calmas el brote está 1 a 3 °C más frío que el abrigo (Trought et al. 1999; FAO 2005). Más realista | Temperatura del sensor: más simple, pero subestima el riesgo |
 
 - La lectura del sensor se guarda tal cual; Δ es un parámetro de configuración.
-- El proyecto no mide viento ni nubosidad, así que **Δ = 2 °C fijo** (supuesto, a validar). Es configurable.
+- El proyecto no mide viento ni nubosidad, así que **Δ = 2 °C fijo** (supuesto adoptado, ADR-012). Es configurable.
 
 ### 2. Índice de riesgo de helada (Q10): margen más agravantes
 

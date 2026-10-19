@@ -90,7 +90,7 @@ bd.lecturas.insert_many(validos)
 | `lecturas` | Temperatura entre −40 y 60 °C, humedades entre 0 y 100 %: descarta valores imposibles |
 | `observaciones_fenologicas` | `observador` solo acepta un rol (`"tecnico"`, `"encargado"`), nunca un nombre |
 | `configuracion` | Un solo documento, con `_id: "general"` |
-| `configuracion` | `sospechoso_minimo_c`: cada límite es un número ≤ 0 o `None` (Tupungato, a validar); no admite claves con tilde ni de más |
+| `configuracion` | `sospechoso_minimo_c`: cada límite es un número ≤ 0 o `None` (hoy los tres tienen valor, ADR-012); no admite claves con tilde ni de más |
 | `configuracion` | `noche_extrema`: `{finca_id, inicio, fin, minimo_c}`, todos obligatorios, fechas de tipo fecha y `minimo_c` ≤ 0 |
 
 ## Reglas que el esquema no puede expresar
@@ -208,6 +208,5 @@ Aprueba si mal formadas = 0 e inesperadas = 0; si no, termina con código 1. Las
 
 - Usar `validar_documentos` en el simulador cuando se escriba.
 - Índices (`db/indexes/`), que van en una tarea aparte.
-- Validar `configuracion.sospechoso_minimo_c.tupungato` (hoy `None`): Tupungato no tiene estación del SMN. Bloquea el seed completo (ADR-009).
-- Validar el piso de la noche extrema (−6,3 °C, supuesto): depende de si la prensa informó temperatura de abrigo o de nivel del cultivo.
-- Fijar las horas exactas de la noche extrema al armar el seed, comprobando con Q9 que la parcela de San Rafael esté en BBCH 07 o más.
+- Comprobar con Q9, cuando exista el simulador, que la parcela de San Rafael esté en BBCH 07 o más la noche extrema (5/10/2026, ADR-012).
+- Los límites de temperatura sospechosa (Tupungato −5,6 °C) y el piso de la noche extrema (−6,3 °C) son supuestos adoptados (ADR-012), no pendientes.

@@ -169,8 +169,8 @@ Un único documento con `_id: "general"`.
 |---|---|---|
 | `delta_brote_c` | number | Δ entre sensor y brote: 2 °C (ADR-005, supuesto) |
 | `nodo_inactivo_min` | int | Minutos sin lecturas para considerar un nodo inactivo: 30 |
-| `sospechoso_minimo_c` | objeto | Límite de "sospechoso" de la temperatura del sensor (`temperatura_c`) por departamento (°C), con `maximum: 0`: `san_rafael` −4,5 y `san_martin` −2,8 (récord de septiembre del SMN, [`verificacion-fuentes.md`](investigacion/verificacion-fuentes.md)); `tupungato` en `null`, a validar (sin estación del SMN). Una lectura estrictamente más fría es sospechosa: no se rechaza ni se excluye, solo se cuenta en la auditoría ([ADR-009](decisions/ADR-009-temperatura-sospechosa-y-noche-extrema.md)) |
-| `noche_extrema` | objeto | La única noche que puede superar ese límite (RF-13): `{ finca_id, inicio, fin, minimo_c }`, ventana en UTC. Hoy: San Rafael, primera semana de octubre de 2026, `minimo_c` −6,3 °C (**supuesto**: cifra de prensa −8,3 °C menos Δ; a validar) ([ADR-009](decisions/ADR-009-temperatura-sospechosa-y-noche-extrema.md)) |
+| `sospechoso_minimo_c` | objeto | Límite de "sospechoso" de la temperatura del sensor (`temperatura_c`) por departamento (°C), con `maximum: 0`: `san_rafael` −4,5 y `san_martin` −2,8 (récord de septiembre del SMN, [`verificacion-fuentes.md`](investigacion/verificacion-fuentes.md)); `tupungato` −5,6 (sin estación del SMN: supuesto adoptado, calculado con La Consulta, [ADR-012](decisions/ADR-012-cierre-de-supuestos.md)). Una lectura estrictamente más fría es sospechosa: no se rechaza ni se excluye, solo se cuenta en la auditoría ([ADR-009](decisions/ADR-009-temperatura-sospechosa-y-noche-extrema.md)) |
+| `noche_extrema` | objeto | La única noche que puede superar ese límite (RF-13): `{ finca_id, inicio, fin, minimo_c }`, ventana en UTC. Hoy: San Rafael, 5/10/2026 de 03:00 a 08:00 hora de Argentina, `minimo_c` −6,3 °C (supuesto adoptado: cifra de prensa −8,3 °C menos Δ) ([ADR-009](decisions/ADR-009-temperatura-sospechosa-y-noche-extrema.md)) |
 | `riesgo` | objeto | Cortes del índice: `{ margen_bajo_c: 2, margen_alto_c: 0, horas_duracion: 2, margen_duracion_c: 1, aire_seco_pct: 60 }` |
 | `umbrales_riego` | objeto | Umbral de humedad de suelo (%) por tipo de suelo y período (`sep_oct`, `nov`, `dic_ene`, `feb_mar`) |
 
@@ -283,7 +283,7 @@ Coordenadas y nombres ficticios.
 
 // configuracion
 { _id: "general", delta_brote_c: 2, nodo_inactivo_min: 30,
-  sospechoso_minimo_c: { san_rafael: -4.5, san_martin: -2.8, tupungato: null /* a validar */ },
+  sospechoso_minimo_c: { san_rafael: -4.5, san_martin: -2.8, tupungato: -5.6 /* supuesto adoptado, ADR-012 */ },
   noche_extrema: { finca_id: "F-SR", inicio: ISODate("2026-10-05T06:00:00Z"), fin: ISODate("2026-10-05T11:00:00Z"), minimo_c: -6.3 /* supuesto */ },
   riesgo: { margen_bajo_c: 2, margen_alto_c: 0, horas_duracion: 2, margen_duracion_c: 1, aire_seco_pct: 60 },
   umbrales_riego: { franco: { sep_oct: 19.2, nov: 19.2, dic_ene: 19.2, feb_mar: 19.2 } /* ... */ } }  // ADR-011

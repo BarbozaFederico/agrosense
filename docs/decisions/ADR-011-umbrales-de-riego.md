@@ -25,7 +25,7 @@ El ADR-005 fijaba umbrales de humedad de suelo (franco 21 %, franco arenoso y pe
 
 La cuenta está en `db/seeds/umbrales_riego.py`. La estructura por período se mantiene en `configuracion.umbrales_riego` aunque hoy los 4 valores sean iguales, para poder ajustar `p` más adelante sin cambiar el esquema ni las consultas.
 
-## Supuestos y límites (a validar)
+## Supuestos y límites (adoptados en ADR-012)
 
 - **Rv = 0,30 es un valor inventado e ilustrativo.** Las gravas no retienen agua, así que reducen θFC y θWP del suelo completo; pero si el sensor midiera solo la tierra fina, el umbral a comparar sería 11,2 %. Elegir mal mueve el umbral unos 3 puntos.
 - **Tratar la tierra fina del suelo pedregoso como loamy sand** se apoya en descripciones de bodegas (Zuccardi 2024), no en mediciones.
