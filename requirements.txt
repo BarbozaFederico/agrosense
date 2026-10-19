@@ -4,6 +4,9 @@
 # Acceso a MongoDB (simulador, seeds y dashboard)
 pymongo==4.18.3
 
+# Simulador (arreglos de números; ya viene con Streamlit, se fija acá porque el simulador lo usa)
+numpy==2.5.4
+
 # Dashboard
 streamlit==1.65.0
 plotly==7.1.0
