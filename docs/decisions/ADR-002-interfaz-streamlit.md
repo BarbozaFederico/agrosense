@@ -10,6 +10,8 @@ El dashboard es parte obligatoria de la demo, corre en la notebook en local, es 
 
 Streamlit con Plotly, leyendo MongoDB con `pymongo`. Toda consulta vive en `dashboard/data.py`; `app.py` solo presenta.
 
+> **Ajustado por [ADR-014](ADR-014-consultas-en-python.md) (20/10/2026):** las consultas Q1 a Q10 viven en `db/queries/` y `dashboard/data.py` las importa y les agrega el caché (`st.cache_data`), en lugar de reescribirlas. `app.py` sigue sin hablar con MongoDB.
+
 ## Alternativas evaluadas
 
 | Opción | Resultado | Motivo |

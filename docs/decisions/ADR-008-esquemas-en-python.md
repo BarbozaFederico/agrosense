@@ -16,7 +16,7 @@ Los esquemas, la creación de las colecciones, la validación previa de lecturas
 - `db/schemas/validar.py`: el simulador valida con el mismo esquema usando `$documents` + `$jsonSchema`, sin guardar ([spike de esquemas, prueba 4](../spikes/spike-esquemas-validacion.md)).
 - `db/queries/auditoria_lecturas.py`: la auditoría del ADR-007.
 
-Las consultas Q1 a Q10 siguen en `mongosh` (`db/queries/qN_nombre.js`), como dice `CLAUDE.md`.
+Las consultas Q1 a Q10 seguían en `mongosh` (`db/queries/qN_nombre.js`) cuando se escribió este ADR. **Reemplazado por [ADR-014](ADR-014-consultas-en-python.md) (20/10/2026): también van en Python con `pymongo`** (`db/queries/qN_nombre.py`).
 
 ## Alternativas
 
