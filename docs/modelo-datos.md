@@ -286,7 +286,7 @@ Coordenadas y nombres ficticios.
   sospechoso_minimo_c: { san_rafael: -4.5, san_martin: -2.8, tupungato: null /* a validar */ },
   noche_extrema: { finca_id: "F-SR", inicio: ISODate("2026-10-05T06:00:00Z"), fin: ISODate("2026-10-05T11:00:00Z"), minimo_c: -6.3 /* supuesto */ },
   riesgo: { margen_bajo_c: 2, margen_alto_c: 0, horas_duracion: 2, margen_duracion_c: 1, aire_seco_pct: 60 },
-  umbrales_riego: { franco: { sep_oct: 21, nov: 21.5, dic_ene: 18.5, feb_mar: 20 } /* ... */ } }
+  umbrales_riego: { franco: { sep_oct: 19.2, nov: 19.2, dic_ene: 19.2, feb_mar: 19.2 } /* ... */ } }  // ADR-011
 ```
 
 Los valores de umbrales, grados-día y riego salen de ADR-005 y `investigacion/`; los marcados como supuesto ahí siguen siéndolo acá.

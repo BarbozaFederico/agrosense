@@ -25,7 +25,7 @@ python -m db.seeds.cargar
 
 Se puede repetir: borra y vuelve a insertar solo lo del seed. No toca `lecturas`, `alertas`, `riegos` ni `observaciones_fenologicas`. Si una validación falla, termina con código 1 sin escribir nada.
 
-**Hoy no puede cargar `configuracion`:** `db/seeds/umbrales_riego.py` está en `None` hasta verificar la Tabla 19 de la FAO-56. El cargador se detiene con un mensaje claro y no escribe nada.
+Los umbrales de riego se calculan en `db/seeds/umbrales_riego.py` con la Tabla 19 de la FAO-56 ([ADR-011](decisions/ADR-011-umbrales-de-riego.md)). Si ese archivo valiera `None`, el cargador se detendría con un mensaje claro sin escribir nada.
 
 ## Archivos
 
@@ -34,7 +34,7 @@ Se puede repetir: borra y vuelve a insertar solo lo del seed. No toca `lecturas`
 | `db/seeds/cargar.py` | Cargador: arma, valida, carga y comprueba la geografía |
 | `db/seeds/ubicaciones.py`, `geometria.py` | Medidas y centros ficticios; de acá salen las geometrías |
 | `db/seeds/fincas.py`, `parcelas.py`, `nodos.py`, `variedades.py`, `configuracion.py`, `eventos_climaticos.py` | Datos de cada colección, con la fuente y la marca (supuesto, con fuente) de cada valor |
-| `db/seeds/umbrales_riego.py` | Umbrales de riego, pendientes |
+| `db/seeds/umbrales_riego.py` | Umbrales de riego: fórmula, datos de la Tabla 19 y su cuenta |
 
 ## Qué comprueba el cargador
 
@@ -63,4 +63,4 @@ Con umbrales de riego de prueba (no verificados, solo para ejercitar el flujo):
 - Grados-día de las etapas intermedias: supuestos e interpolación; con fuente solo 260 (floración) y 972 (envero).
 - Límite de "sospechoso" de Tupungato: `None`, a validar (ADR-009).
 - Piso de −6,3 °C de la noche extrema: supuesto, a validar.
-- `umbrales_riego`: pendientes de la Tabla 19 de la FAO-56.
+- `umbrales_riego`: franco 19,2 %, franco arenoso 17,6 % y pedregoso 7,8 %. El pedregoso se apoya en dos supuestos (loamy sand y 30 % de gravas, inventado); el punto medio de la Tabla 19 es un cálculo propio (ADR-011).

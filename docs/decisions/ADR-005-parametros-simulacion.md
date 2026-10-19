@@ -67,6 +67,8 @@ Los valores de WSU son temperaturas de 10 % de daño, medidas en laboratorio en 
 
 ### 5. Suelo por finca
 
+> **Corregido por [ADR-011](ADR-011-umbrales-de-riego.md) (19/10/2026):** las columnas de capacidad de campo y umbral de riego de esta tabla no salían de la Tabla 19 de la FAO-56. Los umbrales vigentes son franco 19,2 %, franco arenoso 17,6 % y pedregoso 7,8 %. La elección de un suelo por finca no cambia.
+
 | Finca | Suelo | Capacidad de campo | Umbral de riego (sept-oct) | Marca |
 |---|---|---|---|---|
 | San Rafael | Franco | ~28 % | ~21 % | supuesto (sin fuente de suelos para San Rafael) |

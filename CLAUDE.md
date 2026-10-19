@@ -91,7 +91,7 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 - **Índice de riesgo de helada:** nivel base por el margen entre la mínima del brote y el umbral (bajo > 2 °C, medio 0 a 2 °C, alto ≤ 0 °C); sube un nivel por 2 h o más cerca del umbral, por aire seco (< 60 %) o por suelo seco. No es un porcentaje de daño (ADR-005).
 - **Riego y suelo por finca:** San Rafael surco y suelo franco; San Martín surco y franco arenoso; Tupungato goteo y pedregoso (ADR-005).
 - **Riego simulado mixto:** turnos fijos más riegos extra cuando se abre la alerta de riego. Surco: 76 mm brutos cada 7 días; goteo: 1,5 a 3,5 mm por día según el mes (ADR-004 y ADR-005).
-- **Alerta de riego:** se abre cuando la humedad de suelo baja del umbral del suelo de la finca en ese período (por ejemplo, franco ~21 % en septiembre y octubre). Los umbrales son adaptados de la FAO-56 (ADR-003 y ADR-005).
+- **Alerta de riego:** se abre cuando la humedad de suelo baja del umbral del suelo de la finca en ese período (por ejemplo, franco 19,2 %). Los umbrales se calculan con la FAO-56: `θFC − p × (θFC − θWP)` con p = 0,45 (Tablas 19 y 22). Franco 19,2 %, franco arenoso 17,6 % y pedregoso 7,8 % (supuesto, a validar), iguales en los 4 períodos (ADR-011).
 
 ## 7. Consultas que el modelo debe resolver
 
