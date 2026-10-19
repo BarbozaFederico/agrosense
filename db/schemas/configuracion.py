@@ -26,7 +26,8 @@ UMBRALES_SUELO = {
 }
 
 # Un límite de frío: número que no puede ser positivo (un límite de frío > 0 °C es un
-# error de carga), o vacío (None) para dejarlo "pendiente de validar".
+# error de carga), o vacío (None) si un departamento no tiene límite (el simulador falla con
+# un mensaje claro y la auditoría avisa "no auditado"). Hoy los tres tienen valor (ADR-012).
 LIMITE_FRIO_O_NULL = {"bsonType": ["double", "int", "long", "null"], "maximum": 0}
 
 # Límite de "sospechoso" de la temperatura del sensor (temperatura_c, de abrigo), por
@@ -39,9 +40,9 @@ LIMITE_FRIO_O_NULL = {"bsonType": ["double", "int", "long", "null"], "maximum": 
 # Las claves van en snake_case y sin tildes (CLAUDE.md, sección 2): san_rafael, san_martin.
 # Valores: récord de septiembre de las normales 1991-2020 del SMN
 # (docs/investigacion/verificacion-fuentes.md).
-# Tupungato no tiene estación del SMN: queda en None, A VALIDAR (el simulador falla
-# si intenta generar heladas allí sin valor; la auditoría avisa "no auditado").
-# La referencia de La Consulta (-7,3 °C, mínima anual media) es solo contexto, no un límite.
+# Tupungato no tiene estación del SMN: -5,6 °C, supuesto adoptado (ADR-012). Se calcula con
+# la diferencia que hay en San Rafael entre su mínima anual media (-6,2 °C) y el récord de
+# setiembre (-4,5 °C): 1,7 °C, aplicada a la mínima anual media de La Consulta (-7,3 °C).
 SOSPECHOSO_MINIMO_C = {
     "bsonType": "object",
     "required": ["san_rafael", "san_martin", "tupungato"],
@@ -49,7 +50,7 @@ SOSPECHOSO_MINIMO_C = {
     "properties": {
         "san_rafael": LIMITE_FRIO_O_NULL,                        # -4,5 °C (SMN, San Rafael Aero)
         "san_martin": LIMITE_FRIO_O_NULL,                        # -2,8 °C (SMN, San Martín)
-        "tupungato": LIMITE_FRIO_O_NULL,                         # None: a validar
+        "tupungato": LIMITE_FRIO_O_NULL,                         # -5,6 °C (supuesto adoptado, ADR-012)
     },
 }
 
@@ -58,12 +59,12 @@ SOSPECHOSO_MINIMO_C = {
 #   finca_id:  finca donde ocurre (San Rafael, donde el evento de 2026 está documentado).
 #   inicio y fin: ventana explícita, en UTC (Argentina es UTC-3). El simulador la usa para
 #     generar y la auditoría para reconocer las lecturas "esperadas". Primera semana de
-#     octubre de 2026; las horas exactas las fija el seed, comprobando con Q9 que la
-#     parcela esté en BBCH 07 o más (si no, la alerta no se ve).
+#     octubre de 2026 (5/10, de 03:00 a 08:00 hora de Argentina, ADR-012); se comprueba con
+#     Q9 que la parcela esté en BBCH 07 o más (si no, la alerta no se ve).
 #   minimo_c:  piso del sensor esa noche. Ninguna lectura puede ser más fría.
-#     SUPUESTO: cifra de prensa del evento (-8,3 °C) menos delta_brote_c (2 °C), porque se
-#     presume que la prensa informó temperatura de nivel del cultivo y no de abrigo.
-#     A VALIDAR con la investigación (docs/investigacion/verificacion-fuentes.md).
+#     Supuesto adoptado (ADR-012): cifra de prensa del evento (-8,3 °C) menos delta_brote_c
+#     (2 °C), porque se presume que la prensa informó temperatura de nivel del cultivo y no de
+#     abrigo.
 NOCHE_EXTREMA = {
     "bsonType": "object",
     "required": ["finca_id", "inicio", "fin", "minimo_c"],

@@ -19,7 +19,7 @@ La alerta compara el umbral con la **temperatura estimada en el brote**, no con 
 | **Temperatura estimada en el brote.** En noches calmas el brote está 1 a 3 °C más frío que el abrigo (Trought et al. 1999; FAO 2005). Más realista | Temperatura del sensor: más simple, pero subestima el riesgo |
 
 - La lectura del sensor se guarda tal cual; Δ es un parámetro de configuración.
-- El proyecto no mide viento ni nubosidad, así que **Δ = 2 °C fijo** (supuesto, a validar). Es configurable.
+- El proyecto no mide viento ni nubosidad, así que **Δ = 2 °C fijo** (supuesto adoptado, ADR-012). Es configurable.
 
 ### 2. Índice de riesgo de helada (Q10): margen más agravantes
 
@@ -66,6 +66,8 @@ Los valores de WSU son temperaturas de 10 % de daño, medidas en laboratorio en 
 | **Surco en San Rafael y San Martín, goteo en Tupungato.** El 90 % de Mendoza riega por superficie; los viñedos de altura del Valle de Uco usan goteo. Q7 compara dos sistemas | Goteo en las tres (menos realista); surco en las tres (sin contraste) |
 
 ### 5. Suelo por finca
+
+> **Corregido por [ADR-011](ADR-011-umbrales-de-riego.md) (19/10/2026):** las columnas de capacidad de campo y umbral de riego de esta tabla no salían de la Tabla 19 de la FAO-56. Los umbrales vigentes son franco 19,2 %, franco arenoso 17,6 % y pedregoso 7,8 %. La elección de un suelo por finca no cambia.
 
 | Finca | Suelo | Capacidad de campo | Umbral de riego (sept-oct) | Marca |
 |---|---|---|---|---|

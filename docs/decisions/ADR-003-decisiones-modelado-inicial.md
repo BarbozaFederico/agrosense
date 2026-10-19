@@ -35,7 +35,7 @@ Antes de escribir `modelo-datos.md` y los esquemas, el equipo eligió entre dos 
 
 | Opción | Ventaja | Desventaja |
 |---|---|---|
-| **Umbral de humedad de suelo configurable (elegida)** | Usa la variable medida por los sensores | No hay umbral oficial: es un supuesto del proyecto, a validar |
+| **Umbral de humedad de suelo configurable (elegida)** | Usa la variable medida por los sensores | No hay umbral oficial: es un supuesto adoptado del proyecto (calculado con la FAO-56 en ADR-011) |
 | Días sin evento en `riegos` | No depende de sensores | Ignora la humedad medida |
 
 ## Consecuencias
