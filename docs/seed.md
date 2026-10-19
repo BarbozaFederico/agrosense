@@ -13,7 +13,7 @@
 | `nodos` | 12 | 2 por parcela, dentro de su parcela |
 | `eventos_climaticos` | 1 | Helada de la noche extrema (San Rafael) |
 
-No incluye todavía las observaciones fenológicas ni las horas definitivas de la noche extrema: dependen de las lecturas del simulador.
+No incluye las observaciones fenológicas: dependen de las lecturas y las carga el simulador (`python -m simulator.generar`, [`simulador.md`](simulador.md)). La noche extrema queda fijada: 5/10/2026 de 03:00 a 08:00 hora de Argentina ([ADR-012](decisions/ADR-012-cierre-de-supuestos.md)).
 
 ## Cómo se usa
 

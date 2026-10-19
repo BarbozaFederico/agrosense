@@ -63,13 +63,14 @@ agrosense/
 | [`docs/architecture.md`](docs/architecture.md) | Arquitectura y convenciones |
 | [`docs/modelo-datos.md`](docs/modelo-datos.md) | Modelo de datos |
 | [`docs/esquemas-validacion.md`](docs/esquemas-validacion.md) | Esquemas `$jsonSchema`: cómo se crean, se prueban y se auditan |
-| [`docs/simulador.md`](docs/simulador.md) | Escenarios y parámetros del simulador |
+| [`docs/simulador.md`](docs/simulador.md) | Simulador: qué genera, parámetros, calendario de heladas y pruebas |
 | [`docs/ux/pantallas.md`](docs/ux/pantallas.md) | Pantallas y comportamiento del dashboard |
 | [`docs/performance.md`](docs/performance.md) | Mediciones de índices |
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-009) |
+| [`docs/seed.md`](docs/seed.md) | Seed base: qué carga, cómo se usa y qué supuestos tiene |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-013) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta
@@ -85,7 +86,25 @@ Detalle en [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Cómo ejecutarlo
 
-*Se completa a medida que avanza el proyecto.* Pasos previstos: instalar MongoDB, crear el entorno de Python, cargar el seed y levantar el dashboard.
+Requisitos: MongoDB Server 9.0 en marcha, `mongosh` en el PATH y Python 3.10 o superior. Desde la raíz del repositorio (en PowerShell, `install.sh` se corre con `bash install.sh`):
+
+```bash
+bash install.sh                          # crea .venv e instala las dependencias
+source .venv/Scripts/activate            # Git Bash en Windows (en Linux y macOS: .venv/bin/activate)
+
+python -m db.schemas.crear_colecciones   # crea las 10 colecciones con sus validadores
+python -m db.seeds.cargar                # fincas, parcelas, nodos, variedad y configuración
+python -m simulator.generar              # la temporada simulada (~25 s) y su auditoría
+```
+
+Pruebas (usan la base `agrosense_tests`, no tocan `agrosense`):
+
+```bash
+python -m db.schemas.probar_esquemas     # 62 casos de los esquemas
+python -m simulator.probar_simulador     # 51 casos del simulador (~1 min)
+```
+
+La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* consultas Q1 a Q10, índices, dashboard, backup y roles.
 
 ## Equipo
 

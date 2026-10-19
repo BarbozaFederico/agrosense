@@ -19,10 +19,19 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - ADR-008: los esquemas, la creación de colecciones, la validación previa y la auditoría se escriben en Python (`pymongo`).
 - Paquete `db`: esquemas `$jsonSchema` de las 10 colecciones (`db/schemas/`), conexión configurable con `AGROSENSE_URI` y `AGROSENSE_BD`, creación de colecciones repetible sin perder datos, validación de lecturas sin guardar (`$documents` + `$jsonSchema`), auditoría de lecturas y prueba de 62 casos. Documentado en `docs/esquemas-validacion.md`.
 - Spike de esquemas de validación (4 pruebas): esquema cerrado, validador en series temporales, auditoría con `$nor` y validación desde Python.
-- ADR-009: límite de temperatura "sospechosa" por departamento (`configuracion.sospechoso_minimo_c`: San Rafael −4,5 °C y San Martín −2,8 °C, récord de septiembre del SMN; Tupungato `null`, a validar) y noche extrema declarada en `configuracion.noche_extrema` (San Rafael, primera semana de octubre, piso −6,3 °C supuesto). El límite es techo de generación del simulador y aviso de auditoría; no rechaza ni excluye lecturas.
+- ADR-009: límite de temperatura "sospechosa" por departamento (`configuracion.sospechoso_minimo_c`: San Rafael −4,5 °C y San Martín −2,8 °C, récord de septiembre del SMN; Tupungato `null`, resuelto después en ADR-012) y noche extrema declarada en `configuracion.noche_extrema` (San Rafael, primera semana de octubre, piso −6,3 °C supuesto). El límite es techo de generación del simulador y aviso de auditoría; no rechaza ni excluye lecturas.
 - Auditoría de lecturas con tres conteos (mal formadas, sospechosas esperadas e inesperadas) que aprueba con dos ceros y termina con código 1 si falla; `configuracion.verificar_coherencia()` con las reglas que el esquema no puede expresar; `db/departamentos.py`. La prueba pasó a 62 casos.
+- Seed base (`db/seeds/`, `python -m db.seeds.cargar`): 3 fincas, 6 parcelas, 12 nodos con geometrías ficticias, la variedad Malbec con 13 etapas BBCH continuas, la configuración y el evento de la noche extrema. Repetible, valida antes de escribir y comprueba la geografía. ADR-010 y `docs/seed.md`.
+- Umbrales de riego calculados con la Tabla 19 de la FAO-56 (franco 19,2 %, franco arenoso 17,6 %, pedregoso 7,8 %). ADR-011.
+- ADR-012: cierre de supuestos. `CLAUDE.md` define dos marcas, "con fuente" y "supuesto adoptado", y desaparece "a validar". Tupungato pasa a −5,6 °C como límite de temperatura sospechosa.
+- Simulador de la temporada (`simulator/`, `python -m simulator.generar`): 727.980 lecturas, 10 alertas de helada (5 noches × 2 parcelas), 25 de riego, 563 riegos y 42 observaciones fenológicas, con la auditoría en 0 y 0. Pruebas de 51 casos (`python -m simulator.probar_simulador`). ADR-013 y `docs/simulador.md`.
+- `numpy==2.5.4` en `requirements.txt`.
+- Pasos para ejecutar el proyecto en el README y estado actual en `CLAUDE.md`.
 
 ### Cambiado
+- Regla permanente en `CLAUDE.md`: `CLAUDE.md`, `README.md` y `CHANGELOG.md` se actualizan en el mismo cambio.
+- Umbrales de riego: los valores anteriores (21 y 13,5 %) no salían de la FAO-56 y se reemplazaron (ADR-011).
+- San Rafael brota ~30/9 con la regla de Q9, no ~1/10 (ADR-013).
 - Alcance: de 30 días sin variedad definida a una temporada de Malbec (1/9/2026 a 31/3/2027, unas 732.700 lecturas).
 - Umbrales de helada: valores de vid por etapa BBCH en lugar de los de frutales (IDR + DACC).
 - `lecturas` como serie temporal, confirmada como decisión firme (ADR-001).
