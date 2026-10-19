@@ -17,9 +17,9 @@ flowchart LR
 | Base de datos | MongoDB local | Almacena fincas, parcelas, nodos, lecturas, alertas, riegos y eventos |
 | Esquemas e índices | `db/schemas/`, `db/indexes/` | Validaciones `$jsonSchema` e índices reproducibles |
 | Seeds | `db/seeds/` | Datos iniciales, incluida la noche de helada precargada |
-| Consultas | `db/queries/` | Q1 a Q10 como scripts de `mongosh` |
+| Consultas | `db/queries/` | Q1 a Q10 como módulos de Python con `pymongo` (ADR-014); `dashboard/data.py` los llama |
 | Simulador | `simulator/` | Genera lecturas y escenarios; expone funciones importables |
-| Dashboard | `dashboard/` | `data.py` (único acceso a MongoDB) y `app.py` (presentación) |
+| Dashboard | `dashboard/` | `data.py` (único acceso a MongoDB desde la interfaz: llama a `db/queries` y cachea) y `app.py` (presentación) |
 | Resguardo | `scripts/` | Backup y restauración |
 
 ## Decisiones de arquitectura

@@ -229,6 +229,8 @@ Un archivo por colección en `db/schemas/` con su `$jsonSchema` (`validationActi
 
 ## 8. Índices (propuesta, se miden en el Sprint B)
 
+**Ya creados** (`python -m db.indexes.crear_indices`, ADR-014): los tres `2dsphere` (`nodos.ubicacion`, `parcelas.geometria` y `eventos_climaticos.area`); Q3 no funciona sin el de `nodos`. Los demás se crean al medir con `explain()` antes y después ([`performance.md`](performance.md)); el de `lecturas` lo crea MongoDB solo.
+
 | Colección | Índice | Consulta que lo justifica |
 |---|---|---|
 | `lecturas` | `{ meta: 1, ts: 1 }` (lo crea MongoDB solo) | Q1, Q5, Q6, Q9, Q10 |

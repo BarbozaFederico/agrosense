@@ -70,7 +70,8 @@ agrosense/
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
 | [`docs/seed.md`](docs/seed.md) | Seed base: qué carga, cómo se usa y qué supuestos tiene |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-013) |
+| [`docs/consultas.md`](docs/consultas.md) | Consultas Q1 a Q10: qué responden, cómo se calculan etapa por etapa y su resultado real |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-014) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta
@@ -95,16 +96,28 @@ source .venv/Scripts/activate            # Git Bash en Windows (en Linux y macOS
 python -m db.schemas.crear_colecciones   # crea las 10 colecciones con sus validadores
 python -m db.seeds.cargar                # fincas, parcelas, nodos, variedad y configuración
 python -m simulator.generar              # la temporada simulada (~25 s) y su auditoría
+python -m db.indexes.crear_indices       # índices geoespaciales (Q3 no funciona sin ellos)
 ```
+
+Consultas (cada una acepta `--help` y `--mongosh`, que muestra la misma consulta para `mongosh`):
+
+```bash
+python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05
+python -m db.queries.q10_riesgo_de_helada --fecha 2026-09-21
+python -m db.queries.q5_nodos_sin_reportar --ahora 2026-11-12T21:00:00Z
+```
+
+Las diez están en [`docs/consultas.md`](docs/consultas.md).
 
 Pruebas (usan la base `agrosense_tests`, no tocan `agrosense`):
 
 ```bash
 python -m db.schemas.probar_esquemas     # 62 casos de los esquemas
 python -m simulator.probar_simulador     # 51 casos del simulador (~1 min)
+python -m db.queries.probar_consultas    # 43 casos de las consultas contra cálculos independientes (~30 s)
 ```
 
-La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* consultas Q1 a Q10, índices, dashboard, backup y roles.
+La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* índices de rendimiento, dashboard, backup y roles.
 
 ## Equipo
 

@@ -111,9 +111,9 @@ El diseño detallado va en [`modelo-datos.md`](modelo-datos.md).
 
 ## 8. Criterios de aceptación del MVP
 
-- [ ] Las colecciones de dominio y la de configuración `variedades` existen con validación de esquema.
-- [ ] El simulador carga unas 100.000 lecturas o más, con noches de helada en las 3 fincas.
-- [ ] Las consultas Q1 a Q10 están en `db/queries/` y devuelven resultados correctos sobre los datos simulados.
+- [x] Las colecciones de dominio y la de configuración `variedades` existen con validación de esquema (`python -m db.schemas.probar_esquemas`, 62 casos).
+- [x] El simulador carga unas 100.000 lecturas o más, con noches de helada en las 3 fincas (727.980 lecturas; `python -m simulator.probar_simulador`, 51 casos).
+- [x] Las consultas Q1 a Q10 están en `db/queries/` y devuelven resultados correctos sobre los datos simulados (`python -m db.queries.probar_consultas`, 43 casos; ver [`consultas.md`](consultas.md)).
 - [ ] Hay mediciones antes y después de índices para al menos 3 consultas.
 - [ ] El backup se genera con un script y la restauración fue probada.
 - [ ] Existen al menos 2 roles de usuario.
