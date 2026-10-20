@@ -8,7 +8,8 @@ cómo estaba la base ese día. Los 30 minutos salen de `configuracion.nodo_inact
 Cómo se calcula:
     1. Se parte de `nodos` (así un nodo sin ninguna lectura también aparece).
     2. $lookup a `lecturas`: la última lectura de ese nodo hasta el "ahora" (ordena por ts de forma
-       descendente y se queda con una; usa el índice automático de la serie temporal).
+       descendente y se queda con una). Sin un índice propio recorre todos los grupos de lecturas de
+       cada nodo (5.053 documentos examinados); con {meta.nodo_id: 1, ts: -1} lee 433 (ADR-015).
     3. $set: minutos desde esa última lectura hasta el "ahora".
     4. $match: los que pasaron del límite, o no tienen ninguna lectura.
 
