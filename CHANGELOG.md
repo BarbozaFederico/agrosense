@@ -26,12 +26,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - ADR-012: cierre de supuestos. `CLAUDE.md` define dos marcas, "con fuente" y "supuesto adoptado", y desaparece "a validar". Tupungato pasa a −5,6 °C como límite de temperatura sospechosa.
 - Simulador de la temporada (`simulator/`, `python -m simulator.generar`): 727.980 lecturas, 10 alertas de helada (5 noches × 2 parcelas), 25 de riego, 563 riegos y 42 observaciones fenológicas, con la auditoría en 0 y 0. Pruebas de 51 casos (`python -m simulator.probar_simulador`). ADR-013 y `docs/simulador.md`.
 - `numpy==2.5.4` en `requirements.txt`.
+- Consultas Q1 a Q10 en Python con `pymongo` (`db/queries/q1_horas_bajo_cero.py` a `q10_riesgo_de_helada.py`): cada una con `pipeline()`, `consultar()` y consola con `--mongosh`; piezas comunes en `db/queries/comun.py`. Explicadas etapa por etapa, con sus resultados reales, en `docs/consultas.md`. ADR-014.
+- `db/indexes/crear_indices.py`: índices `2dsphere` de `nodos.ubicacion` (Q3 no funciona sin él), `parcelas.geometria` y `eventos_climaticos.area`.
+- `db.queries.probar_consultas`: 43 casos que comparan cada consulta con un cálculo independiente, y el texto de `mongosh` de Q1, Q4 y Q7 con el resultado de Python.
 - Pasos para ejecutar el proyecto en el README y estado actual en `CLAUDE.md`.
 
 ### Cambiado
 - Regla permanente en `CLAUDE.md`: `CLAUDE.md`, `README.md` y `CHANGELOG.md` se actualizan en el mismo cambio.
 - Umbrales de riego: los valores anteriores (21 y 13,5 %) no salían de la FAO-56 y se reemplazaron (ADR-011).
 - San Rafael brota ~30/9 con la regla de Q9, no ~1/10 (ADR-013).
+- Las consultas Q1 a Q10 pasan de `mongosh` a Python (ADR-014, reemplaza una frase de ADR-008); `dashboard/data.py` las llama en lugar de reescribirlas (ajuste a ADR-002). La helada (Q2 y Q10) usa la etapa estimada y no la observada, igual que las alertas (excepción a ADR-004).
 - Alcance: de 30 días sin variedad definida a una temporada de Malbec (1/9/2026 a 31/3/2027, unas 732.700 lecturas).
 - Umbrales de helada: valores de vid por etapa BBCH en lugar de los de frutales (IDR + DACC).
 - `lecturas` como serie temporal, confirmada como decisión firme (ADR-001).
