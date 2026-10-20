@@ -170,6 +170,19 @@ Las alertas guardan solo la parcela (ADR-003); el departamento sale de dos `$loo
 | 5/10 | San Rafael | 2 | 2 | −8,30 °C |
 | 5/10 | Tupungato | 2 | 2 | −3,03 °C |
 
+## Índices que usa cada consulta
+
+| Consulta | Índice | Mejora |
+|---|---|---|
+| Q1, Q6 | Ninguno propio: la serie temporal se lee por tiempo (CLUSTERED_IXSCAN) | - |
+| Q2, Q9, Q10 | `observaciones_fenologicas {parcela_id, fecha}` | 1.092 → 846 documentos examinados (Q9) |
+| Q3, Q4 | `2dsphere` en `nodos` y `parcelas` | Q3 no funciona sin el índice |
+| Q5 | `lecturas {meta.nodo_id, ts}` | 5.053 → 433 |
+| Q7 | `riegos {parcela_id, inicio}` | 563 → 33 |
+| Q8 | `alertas {tipo, inicio}` | 57 → 32 |
+
+Se crean con `python -m db.indexes.crear_indices`. Mediciones completas, costo en espacio y experimentos en [`performance.md`](performance.md) y [ADR-015](decisions/ADR-015-indices-de-rendimiento.md).
+
 ## Cómo se probó
 
 `python -m db.queries.probar_consultas` (43 casos, base `agrosense_tests`, ~30 s): cada consulta se compara con un cálculo independiente (Python con `find`, el escenario del simulador o la colección `alertas`) y el texto de `mongosh` de Q1, Q4 y Q7 se ejecuta en `mongosh` y se compara con el resultado de Python. Detalle de lo que verifica cada caso en la salida de la prueba.

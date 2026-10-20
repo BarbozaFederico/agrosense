@@ -227,19 +227,20 @@ Un archivo por colección en `db/schemas/` con su `$jsonSchema` (`validationActi
 1. El simulador valida cada lote antes de insertarlo: MongoDB valida con el mismo esquema, sin guardar (`db/schemas/validar.py`, [ADR-008](decisions/ADR-008-esquemas-en-python.md)).
 2. Una consulta de auditoría, `find({ $nor: [{ $jsonSchema: esquema }] })`, cuenta las lecturas que no cumplen el esquema después de cada carga (resultado esperado: 0).
 
-## 8. Índices (propuesta, se miden en el Sprint B)
+## 8. Índices (creados y medidos)
 
-**Ya creados** (`python -m db.indexes.crear_indices`, ADR-014): los tres `2dsphere` (`nodos.ubicacion`, `parcelas.geometria` y `eventos_climaticos.area`); Q3 no funciona sin el de `nodos`. Los demás se crean al medir con `explain()` antes y después ([`performance.md`](performance.md)); el de `lecturas` lo crea MongoDB solo.
+Todos se crean con `python -m db.indexes.crear_indices` ([ADR-014](decisions/ADR-014-consultas-en-python.md) y [ADR-015](decisions/ADR-015-indices-de-rendimiento.md)). Cada uno tiene una medición antes y después en [`performance.md`](performance.md); la propuesta inicial se corrigió con esas mediciones (`alertas` ahora es `{ tipo, inicio }` y se agregó el de `lecturas` para Q5).
 
-| Colección | Índice | Consulta que lo justifica |
-|---|---|---|
-| `lecturas` | `{ meta: 1, ts: 1 }` (lo crea MongoDB solo) | Q1, Q5, Q6, Q9, Q10 |
-| `nodos` | `{ ubicacion: "2dsphere" }` | Q3 |
-| `parcelas` | `{ geometria: "2dsphere" }` | Q4 |
-| `eventos_climaticos` | `{ area: "2dsphere" }` | Q4 |
-| `alertas` | `{ parcela_id: 1, inicio: 1 }` y `{ estado: 1, tipo: 1 }` | Q2, Q8, alertas activas del dashboard |
-| `riegos` | `{ parcela_id: 1, inicio: 1 }` | Q7 |
-| `observaciones_fenologicas` | `{ parcela_id: 1, fecha: -1 }` | Última observación de cada parcela |
+| Colección | Índice | Consulta que lo justifica | Documentos examinados |
+|---|---|---|---|
+| `lecturas` | `{ meta: 1, ts: 1 }` (lo crea MongoDB solo) | Ninguna lo usa; se deja (experimento en `performance.md`) | - |
+| `lecturas` | `{ "meta.nodo_id": 1, ts: -1 }` | Q5 | 5.053 → 433 |
+| `nodos` | `{ ubicacion: "2dsphere" }` | Q3 (sin él falla) | falla → 12 |
+| `parcelas` | `{ geometria: "2dsphere" }` | Q4 | 9 → 5 |
+| `eventos_climaticos` | `{ area: "2dsphere" }` | Q4 | - |
+| `alertas` | `{ tipo: 1, inicio: 1 }` | Q8 | 57 → 32 |
+| `riegos` | `{ parcela_id: 1, inicio: 1 }` | Q7 | 563 → 33 |
+| `observaciones_fenologicas` | `{ parcela_id: 1, fecha: -1 }` | Q9 (y Q2 y Q10, que la llaman) | 1.092 → 846 |
 
 ## 9. Ejemplos de documentos
 

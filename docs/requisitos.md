@@ -49,7 +49,7 @@ El escenario realista justifica la serie temporal, los índices y una política 
 
 | ID | Requisito | Verificación |
 |---|---|---|
-| RNF-01 | Las consultas principales se miden con `explain("executionStats")` antes y después de aplicar índices | `docs/performance.md` |
+| RNF-01 | Las consultas principales se miden antes y después de aplicar índices (planes y documentos examinados con el perfilador y `explain`, ADR-015) | `docs/performance.md` |
 | RNF-02 | Existe una política de backup documentada (frecuencia, retención) con script reproducible | `docs/backup-restore.md` |
 | RNF-03 | La restauración de un backup se prueba y se documenta | Prueba registrada |
 | RNF-04 | Existen al menos dos roles de usuario con permisos distintos (por ejemplo, lectura y administración) | Evidencia en el repo |
@@ -114,7 +114,7 @@ El diseño detallado va en [`modelo-datos.md`](modelo-datos.md).
 - [x] Las colecciones de dominio y la de configuración `variedades` existen con validación de esquema (`python -m db.schemas.probar_esquemas`, 62 casos).
 - [x] El simulador carga unas 100.000 lecturas o más, con noches de helada en las 3 fincas (727.980 lecturas; `python -m simulator.probar_simulador`, 51 casos).
 - [x] Las consultas Q1 a Q10 están en `db/queries/` y devuelven resultados correctos sobre los datos simulados (`python -m db.queries.probar_consultas`, 43 casos; ver [`consultas.md`](consultas.md)).
-- [ ] Hay mediciones antes y después de índices para al menos 3 consultas.
+- [x] Hay mediciones antes y después de índices para al menos 3 consultas (las 10 medidas; 4 mejoradas con índice propio: Q5, Q7, Q8 y Q9; ver [`performance.md`](performance.md) y `python -m db.indexes.probar_indices`, 19 casos).
 - [ ] El backup se genera con un script y la restauración fue probada.
 - [ ] Existen al menos 2 roles de usuario.
 - [ ] El dashboard muestra las 4 pantallas con la noche precargada, con tema oscuro, y funciona sin internet.
