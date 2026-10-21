@@ -20,7 +20,7 @@
 | 8 | Humedad del aire en Q10 | Promedio de 22:00 a 08:00 (hora local) | Toda la ventana: incluye la mañana, con aire seco, y subía a "medio" noches sin frío |
 | 9 | Horas bajo cero (Q1) | `$setWindowFields` con `$integral` de un indicador; cada lectura bajo cero aporta 5 minutos | Contar lecturas en Python (saca la lógica de la base) |
 | 10 | Eventos de helada (Q8) | Una alerta de helada es un evento; se informan también las parcelas afectadas | Contar noches distintas (pierde cuántas parcelas) |
-| 11 | Índices | Solo `2dsphere` en `nodos.ubicacion` (Q3 no funciona sin él), `parcelas.geometria` y `eventos_climaticos.area`, con `db/indexes/crear_indices.py`. Los de rendimiento quedan para medir antes y después | Crear todos los índices ya (no habría "antes" para medir, RNF-01) |
+| 11 | Índices | Solo `2dsphere` en `nodos.ubicacion` (Q3 no funciona sin él), `parcelas.geometria` y `eventos_climaticos.area`, con `db/indexes/crear_indices.py`. Los de rendimiento quedaron para medir antes y después (hecho en [ADR-015](ADR-015-indices-de-rendimiento.md)) | Crear todos los índices ya (no habría "antes" para medir, RNF-01) |
 | 12 | Dashboard | `dashboard/data.py` importa `consultar()` de `db/queries` y les agrega `st.cache_data`; el panel "Ver consulta" muestra `texto_mongosh`. Ajusta ADR-002 | Reescribir cada consulta en `data.py` |
 
 ## Consecuencias

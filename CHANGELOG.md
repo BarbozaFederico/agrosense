@@ -28,6 +28,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - `numpy==2.5.4` en `requirements.txt`.
 - Consultas Q1 a Q10 en Python con `pymongo` (`db/queries/q1_horas_bajo_cero.py` a `q10_riesgo_de_helada.py`): cada una con `pipeline()`, `consultar()` y consola con `--mongosh`; piezas comunes en `db/queries/comun.py`. Explicadas etapa por etapa, con sus resultados reales, en `docs/consultas.md`. ADR-014.
 - `db/indexes/crear_indices.py`: índices `2dsphere` de `nodos.ubicacion` (Q3 no funciona sin él), `parcelas.geometria` y `eventos_climaticos.area`.
+- Índices de rendimiento (`db/indexes/crear_indices.py`): `lecturas {meta.nodo_id, ts}` (Q5: 5.053 → 433 documentos examinados), `riegos {parcela_id, inicio}` (Q7: 563 → 33), `alertas {tipo, inicio}` (Q8) y `observaciones_fenologicas {parcela_id, fecha}` (Q9). `medir_indices.py` mide las 10 consultas antes y después con el perfilador de MongoDB (plan, documentos y claves examinados, tiempo), con un experimento sobre el índice automático de `lecturas` y el tamaño de cada índice; `probar_indices.py` (19 casos) comprueba que se usan y que no cambian ninguna respuesta. Resultados en `docs/performance.md`. ADR-015.
 - `db.queries.probar_consultas`: 43 casos que comparan cada consulta con un cálculo independiente, y el texto de `mongosh` de Q1, Q4 y Q7 con el resultado de Python.
 - Pasos para ejecutar el proyecto en el README y estado actual en `CLAUDE.md`.
 
@@ -35,6 +36,8 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - Regla permanente en `CLAUDE.md`: `CLAUDE.md`, `README.md` y `CHANGELOG.md` se actualizan en el mismo cambio.
 - Umbrales de riego: los valores anteriores (21 y 13,5 %) no salían de la FAO-56 y se reemplazaron (ADR-011).
 - San Rafael brota ~30/9 con la regla de Q9, no ~1/10 (ADR-013).
+- Índices propuestos en `docs/modelo-datos.md` corregidos con las mediciones: `alertas {tipo, inicio}` en lugar de `{parcela_id, inicio}` y `{estado, tipo}` (ninguna consulta filtra por `estado`), y se agrega el de `lecturas` para Q5 (ADR-015). El criterio de aceptación de mediciones queda cumplido.
+- Q5 documentaba que usaba el índice automático de la serie temporal; no era cierto (examinaba 5.053 documentos). Corregido en `q5_nodos_sin_reportar.py`.
 - Las consultas Q1 a Q10 pasan de `mongosh` a Python (ADR-014, reemplaza una frase de ADR-008); `dashboard/data.py` las llama en lugar de reescribirlas (ajuste a ADR-002). La helada (Q2 y Q10) usa la etapa estimada y no la observada, igual que las alertas (excepción a ADR-004).
 - Alcance: de 30 días sin variedad definida a una temporada de Malbec (1/9/2026 a 31/3/2027, unas 732.700 lecturas).
 - Umbrales de helada: valores de vid por etapa BBCH en lugar de los de frutales (IDR + DACC).

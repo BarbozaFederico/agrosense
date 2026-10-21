@@ -27,7 +27,7 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-014). Consultas explicadas en `docs/consultas.md`.
+Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-015). Consultas explicadas en `docs/consultas.md` y mediciones de índices en `docs/performance.md`.
 
 ## 4. Alcance del MVP
 
@@ -51,6 +51,7 @@ Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informe
 | Simulador | Python + `pymongo`, en `simulator/`, con funciones importables |
 | Backup | `mongodump` y `mongorestore`, scripts en `scripts/` |
 | Consultas | Q1 a Q10 en Python con `pymongo` (`db/queries/qN_nombre.py`); cada una puede mostrar su versión de `mongosh` con `--mongosh`. Ver ADR-014 y `docs/consultas.md` |
+| Índices | 3 `2dsphere` (Q3 y Q4) y 4 de rendimiento medidos con el perfilador (Q5, Q7, Q8 y Q9), en `db/indexes/`; `lecturas` conserva el automático de la serie temporal. Ver ADR-015 y `docs/performance.md` |
 | Interfaz | Streamlit + Plotly, web de escritorio; las consultas viven en `db/queries/` y `dashboard/data.py` las llama y cachea. Ver ADR-002 y ADR-014 |
 | Móvil | Fuera de alcance |
 | Licencia | MIT |
@@ -79,13 +80,14 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 | ADR-012 | Cierre de supuestos: dos marcas, **con fuente** y **supuesto adoptado** (desaparece "a validar"); Tupungato −5,6 °C; parámetros del simulador |
 | ADR-013 | Diseño del simulador: noche extrema de ~7 h bajo cero, calendario de heladas según la etapa, 10 alertas de helada (5 noches × 2 parcelas), cierres con 1 h de histéresis, regla de grados-día de Q9 |
 | ADR-014 | Consultas Q1 a Q10 en Python con `pymongo` (no en `mongosh`); una noche va de las 18:00 a las 12:00 hora de Argentina; semana de lunes a domingo; la helada (Q2 y Q10) usa la etapa estimada, no la observada; índices `2dsphere` de `nodos`, `parcelas` y `eventos_climaticos` |
+| ADR-015 | Índices de rendimiento: `lecturas {meta.nodo_id, ts}` (Q5: 5.053 → 433 documentos examinados), `riegos {parcela_id, inicio}` (Q7), `alertas {tipo, inicio}` (Q8) y `observaciones_fenologicas {parcela_id, fecha}` (Q9); se miden las 10 consultas con el perfilador (la mejora está en documentos examinados, no en tiempo) y `meta_1_ts_1` se deja |
 
 ### Entorno
 
 - MongoDB Server 9.0 instalado como servicio de Windows. `mongosh` y MongoDB Database Tools se instalan aparte y deben estar en el PATH.
 - Los scripts de `db/` se corren desde la raíz con `python -m`, por ejemplo `python -m db.schemas.crear_colecciones`. La base se elige con `AGROSENSE_BD` (por defecto `agrosense`; las pruebas usan `agrosense_tests`).
 - Dependencias de Python en `requirements.txt` (raíz, versiones fijas). `install.sh` crea `.venv` e instala todo: en PowerShell se ejecuta con `bash install.sh`.
-- Para reconstruir los datos: `python -m db.seeds.cargar` (fincas, parcelas, nodos y configuración) y después `python -m simulator.generar` (la temporada, ~25 s). Índices geoespaciales (Q3 no funciona sin ellos): `python -m db.indexes.crear_indices`. Consultas: `python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05` (cada `qN_nombre` acepta `--help` y `--mongosh`). Pruebas: `python -m db.schemas.probar_esquemas`, `python -m simulator.probar_simulador` y `python -m db.queries.probar_consultas` (usan `agrosense_tests`). Ver `docs/simulador.md` y `docs/consultas.md`.
+- Para reconstruir los datos: `python -m db.seeds.cargar` (fincas, parcelas, nodos y configuración) y después `python -m simulator.generar` (la temporada, ~25 s). Índices (después de `simulator.generar`; Q3 no funciona sin los geoespaciales): `python -m db.indexes.crear_indices`. Mediciones antes y después: `python -m db.indexes.medir_indices` (usa `agrosense_tests`). Consultas: `python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05` (cada `qN_nombre` acepta `--help` y `--mongosh`). Pruebas: `python -m db.schemas.probar_esquemas`, `python -m simulator.probar_simulador`, `python -m db.queries.probar_consultas` y `python -m db.indexes.probar_indices` (usan `agrosense_tests`). Ver `docs/simulador.md`, `docs/consultas.md` y `docs/performance.md`.
 
 ## 6. Reglas de dominio
 
@@ -146,13 +148,13 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001 a ADR-014
+│   ├── decisions/             # ADR-001 a ADR-015
 │   └── sprints/
 ├── db/                        # paquete de Python (python -m db.…)
 │   ├── conexion.py            # AGROSENSE_URI y AGROSENSE_BD
 │   ├── departamentos.py       # "San Martín" → san_martin
 │   ├── schemas/               # un esquema por colección, crear, validar y probar (ADR-008)
-│   ├── indexes/               # crear_indices.py: los 3 índices 2dsphere (ADR-014)
+│   ├── indexes/               # crear_indices.py (3 geoespaciales y 4 de rendimiento), medir_indices.py, probar_indices.py (ADR-014 y ADR-015)
 │   ├── seeds/                 # cargador y datos fijos (python -m db.seeds.cargar), ADR-010
 │   └── queries/               # q1 a q10 (python -m db.queries.qN_nombre), comun.py, auditoría y probar_consultas.py
 ├── simulator/                 # temporada simulada (python -m simulator.generar), ADR-013
@@ -222,9 +224,9 @@ Reglas:
 
 ## 13. Estado actual y pendientes
 
-**Hecho (20/10/2026):** documentación y ADR-001 a ADR-014; esquemas `$jsonSchema` de las 10 colecciones con 62 pruebas; seed base; umbrales de riego; simulador de la temporada (727.980 lecturas, alertas, riegos y observaciones, con 51 pruebas); base `agrosense` cargada y auditada; consultas Q1 a Q10 en Python (43 pruebas contra cálculos independientes) y los 3 índices geoespaciales.
+**Hecho (20/10/2026):** documentación y ADR-001 a ADR-015; esquemas `$jsonSchema` de las 10 colecciones con 62 pruebas; seed base; umbrales de riego; simulador de la temporada (727.980 lecturas, alertas, riegos y observaciones, con 51 pruebas); base `agrosense` cargada y auditada; consultas Q1 a Q10 en Python (43 pruebas contra cálculos independientes) y los 3 índices geoespaciales; 4 índices de rendimiento medidos antes y después en las 10 consultas (`docs/performance.md`, 19 pruebas).
 
-**Falta:** índices de rendimiento y mediciones con `explain` en `docs/performance.md`; dashboard con 4 pantallas; backup con restauración y roles; opcionales (variedad simulada X, simulación en vivo).
+**Falta:** dashboard con 4 pantallas; backup con restauración y roles; opcionales (variedad simulada X, simulación en vivo).
 
 **Pendientes conocidos:**
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).

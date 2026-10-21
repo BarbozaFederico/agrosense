@@ -65,13 +65,13 @@ agrosense/
 | [`docs/esquemas-validacion.md`](docs/esquemas-validacion.md) | Esquemas `$jsonSchema`: cómo se crean, se prueban y se auditan |
 | [`docs/simulador.md`](docs/simulador.md) | Simulador: qué genera, parámetros, calendario de heladas y pruebas |
 | [`docs/ux/pantallas.md`](docs/ux/pantallas.md) | Pantallas y comportamiento del dashboard |
-| [`docs/performance.md`](docs/performance.md) | Mediciones de índices |
+| [`docs/performance.md`](docs/performance.md) | Índices: mediciones antes y después de las 10 consultas, costo y experimentos |
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
 | [`docs/seed.md`](docs/seed.md) | Seed base: qué carga, cómo se usa y qué supuestos tiene |
 | [`docs/consultas.md`](docs/consultas.md) | Consultas Q1 a Q10: qué responden, cómo se calculan etapa por etapa y su resultado real |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-014) |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-015) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta
@@ -96,7 +96,8 @@ source .venv/Scripts/activate            # Git Bash en Windows (en Linux y macOS
 python -m db.schemas.crear_colecciones   # crea las 10 colecciones con sus validadores
 python -m db.seeds.cargar                # fincas, parcelas, nodos, variedad y configuración
 python -m simulator.generar              # la temporada simulada (~25 s) y su auditoría
-python -m db.indexes.crear_indices       # índices geoespaciales (Q3 no funciona sin ellos)
+python -m db.indexes.crear_indices       # 3 índices geoespaciales (Q3 no funciona sin ellos) y 4 de rendimiento
+python -m db.indexes.medir_indices       # opcional: mediciones antes y después (usa agrosense_tests)
 ```
 
 Consultas (cada una acepta `--help` y `--mongosh`, que muestra la misma consulta para `mongosh`):
@@ -115,9 +116,10 @@ Pruebas (usan la base `agrosense_tests`, no tocan `agrosense`):
 python -m db.schemas.probar_esquemas     # 62 casos de los esquemas
 python -m simulator.probar_simulador     # 51 casos del simulador (~1 min)
 python -m db.queries.probar_consultas    # 43 casos de las consultas contra cálculos independientes (~30 s)
+python -m db.indexes.probar_indices      # 19 casos: los índices existen, se usan y no cambian ninguna respuesta
 ```
 
-La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* índices de rendimiento, dashboard, backup y roles.
+La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* dashboard, backup y roles.
 
 ## Equipo
 
