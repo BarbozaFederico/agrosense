@@ -3,7 +3,7 @@
 Pregunta: ¿el backup se hace, se rota según la política, se restaura igual y se niega a hacer cosas peligrosas?
 
 Cómo correrlo (desde la raíz del repo, con el entorno virtual activado):
-    python -m scripts.probar_respaldo
+    python -m scripts.backup_restore.probar_respaldo
 
 Usa la base de PRUEBA `agrosense_tests` (si está vacía, carga el seed y la temporada ahí) y una carpeta temporal
 fuera del repositorio. Restaura en `agrosense_tests_restaurada` y la borra al terminar. No toca `agrosense`.
@@ -21,9 +21,10 @@ from pathlib import Path
 from db.conexion import obtener_base, preparar_consola
 from db.indexes.crear_indices import crear_indices, crear_indices_rendimiento
 from db.schemas.probar_esquemas import Resumen
-from scripts import backup, restaurar
-from scripts.comun import (RAIZ, ErrorDeRespaldo, buscar_herramienta, comparar_consultas, comparar_resumenes,
-                           directorio_de_respaldos, integro, leer_manifiesto, resumen_de_base, ruta_manifiesto)
+from scripts.backup_restore import backup, restaurar
+from scripts.backup_restore.comun import (RAIZ, ErrorDeRespaldo, buscar_herramienta, comparar_consultas,
+                                          comparar_resumenes, directorio_de_respaldos, integro, leer_manifiesto,
+                                          resumen_de_base, ruta_manifiesto)
 
 ORIGEN = "agrosense_tests"
 COPIA = "agrosense_tests_restaurada"

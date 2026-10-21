@@ -9,8 +9,8 @@ Qué hace:
 Política (supuesto adoptado, ADR-016): un backup por día a las 02:00; 7 diarios y 4 semanales.
 
 Cómo correrlo (desde la raíz, con el entorno virtual activado):
-    python -m scripts.backup                       # base "agrosense" (o la de AGROSENSE_BD)
-    python -m scripts.backup --bd agrosense_tests --destino C:/algun/lugar --sin-rotar
+    python -m scripts.backup_restore.backup                       # base "agrosense" (o la de AGROSENSE_BD)
+    python -m scripts.backup_restore.backup --bd agrosense_tests --destino C:/algun/lugar --sin-rotar
 
 Los respaldos van fuera del repositorio: ~/agrosense-backups, o la carpeta de AGROSENSE_BACKUP_DIR.
 """
@@ -23,8 +23,9 @@ from datetime import datetime
 from pathlib import Path
 
 from db.conexion import BASE_POR_DEFECTO, obtener_base, preparar_consola
-from scripts.comun import (DIARIOS, SEMANALES, SUFIJO, ErrorDeRespaldo, buscar_herramienta, directorio_de_respaldos,
-                           ejecutar, listar_respaldos, ruta_manifiesto, sha256_de, uri, resumen_de_base)
+from scripts.backup_restore.comun import (DIARIOS, SEMANALES, SUFIJO, ErrorDeRespaldo, buscar_herramienta,
+                                          directorio_de_respaldos, ejecutar, listar_respaldos, resumen_de_base,
+                                          ruta_manifiesto, sha256_de, uri)
 
 DOMINGO = 6
 

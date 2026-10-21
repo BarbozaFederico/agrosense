@@ -23,7 +23,7 @@ from bson import json_util
 
 from db.conexion import URI_POR_DEFECTO
 
-RAIZ = Path(__file__).resolve().parents[1]
+RAIZ = Path(__file__).resolve().parents[2]      # scripts/backup_restore/comun.py → raíz del repositorio
 DIARIOS = 7        # política (supuesto adoptado, ADR-016): copias de los últimos 7 días...
 SEMANALES = 4      # ...y de los últimos 4 domingos
 SUFIJO = ".archive.gz"

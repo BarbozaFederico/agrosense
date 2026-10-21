@@ -8,9 +8,9 @@ Qué hace:
     4. Con --comparar-con, corre Q1, Q5, Q9 y Q10 en las dos bases y comprueba que den lo mismo.
 
 Cómo correrlo (desde la raíz, con el entorno virtual activado):
-    python -m scripts.restaurar                                   # el último backup de "agrosense"
-    python -m scripts.restaurar RUTA_DEL_ARCHIVO --destino prueba --comparar-con agrosense
-    python -m scripts.restaurar --reemplazar                      # desastre: vuelve a dejar "agrosense" como estaba
+    python -m scripts.backup_restore.restaurar                    # el último backup de "agrosense"
+    python -m scripts.backup_restore.restaurar RUTA_DEL_ARCHIVO --destino prueba --comparar-con agrosense
+    python -m scripts.backup_restore.restaurar --reemplazar       # desastre: vuelve a dejar "agrosense" como estaba
 """
 
 import argparse
@@ -19,9 +19,9 @@ import sys
 from pathlib import Path
 
 from db.conexion import BASE_POR_DEFECTO, obtener_base, preparar_consola
-from scripts.comun import (CONSULTAS_A_COMPARAR, ErrorDeRespaldo, base_de_origen, buscar_herramienta,
-                           comparar_consultas, comparar_resumenes, directorio_de_respaldos, ejecutar, integro,
-                           leer_manifiesto, listar_respaldos, resumen_de_base, uri)
+from scripts.backup_restore.comun import (CONSULTAS_A_COMPARAR, ErrorDeRespaldo, base_de_origen, buscar_herramienta,
+                                          comparar_consultas, comparar_resumenes, directorio_de_respaldos, ejecutar,
+                                          integro, leer_manifiesto, listar_respaldos, resumen_de_base, uri)
 
 
 def restaurar(archivo: Path, destino: str | None = None, reemplazar: bool = False) -> list[str]:
@@ -65,7 +65,7 @@ def main() -> None:
         else:
             respaldos = listar_respaldos(directorio_de_respaldos(args.carpeta), args.bd)
             if not respaldos:
-                raise ErrorDeRespaldo(f"No hay backups de {args.bd}. Hacé uno con: python -m scripts.backup")
+                raise ErrorDeRespaldo(f"No hay backups de {args.bd}. Hacé uno con: python -m scripts.backup_restore.backup")
             archivo = respaldos[-1][0]
         if not archivo.exists():
             raise ErrorDeRespaldo(f"No existe {archivo}")
