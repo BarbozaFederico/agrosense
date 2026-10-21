@@ -49,7 +49,7 @@ agrosense/
 ├── db/            # esquemas, índices, seeds y consultas
 ├── simulator/     # simulador de sensores (Python)
 ├── dashboard/     # dashboard Streamlit
-├── scripts/       # backup y restauración
+├── scripts/       # backup y restauración (backup_restore/) y spikes
 └── .github/       # plantillas de issues y pull requests
 ```
 
@@ -113,8 +113,8 @@ Las diez están en [`docs/consultas.md`](docs/consultas.md).
 Backup y restauración (requieren MongoDB Database Tools: `winget install MongoDB.DatabaseTools`). Los respaldos se guardan fuera del repositorio, en `~/agrosense-backups` o en la carpeta de `AGROSENSE_BACKUP_DIR`:
 
 ```bash
-python -m scripts.backup                           # copia de agrosense (7 diarios y 4 semanales) con su manifiesto
-python -m scripts.restaurar --comparar-con agrosense   # restaura el último en agrosense_restaurada y lo verifica
+python -m scripts.backup_restore.backup                           # copia de agrosense (7 diarios y 4 semanales) con su manifiesto
+python -m scripts.backup_restore.restaurar --comparar-con agrosense   # restaura el último en agrosense_restaurada y lo verifica
 ```
 
 Política, procedimiento y la prueba de restauración en [`docs/backup-restore.md`](docs/backup-restore.md).
@@ -126,7 +126,7 @@ python -m db.schemas.probar_esquemas     # 62 casos de los esquemas
 python -m simulator.probar_simulador     # 51 casos del simulador (~1 min)
 python -m db.queries.probar_consultas    # 43 casos de las consultas contra cálculos independientes (~30 s)
 python -m db.indexes.probar_indices      # 19 casos: los índices existen, se usan y no cambian ninguna respuesta
-python -m scripts.probar_respaldo        # 19 casos: backup, rotación, restauración y protecciones (unos segundos)
+python -m scripts.backup_restore.probar_respaldo        # 19 casos: backup, rotación, restauración y protecciones (unos segundos)
 ```
 
 La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* dashboard y roles.
