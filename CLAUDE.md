@@ -27,7 +27,7 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-015). Consultas explicadas en `docs/consultas.md` y mediciones de índices en `docs/performance.md`.
+Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-016). Consultas explicadas en `docs/consultas.md`, mediciones de índices en `docs/performance.md` y backup en `docs/backup-restore.md`.
 
 ## 4. Alcance del MVP
 
@@ -49,7 +49,7 @@ Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informe
 | Geoespacial | GeoJSON + índices `2dsphere` |
 | Validación | `$jsonSchema` en las colecciones comunes (esquema cerrado, con `_id` declarado). `lecturas` se valida en el simulador y con una consulta de auditoría. Esquemas en Python (`db/schemas/`). Ver ADR-007, ADR-008 y `docs/esquemas-validacion.md` |
 | Simulador | Python + `pymongo`, en `simulator/`, con funciones importables |
-| Backup | `mongodump` y `mongorestore`, scripts en `scripts/` |
+| Backup | `mongodump` y `mongorestore` (Database Tools), con scripts de Python en `scripts/` (`backup`, `restaurar`, `probar_respaldo`). Un archivo `.archive.gz` por backup con su manifiesto (sha256 y resumen de cada colección), siempre fuera del repo; política de 7 diarios y 4 semanales (supuesto adoptado); se restaura en una base aparte. Ver ADR-016 y `docs/backup-restore.md` |
 | Consultas | Q1 a Q10 en Python con `pymongo` (`db/queries/qN_nombre.py`); cada una puede mostrar su versión de `mongosh` con `--mongosh`. Ver ADR-014 y `docs/consultas.md` |
 | Índices | 3 `2dsphere` (Q3 y Q4) y 4 de rendimiento medidos con el perfilador (Q5, Q7, Q8 y Q9), en `db/indexes/`; `lecturas` conserva el automático de la serie temporal. Ver ADR-015 y `docs/performance.md` |
 | Interfaz | Streamlit + Plotly, web de escritorio; las consultas viven en `db/queries/` y `dashboard/data.py` las llama y cachea. Ver ADR-002 y ADR-014 |
@@ -81,6 +81,7 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 | ADR-013 | Diseño del simulador: noche extrema de ~7 h bajo cero, calendario de heladas según la etapa, 10 alertas de helada (5 noches × 2 parcelas), cierres con 1 h de histéresis, regla de grados-día de Q9 |
 | ADR-014 | Consultas Q1 a Q10 en Python con `pymongo` (no en `mongosh`); una noche va de las 18:00 a las 12:00 hora de Argentina; semana de lunes a domingo; la helada (Q2 y Q10) usa la etapa estimada, no la observada; índices `2dsphere` de `nodos`, `parcelas` y `eventos_climaticos` |
 | ADR-015 | Índices de rendimiento: `lecturas {meta.nodo_id, ts}` (Q5: 5.053 → 433 documentos examinados), `riegos {parcela_id, inicio}` (Q7), `alertas {tipo, inicio}` (Q8) y `observaciones_fenologicas {parcela_id, fecha}` (Q9); se miden las 10 consultas con el perfilador (la mejora está en documentos examinados, no en tiempo) y `meta_1_ts_1` se deja |
+| ADR-016 | Backup con `mongodump --archive --gzip` de la base `agrosense` y restauración con `mongorestore` a una base aparte, en `scripts/` (Python); manifiesto con sha256; respaldos fuera del repo; política de 7 diarios y 4 semanales (supuesto adoptado); la serie temporal `lecturas` se restaura bien (727.980 lecturas) |
 
 ### Entorno
 
@@ -88,6 +89,7 @@ Verificado en MongoDB 9.0.2 ([spike del 14/10/2026](docs/spikes/spike-adr001-ser
 - Los scripts de `db/` se corren desde la raíz con `python -m`, por ejemplo `python -m db.schemas.crear_colecciones`. La base se elige con `AGROSENSE_BD` (por defecto `agrosense`; las pruebas usan `agrosense_tests`).
 - Dependencias de Python en `requirements.txt` (raíz, versiones fijas). `install.sh` crea `.venv` e instala todo: en PowerShell se ejecuta con `bash install.sh`.
 - Para reconstruir los datos: `python -m db.seeds.cargar` (fincas, parcelas, nodos y configuración) y después `python -m simulator.generar` (la temporada, ~25 s). Índices (después de `simulator.generar`; Q3 no funciona sin los geoespaciales): `python -m db.indexes.crear_indices`. Mediciones antes y después: `python -m db.indexes.medir_indices` (usa `agrosense_tests`). Consultas: `python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05` (cada `qN_nombre` acepta `--help` y `--mongosh`). Pruebas: `python -m db.schemas.probar_esquemas`, `python -m simulator.probar_simulador`, `python -m db.queries.probar_consultas` y `python -m db.indexes.probar_indices` (usan `agrosense_tests`). Ver `docs/simulador.md`, `docs/consultas.md` y `docs/performance.md`.
+- Backup y restauración (requieren MongoDB Database Tools: `winget install MongoDB.DatabaseTools`; el instalador no los agrega al PATH y los scripts los encuentran solos, o con `AGROSENSE_HERRAMIENTAS`): `python -m scripts.backup` (copia en `~/agrosense-backups` o `AGROSENSE_BACKUP_DIR`, nunca dentro del repo, y rota), `python -m scripts.restaurar --comparar-con agrosense` (al último backup en `agrosense_restaurada` y lo verifica) y `python -m scripts.probar_respaldo` (19 casos sobre `agrosense_tests`). Ver `docs/backup-restore.md`.
 
 ## 6. Reglas de dominio
 
@@ -148,7 +150,7 @@ agrosense/
 │   ├── equipo.md
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
-│   ├── decisions/             # ADR-001 a ADR-015
+│   ├── decisions/             # ADR-001 a ADR-016
 │   └── sprints/
 ├── db/                        # paquete de Python (python -m db.…)
 │   ├── conexion.py            # AGROSENSE_URI y AGROSENSE_BD
@@ -159,7 +161,7 @@ agrosense/
 │   └── queries/               # q1 a q10 (python -m db.queries.qN_nombre), comun.py, auditoría y probar_consultas.py
 ├── simulator/                 # temporada simulada (python -m simulator.generar), ADR-013
 ├── dashboard/                 # data.py, app.py (pendiente)
-├── scripts/
+├── scripts/                   # backup.py, restaurar.py, comun.py, probar_respaldo.py (ADR-016); spikes en spike-*/
 ├── requirements.txt           # dependencias de Python (versiones fijas)
 ├── install.sh                 # crea .venv e instala requirements.txt
 └── .gitattributes             # los .sh con fin de línea LF
@@ -224,9 +226,9 @@ Reglas:
 
 ## 13. Estado actual y pendientes
 
-**Hecho (20/10/2026):** documentación y ADR-001 a ADR-015; esquemas `$jsonSchema` de las 10 colecciones con 62 pruebas; seed base; umbrales de riego; simulador de la temporada (727.980 lecturas, alertas, riegos y observaciones, con 51 pruebas); base `agrosense` cargada y auditada; consultas Q1 a Q10 en Python (43 pruebas contra cálculos independientes) y los 3 índices geoespaciales; 4 índices de rendimiento medidos antes y después en las 10 consultas (`docs/performance.md`, 19 pruebas).
+**Hecho (21/10/2026):** documentación y ADR-001 a ADR-016; esquemas `$jsonSchema` de las 10 colecciones con 62 pruebas; seed base; umbrales de riego; simulador de la temporada (727.980 lecturas, alertas, riegos y observaciones, con 51 pruebas); base `agrosense` cargada y auditada; consultas Q1 a Q10 en Python (43 pruebas contra cálculos independientes) y los 3 índices geoespaciales; 4 índices de rendimiento medidos antes y después en las 10 consultas (`docs/performance.md`, 19 pruebas); backup y restauración con `mongodump`/`mongorestore` probados sobre la base real (727.980 lecturas restauradas igual, 19 pruebas, `docs/backup-restore.md`).
 
-**Falta:** dashboard con 4 pantallas; backup con restauración y roles; opcionales (variedad simulada X, simulación en vivo).
+**Falta:** dashboard con 4 pantallas; roles y autenticación (acordado en la entrevista del 21/10/2026, en un PR aparte, ADR-017: cuatro usuarios `admin` con rol `root`, `dashboard` con `read`, `simulador` con `readWrite` y `dbAdmin` sobre `agrosense` y `agrosense_tests`, y `respaldo` con `backup` y `restore`; autenticación activada en la instancia real; claves en un `.env` ignorado por git); opcionales (variedad simulada X, simulación en vivo).
 
 **Pendientes conocidos:**
 - Respuesta de la DACC a un pedido de series horarias (no bloquea nada: todo es simulado).
