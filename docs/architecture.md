@@ -20,7 +20,7 @@ flowchart LR
 | Consultas | `db/queries/` | Q1 a Q10 como módulos de Python con `pymongo` (ADR-014); `dashboard/data.py` los llama |
 | Simulador | `simulator/` | Genera lecturas y escenarios; expone funciones importables |
 | Dashboard | `dashboard/` | `data.py` (único acceso a MongoDB desde la interfaz: llama a `db/queries` y cachea) y `app.py` (presentación) |
-| Resguardo | `scripts/` | Backup y restauración |
+| Resguardo | `scripts/backup_restore/` | Backup y restauración |
 
 ## Decisiones de arquitectura
 

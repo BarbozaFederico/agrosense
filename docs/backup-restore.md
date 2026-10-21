@@ -5,9 +5,9 @@
 ## En tres comandos
 
 ```bash
-python -m scripts.backup                                              # hace el backup y borra las copias que sobran
-python -m scripts.restaurar --comparar-con agrosense                  # restaura el último en agrosense_restaurada y lo verifica
-python -m scripts.probar_respaldo                                     # 19 casos automáticos (usa agrosense_tests)
+python -m scripts.backup_restore.backup                                              # hace el backup y borra las copias que sobran
+python -m scripts.backup_restore.restaurar --comparar-con agrosense                  # restaura el último en agrosense_restaurada y lo verifica
+python -m scripts.backup_restore.probar_respaldo                                     # 19 casos automáticos (usa agrosense_tests)
 ```
 
 Requisito: MongoDB Database Tools (`winget install MongoDB.DatabaseTools`). El instalador no los agrega al PATH; los scripts los encuentran solos en `C:\Program Files\MongoDB\Tools\*\bin`, o en la carpeta de la variable `AGROSENSE_HERRAMIENTAS`.
@@ -25,15 +25,15 @@ Estos números no tienen fuente: son un **supuesto adoptado** por el equipo (ADR
 | Pérdida máxima | Lo ocurrido desde el último backup (24 h). La instancia es una sola, sin réplicas ni oplog: no hay recuperación a un instante |
 | Tamaño | 2,4 MB por copia (727.980 lecturas comprimidas) |
 
-La retención se decide en `seleccionar_a_borrar` (`scripts/backup.py`). Si hay dos copias el mismo día queda la más nueva; un domingo cuenta como diario mientras esté entre los 7 días más recientes y, después, como semanal hasta completar 4.
+La retención se decide en `seleccionar_a_borrar` (`scripts/backup_restore/backup.py`). Si hay dos copias el mismo día queda la más nueva; un domingo cuenta como diario mientras esté entre los 7 días más recientes y, después, como semanal hasta completar 4.
 
 ## Procedimiento
 
 ### Hacer un backup
 
 ```bash
-python -m scripts.backup                      # base "agrosense" (o la de AGROSENSE_BD)
-python -m scripts.backup --destino D:/respaldos --sin-rotar
+python -m scripts.backup_restore.backup                      # base "agrosense" (o la de AGROSENSE_BD)
+python -m scripts.backup_restore.backup --destino D:/respaldos --sin-rotar
 ```
 
 Genera dos archivos: `agrosense_AAAAMMDD_HHMMSS.archive.gz` (el volcado, hecho con `mongodump --db agrosense --archive --gzip`) y `agrosense_AAAAMMDD_HHMMSS.manifiesto.json` con la huella `sha256`, el tamaño, la versión del servidor y, por colección, tipo, documentos, nombres de índices y huella del validador. El manifiesto no tiene datos ni credenciales.
@@ -41,9 +41,9 @@ Genera dos archivos: `agrosense_AAAAMMDD_HHMMSS.archive.gz` (el volcado, hecho c
 ### Restaurar
 
 ```bash
-python -m scripts.restaurar                                   # el último backup, en agrosense_restaurada
-python -m scripts.restaurar RUTA.archive.gz --destino prueba  # un archivo concreto, en otra base
-python -m scripts.restaurar --comparar-con agrosense          # y además corre Q1, Q5, Q9 y Q10 en las dos bases
+python -m scripts.backup_restore.restaurar                                   # el último backup, en agrosense_restaurada
+python -m scripts.backup_restore.restaurar RUTA.archive.gz --destino prueba  # un archivo concreto, en otra base
+python -m scripts.backup_restore.restaurar --comparar-con agrosense          # y además corre Q1, Q5, Q9 y Q10 en las dos bases
 ```
 
 1. Comprueba que el archivo no cambió (huella `sha256`). Si cambió, **no restaura nada**.
@@ -54,7 +54,7 @@ python -m scripts.restaurar --comparar-con agrosense          # y además corre 
 ### Si se pierde la base (desastre)
 
 ```bash
-python -m scripts.restaurar --reemplazar                      # vuelve a dejar "agrosense" como estaba en el último backup
+python -m scripts.backup_restore.restaurar --reemplazar                      # vuelve a dejar "agrosense" como estaba en el último backup
 ```
 
 `--reemplazar` borra cada colección antes de restaurarla (`mongorestore --drop`). Se usa a propósito: sin ese permiso explícito, el script nunca toca una base que existe.
@@ -64,7 +64,7 @@ python -m scripts.restaurar --reemplazar                      # vuelve a dejar "
 Ejemplo para el Programador de tareas de Windows. **No se registró ninguna tarea** en este equipo (ADR-016) y el comando no se probó acá; se deja para quien lo necesite:
 
 ```bash
-schtasks /Create /SC DAILY /ST 02:00 /TN "agrosense-backup" /TR "cmd /c cd /d C:\ruta\agrosense && .venv\Scripts\python.exe -m scripts.backup" /F
+schtasks /Create /SC DAILY /ST 02:00 /TN "agrosense-backup" /TR "cmd /c cd /d C:\ruta\agrosense && .venv\Scripts\python.exe -m scripts.backup_restore.backup" /F
 ```
 
 Si la notebook está apagada a las 02:00, la tarea no corre salvo que se active "ejecutar lo antes posible si se perdió el inicio programado". La rotación va incluida en el mismo script.
@@ -81,14 +81,14 @@ Si la notebook está apagada a las 02:00, la tarea no corre salvo que se active 
 **Fecha:** 21/10/2026. **Servidor:** MongoDB 9.0.2. **Herramientas:** Database Tools 100.19.1. **Base:** `agrosense` real.
 
 ```text
-$ python -m scripts.backup
+$ python -m scripts.backup_restore.backup
 Backup de agrosense: C:\Users\g3d3g\agrosense-backups\agrosense_20261021_120816.archive.gz
   2445 KB, sha256 85c204749f28adcc…, MongoDB 9.0.2
   lecturas                      727980 documentos  timeseries
   riegos 563 · alertas 35 · observaciones_fenologicas 42 · nodos 12 · parcelas 6 · fincas 3 · variedades 1 · configuracion 1 · eventos_climaticos 1
 Rotación: 0 copia(s) borrada(s) (7 diarios + 4 semanales)
 
-$ python -m scripts.restaurar --comparar-con agrosense
+$ python -m scripts.backup_restore.restaurar --comparar-con agrosense
 Restaurando agrosense_20261021_120816.archive.gz en la base agrosense_restaurada…
   lecturas                      727980 documentos  timeseries  2 índices
   (las otras 9 colecciones, con los mismos conteos y sus índices)
@@ -103,7 +103,7 @@ RESULTADO: la base restaurada coincide con el manifiesto y con agrosense en Q1, 
 
 ### Pruebas automáticas
 
-`python -m scripts.probar_respaldo` (19 casos, sobre `agrosense_tests` y una carpeta temporal):
+`python -m scripts.backup_restore.probar_respaldo` (19 casos, sobre `agrosense_tests` y una carpeta temporal):
 
 | Grupo | Qué comprueba |
 |---|---|
