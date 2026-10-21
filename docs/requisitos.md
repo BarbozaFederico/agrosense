@@ -115,7 +115,7 @@ El diseño detallado va en [`modelo-datos.md`](modelo-datos.md).
 - [x] El simulador carga unas 100.000 lecturas o más, con noches de helada en las 3 fincas (727.980 lecturas; `python -m simulator.probar_simulador`, 51 casos).
 - [x] Las consultas Q1 a Q10 están en `db/queries/` y devuelven resultados correctos sobre los datos simulados (`python -m db.queries.probar_consultas`, 43 casos; ver [`consultas.md`](consultas.md)).
 - [x] Hay mediciones antes y después de índices para al menos 3 consultas (las 10 medidas; 4 mejoradas con índice propio: Q5, Q7, Q8 y Q9; ver [`performance.md`](performance.md) y `python -m db.indexes.probar_indices`, 19 casos).
-- [ ] El backup se genera con un script y la restauración fue probada.
+- [x] El backup se genera con un script y la restauración fue probada (`docs/backup-restore.md`, ADR-016).
 - [ ] Existen al menos 2 roles de usuario.
 - [ ] El dashboard muestra las 4 pantallas con la noche precargada, con tema oscuro, y funciona sin internet.
 - [ ] El README permite reconstruir el proyecto desde cero.
