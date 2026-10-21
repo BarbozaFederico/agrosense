@@ -186,3 +186,16 @@ Se crean con `python -m db.indexes.crear_indices`. Mediciones completas, costo e
 ## Cómo se probó
 
 `python -m db.queries.probar_consultas` (43 casos, base `agrosense_tests`, ~30 s): cada consulta se compara con un cálculo independiente (Python con `find`, el escenario del simulador o la colección `alertas`) y el texto de `mongosh` de Q1, Q4 y Q7 se ejecuta en `mongosh` y se compara con el resultado de Python. Detalle de lo que verifica cada caso en la salida de la prueba.
+
+## Consultas de apoyo del dashboard
+
+La pantalla "Resumen de la mañana" (ADR-018) reutiliza Q5, Q9 y Q10 y suma cuatro consultas de `db/queries/resumen_manana.py`. **No son Q11**: no responden a un requisito nuevo, solo traen lo que la pantalla muestra. Ninguna escribe en la base.
+
+| Función | Qué devuelve | Etapas |
+|---|---|---|
+| `alertas_de_helada` | Alertas de helada que se solapan con la noche (de las 18:00 a las 12:00, hora de Argentina) | `$match` (`inicio` antes del cierre y `fin` nulo o posterior al comienzo), `$project`, `$sort` |
+| `ultimo_riego` | El último riego de cada parcela que empezó antes del cierre de la noche | `$match`, `$sort` descendente, `$group` con `$first`, `$project` |
+| `ultima_lectura` | Momento de la última lectura hasta un "ahora" (se busca solo en las 6 horas previas) | `$match` por rango de `ts`, `$sort`, `$limit` 1 |
+| `noches_con_helada` | Las mañanas con al menos una alerta de helada (la mañana de una alerta es la fecha local de `inicio` + 6 h) | `$match`, `$group` con `$dateToString` y `$dateAdd`, `$sort` |
+
+Cada una tiene su `pipeline_xxx(...)`, de donde sale el texto de `mongosh` del panel "Ver consulta". Se prueban con `python -m dashboard.probar_datos`.

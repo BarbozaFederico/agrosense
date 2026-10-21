@@ -71,7 +71,7 @@ agrosense/
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
 | [`docs/seed.md`](docs/seed.md) | Seed base: qué carga, cómo se usa y qué supuestos tiene |
 | [`docs/consultas.md`](docs/consultas.md) | Consultas Q1 a Q10: qué responden, cómo se calculan etapa por etapa y su resultado real |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-016) |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-016 y ADR-018) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta
@@ -127,9 +127,16 @@ python -m simulator.probar_simulador     # 51 casos del simulador (~1 min)
 python -m db.queries.probar_consultas    # 43 casos de las consultas contra cálculos independientes (~30 s)
 python -m db.indexes.probar_indices      # 19 casos: los índices existen, se usan y no cambian ninguna respuesta
 python -m scripts.backup_restore.probar_respaldo        # 19 casos: backup, rotación, restauración y protecciones (unos segundos)
+python -m dashboard.probar_datos         # 21 casos de los datos de la pantalla "Resumen de la mañana" (unos segundos)
 ```
 
-La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* dashboard y roles.
+Dashboard (con la base cargada; se abre en `http://localhost:8501`). Hoy tiene la primera pantalla, "Resumen de la mañana" ([ADR-018](docs/decisions/ADR-018-resumen-de-la-manana.md)); las otras tres están en construcción:
+
+```bash
+python -m streamlit run dashboard/app.py
+```
+
+La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* tres pantallas del dashboard y roles.
 
 ## Equipo
 

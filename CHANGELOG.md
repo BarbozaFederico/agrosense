@@ -32,6 +32,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - Backup y restauración (`scripts/backup_restore/backup.py`, `scripts/backup_restore/restaurar.py`, `scripts/backup_restore/comun.py`): `mongodump --archive --gzip` de la base `agrosense` en un archivo con su manifiesto (sha256 y resumen de cada colección), rotación de 7 diarios y 4 semanales, respaldos siempre fuera del repositorio, y restauración a una base aparte que se niega a pisar una base existente, detecta un archivo alterado y se verifica contra el manifiesto y con Q1, Q5, Q9 y Q10. Probado sobre la base real (727.980 lecturas restauradas como serie temporal, con los mismos índices y validadores). `scripts/backup_restore/probar_respaldo.py` (19 casos) y `docs/backup-restore.md` completo con la prueba de restauración. ADR-016. Instalación: MongoDB Database Tools 100.19.1.
 - `db.queries.probar_consultas`: 43 casos que comparan cada consulta con un cálculo independiente, y el texto de `mongosh` de Q1, Q4 y Q7 con el resultado de Python.
 - Pasos para ejecutar el proyecto en el README y estado actual en `CLAUDE.md`.
+- Primera pantalla del dashboard, "Resumen de la mañana" (`dashboard/app.py`, `data.py`, `estilo.py`, `.streamlit/config.toml`): frase de estado, tabla de la noche por parcela con barra de tiempo de 18:00 a 12:00, mapa por finca sin mapa base y panel "Ver consulta". Corre con `python -m streamlit run dashboard/app.py`. ADR-018.
+- `db/queries/resumen_manana.py`: cuatro consultas de apoyo de esa pantalla (alertas de helada de la noche, último riego, última lectura y mañanas con helada); no son Q11.
+- `dashboard/probar_datos.py`: 21 casos de los datos de la pantalla (`python -m dashboard.probar_datos`).
+- `PRODUCT.md`: contexto de producto (usuarios, propósito, restricciones y principios) para el trabajo de diseño de la interfaz.
 
 ### Cambiado
 - Regla permanente en `CLAUDE.md`: `CLAUDE.md`, `README.md` y `CHANGELOG.md` se actualizan en el mismo cambio.
@@ -39,6 +43,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - San Rafael brota ~30/9 con la regla de Q9, no ~1/10 (ADR-013).
 - Índices propuestos en `docs/modelo-datos.md` corregidos con las mediciones: `alertas {tipo, inicio}` en lugar de `{parcela_id, inicio}` y `{estado, tipo}` (ninguna consulta filtra por `estado`), y se agrega el de `lecturas` para Q5 (ADR-015). El criterio de aceptación de mediciones queda cumplido.
 - Q5 documentaba que usaba el índice automático de la serie temporal; no era cierto (examinaba 5.053 documentos). Corregido en `q5_nodos_sin_reportar.py`.
+- `docs/ux/pantallas.md` v0.3: "Resumen de finca" pasa a ser "Resumen de la mañana" (ADR-018), con la tabla de la noche como protagonista; las otras tres pantallas quedan marcadas como pendientes.
 - Las consultas Q1 a Q10 pasan de `mongosh` a Python (ADR-014, reemplaza una frase de ADR-008); `dashboard/data.py` las llama en lugar de reescribirlas (ajuste a ADR-002). La helada (Q2 y Q10) usa la etapa estimada y no la observada, igual que las alertas (excepción a ADR-004).
 - Alcance: de 30 días sin variedad definida a una temporada de Malbec (1/9/2026 a 31/3/2027, unas 732.700 lecturas).
 - Umbrales de helada: valores de vid por etapa BBCH en lugar de los de frutales (IDR + DACC).
