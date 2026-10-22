@@ -19,7 +19,7 @@ flowchart LR
 | Seeds | `db/seeds/` | Datos iniciales, incluida la noche de helada precargada |
 | Consultas | `db/queries/` | Q1 a Q10 como módulos de Python con `pymongo` (ADR-014); `dashboard/data.py` los llama |
 | Simulador | `simulator/` | Genera lecturas y escenarios; expone funciones importables |
-| Dashboard | `dashboard/` | `data.py` (único acceso a MongoDB desde la interfaz: llama a `db/queries` y cachea), `mapa.py` y `graficos.py` (figuras), `piezas.py`, `piezas_alertas.py` y `formato.py` (textos y HTML, sin Streamlit), `estilo.py` (paleta y CSS), `lateral.py` (barra lateral), `app.py` (menú) y `paginas/` (una pantalla por archivo) |
+| Dashboard | `dashboard/` | `data.py` (único acceso a MongoDB desde la interfaz: llama a `db/queries` y cachea), `mapa.py` y `graficos.py` (figuras), `piezas.py`, `piezas_alertas.py`, `piezas_nodos.py` y `formato.py` (textos y HTML, sin Streamlit), `estilo.py` (paleta y CSS), `lateral.py` (barra lateral), `app.py` (menú) y `paginas/` (una pantalla por archivo) |
 | Resguardo | `scripts/backup_restore/` | Backup y restauración |
 
 ## Decisiones de arquitectura
@@ -53,4 +53,4 @@ Desde la raíz del repo, con la base cargada (`python -m db.seeds.cargar` y `pyt
 .venv/Scripts/python.exe -m streamlit run dashboard/app.py
 ```
 
-Se abre en `http://localhost:8501`. Pruebas: `python -m dashboard.probar_datos`, `python -m dashboard.probar_detalle`, `python -m dashboard.probar_alertas` y `python -m dashboard.probar_pantallas`. Detalle en el README.
+Se abre en `http://localhost:8501`. Pruebas: `python -m dashboard.probar_datos`, `python -m dashboard.probar_detalle`, `python -m dashboard.probar_alertas`, `python -m dashboard.probar_nodos` y `python -m dashboard.probar_pantallas`. Detalle en el README.

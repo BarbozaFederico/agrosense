@@ -218,3 +218,11 @@ La pantalla "Alertas" (ADR-020) reutiliza Q8 y suma tres consultas de `db/querie
 | `etapas_del_malbec` | Nombre y rango BBCH de cada etapa, para traducir el número que guarda la alerta | `find` sobre `variedades` |
 
 Se prueban con `python -m dashboard.probar_alertas`.
+
+La pantalla "Estado de nodos" (ADR-021) reutiliza Q5 y suma una consulta de `db/queries/estado_nodos.py`, tampoco Q11:
+
+| Función | Qué devuelve | Etapas |
+|---|---|---|
+| `ultimo_reporte` | Los 12 nodos con el momento de su última lectura hasta el "ahora" y los minutos desde entonces | Las 3 primeras etapas de Q5 (`$lookup` a la última lectura y los dos `$set`), `$project`, `$sort` |
+
+Q5 devuelve solo los nodos que no reportan; esta trae todos, con la misma búsqueda. Se prueba con `python -m dashboard.probar_nodos`, que compara los nodos sin reportar contra Q5 en 75 fechas de la temporada.

@@ -71,7 +71,7 @@ agrosense/
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
 | [`docs/seed.md`](docs/seed.md) | Seed base: qué carga, cómo se usa y qué supuestos tiene |
 | [`docs/consultas.md`](docs/consultas.md) | Consultas Q1 a Q10: qué responden, cómo se calculan etapa por etapa y su resultado real |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-016 y ADR-018 a ADR-020) |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-016 y ADR-018 a ADR-021) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta
@@ -130,16 +130,17 @@ python -m scripts.backup_restore.probar_respaldo        # 19 casos: backup, rota
 python -m dashboard.probar_datos         # 37 casos de los datos y del mapa de "Resumen de la mañana" (unos segundos)
 python -m dashboard.probar_detalle       # 53 casos de "Detalle de parcela": datos, textos, gráficos y consultas de apoyo
 python -m dashboard.probar_alertas       # 44 casos de "Alertas": datos, textos, filtros, historial, semanas y consultas de apoyo
-python -m dashboard.probar_pantallas     # 36 casos de punta a punta: abre las tres pantallas, con las 6 parcelas, y prueba los controles
+python -m dashboard.probar_nodos         # 31 casos de "Estado de nodos": datos, textos y la coincidencia con Q5
+python -m dashboard.probar_pantallas     # 46 casos de punta a punta: abre las cuatro pantallas, con las 6 parcelas, y prueba los controles
 ```
 
-Dashboard (con la base cargada; se abre en `http://localhost:8501`). Hoy tiene tres pantallas, "Resumen de la mañana" ([ADR-018](docs/decisions/ADR-018-resumen-de-la-manana.md)), "Detalle de parcela" ([ADR-019](docs/decisions/ADR-019-detalle-de-parcela.md)) y "Alertas" ([ADR-020](docs/decisions/ADR-020-alertas.md)); la de estado de nodos está en construcción:
+Dashboard (con la base cargada; se abre en `http://localhost:8501`). Tiene las 4 pantallas: "Resumen de la mañana" ([ADR-018](docs/decisions/ADR-018-resumen-de-la-manana.md)), "Detalle de parcela" ([ADR-019](docs/decisions/ADR-019-detalle-de-parcela.md)), "Alertas" ([ADR-020](docs/decisions/ADR-020-alertas.md)) y "Estado de nodos" ([ADR-021](docs/decisions/ADR-021-estado-de-nodos.md)):
 
 ```bash
 python -m streamlit run dashboard/app.py
 ```
 
-La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* una pantalla del dashboard y roles.
+La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* roles.
 
 ## Equipo
 

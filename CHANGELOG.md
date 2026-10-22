@@ -43,6 +43,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - Tercera pantalla del dashboard, "Alertas" (`dashboard/paginas/alertas.py`): las alertas de la noche elegida (helada y riego, con filtro de tipo y de finca), el historial de la temporada en una tabla ordenable y las heladas por departamento y semana (Q8). ADR-020.
 - `db/queries/alertas_pantalla.py`: tres consultas de apoyo (`alertas_de_la_noche`, `historial` y `etapas_del_malbec`); no son Q11.
 - `dashboard/probar_alertas.py` (44 casos) y 13 casos de punta a punta de Alertas en `dashboard/probar_pantallas.py` (36 en total).
+- Cuarta y última pantalla del dashboard, "Estado de nodos" (`dashboard/paginas/nodos.py`): cuántos de los 12 nodos reportan, cuáles no y desde cuándo, con el estado del reporte (calculado) separado del estado administrativo del nodo. Con ella quedan hechas las 4 pantallas del MVP. ADR-021.
+- `db/queries/estado_nodos.py`: consulta de apoyo con el último reporte de los 12 nodos, armada con las etapas de Q5 para que nunca discrepen; no es Q11.
+- `dashboard/probar_nodos.py` (31 casos, incluida la comparación con Q5 en 75 fechas) y 10 casos de punta a punta de Estado de nodos en `dashboard/probar_pantallas.py` (46 en total).
 
 ### Cambiado
 - Regla permanente en `CLAUDE.md`: `CLAUDE.md`, `README.md` y `CHANGELOG.md` se actualizan en el mismo cambio.
@@ -50,6 +53,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - San Rafael brota ~30/9 con la regla de Q9, no ~1/10 (ADR-013).
 - Índices propuestos en `docs/modelo-datos.md` corregidos con las mediciones: `alertas {tipo, inicio}` en lugar de `{parcela_id, inicio}` y `{estado, tipo}` (ninguna consulta filtra por `estado`), y se agrega el de `lecturas` para Q5 (ADR-015). El criterio de aceptación de mediciones queda cumplido.
 - Q5 documentaba que usaba el índice automático de la serie temporal; no era cierto (examinaba 5.053 documentos). Corregido en `q5_nodos_sin_reportar.py`.
+- `docs/ux/pantallas.md` v0.6: "Estado de nodos" pasa a hecha; las 4 pantallas están completas (ADR-021).
 - `docs/ux/pantallas.md` v0.5: "Alertas" pasa a hecha (ADR-020).
 - `docs/ux/pantallas.md` v0.4: "Detalle de parcela" pasa a hecha (ADR-019).
 - `docs/ux/pantallas.md` v0.3: "Resumen de finca" pasa a ser "Resumen de la mañana" (ADR-018), con la tabla de la noche como protagonista; las otras tres pantallas quedan marcadas como pendientes.

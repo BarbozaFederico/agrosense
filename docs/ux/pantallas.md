@@ -1,6 +1,6 @@
 # Pantallas y comportamiento del dashboard
 
-**Estado:** v0.5 (22/10/2026). Hechas "Resumen de la mañana" ([ADR-018](../decisions/ADR-018-resumen-de-la-manana.md)), "Detalle de parcela" ([ADR-019](../decisions/ADR-019-detalle-de-parcela.md)) y "Alertas" ([ADR-020](../decisions/ADR-020-alertas.md)). Falta estado de nodos.
+**Estado:** v0.6 (22/10/2026). Hechas las 4 pantallas: "Resumen de la mañana" ([ADR-018](../decisions/ADR-018-resumen-de-la-manana.md)), "Detalle de parcela" ([ADR-019](../decisions/ADR-019-detalle-de-parcela.md)), "Alertas" ([ADR-020](../decisions/ADR-020-alertas.md)) y "Estado de nodos" ([ADR-021](../decisions/ADR-021-estado-de-nodos.md)).
 Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [ADR-002](../decisions/ADR-002-interfaz-streamlit.md).
 
 ---
@@ -12,7 +12,7 @@ Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [AD
 | Objetivo | Demo vistosa del sistema completo. **Parte obligatoria de la entrega** |
 | Plataforma | Web de escritorio, en local. Móvil fuera de alcance |
 | Tecnología | Streamlit + Plotly + pymongo |
-| Pantallas | Resumen de la mañana, detalle de parcela y alertas (hechas); estado de nodos (pendiente) |
+| Pantallas | Resumen de la mañana, detalle de parcela, alertas y estado de nodos (las 4, hechas) |
 | Estilo | Tema oscuro, mundo "Boletín agrometeorológico" (ADR-018): grafito, tinta cálida y color solo para el estado |
 | Noche de helada | **Precargada** en el seed (obligatoria) |
 | Simulación en vivo | Opcional; **es lo primero que se recorta** si falta tiempo |
@@ -23,7 +23,7 @@ Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [AD
 
 ## 2. Elementos comunes
 
-- Barra lateral con la navegación entre las 4 pantallas (las pendientes figuran "en construcción"), el selector de la pantalla (**finca** en el resumen, **parcela** en el detalle), el **selector de fecha** y un botón por cada mañana con alerta de helada. La fecha y la parcela viajan también en la URL (`?fecha=2026-10-05&parcela=P-SR-1`).
+- Barra lateral con la navegación entre las 4 pantallas, el selector de la pantalla (**finca** en el resumen, **parcela** en el detalle), el **selector de fecha** y un botón por cada mañana con alerta de helada. La fecha y la parcela viajan también en la URL (`?fecha=2026-10-05&parcela=P-SR-1`).
 - Etiqueta visible **"datos simulados"**.
 - Panel desplegable **"Ver consulta"** con las consultas de MongoDB que alimentan la pantalla, escritas para `mongosh`.
 - Indicador "último dato" y cantidad de nodos que reportan.
@@ -75,13 +75,18 @@ Para el encargado o el técnico después de ver el resumen. Responde: ¿qué ale
 | Consultas | Q8, más las de apoyo de `db/queries/alertas_pantalla.py` |
 | Estados | Noche sin alertas, filtro sin resultados, alerta en curso al cierre, historial vacío (antes de la primera alerta), noche con solo riego |
 
-### 3.4 Estado de nodos (pendiente)
+### 3.4 Estado de nodos (hecha)
+
+Para el administrador, el técnico o el encargado que duda de un dato. Responde: ¿están reportando todos los sensores, cuál no y desde cuándo? El "ahora" es el cierre de la noche elegida (12:00): casi siempre los 12 nodos reportan, y hay nodos sin reportar en 17 días de la temporada (3/12, 2/3 y del 17/3 en adelante).
 
 | Elemento | Detalle |
 |---|---|
-| Lista | Nodo, parcela, último reporte y estado |
-| Inactivos | Resaltados (sin reportar hace más de 30 minutos) |
-| Consultas | Q5 |
+| Frase de estado | "Los 12 nodos reportan." o "1 de 12 nodos sin reportar: N-TU-2-B.", con cuánto lleva sin datos y cuándo fue su último reporte. A la derecha, el último dato de la red |
+| Tabla de nodos (protagonista) | Una fila por nodo: reporte (círculo verde o triángulo ámbar, con la palabra), nodo, parcela (enlace al detalle), último reporte, hace cuánto y estado del nodo. Los que no reportan van primero y resaltados |
+| Dos estados | "Reporte" se calcula (más de 30 minutos sin lecturas = sin reportar). "Estado del nodo" es el del catálogo (activo, mantenimiento o baja). Si se contradicen, la celda lo aclara ("sigue reportando", "activo, pero no reporta") |
+| Ver consulta | Último reporte de cada nodo y Q5 |
+| Consultas | Q5, más la de apoyo de `db/queries/estado_nodos.py` |
+| Estados | Todos reportan, uno o varios sin reportar, un nodo sin ninguna lectura, mantenimiento que sigue reportando, activo que dejó de reportar, filtro de finca (4 nodos por finca) |
 
 ## 4. Noche precargada (obligatoria)
 

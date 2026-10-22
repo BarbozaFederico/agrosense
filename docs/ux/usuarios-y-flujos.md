@@ -27,7 +27,7 @@
 1. **Revisar la mañana** (hecho, [ADR-018](../decisions/ADR-018-resumen-de-la-manana.md)): el encargado abre "Resumen de la mañana", lee la frase de estado, mira en la tabla qué parcelas se helaron, desde cuándo y si se regaron, y ubica la parcela en el mapa.
 2. **Investigar una alerta** (hecho, [ADR-019](../decisions/ADR-019-detalle-de-parcela.md)): desde la tabla del resumen, un clic en la parcela abre su detalle con la misma noche; ahí se ve la curva contra el umbral, cuánto duró y qué pasó con el suelo y el riego.
 3. **Revisar las alertas** (hecho, [ADR-020](../decisions/ADR-020-alertas.md)): desde la barra lateral, la pantalla "Alertas" muestra las de la noche elegida, el historial y las heladas por semana; un clic en la parcela abre su detalle.
-4. *A completar:* verificar nodos inactivos.
+4. **Verificar los nodos** (hecho, [ADR-021](../decisions/ADR-021-estado-de-nodos.md)): desde la barra lateral, "Estado de nodos" dice cuántos reportan, cuáles no y desde cuándo, y un clic en la parcela abre su detalle.
 
 ## Wireframes
 
