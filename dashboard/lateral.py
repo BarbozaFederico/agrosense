@@ -14,8 +14,9 @@ from dashboard.formato import fecha_corta
 
 FECHA_INICIAL = date(2026, 10, 5)               # la noche de helada precargada (RF-13)
 TEMPORADA = (date(2026, 9, 1), date(2027, 3, 31))
-PANTALLAS_HECHAS = [("paginas/resumen.py", "Resumen de la mañana"), ("paginas/detalle.py", "Detalle de parcela")]
-PANTALLAS_PENDIENTES = ["Alertas", "Estado de nodos"]
+PANTALLAS_HECHAS = [("paginas/resumen.py", "Resumen de la mañana"), ("paginas/detalle.py", "Detalle de parcela"),
+                    ("paginas/alertas.py", "Alertas")]
+PANTALLAS_PENDIENTES = ["Estado de nodos"]
 
 
 def fecha_de_la_url() -> date | None:

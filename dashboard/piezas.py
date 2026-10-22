@@ -9,6 +9,9 @@ from html import escape
 
 from dashboard.formato import AGRAVANTES, duracion, fecha_corta, grados, hora, marca, numero
 
+EJE_NOCHE = ["18", "21", "00", "03", "06", "09", "12"]      # las horas del eje de la barra de tiempo
+
+
 # --------------------------------------------------------------------------- Resumen de la mañana
 
 def frase_de_estado(filas: list[dict]) -> tuple[str, str]:
@@ -46,21 +49,21 @@ def texto_riego(r: dict) -> str:
     return 'Sin regar<span class="sec">Sin riegos registrados</span>'
 
 
-def barra(f: dict) -> str:
-    """La noche de 18:00 a 12:00; en rojo, lo que duró la alerta de helada."""
+def barra(f: dict, clase: str = "") -> str:
+    """La noche de 18:00 a 12:00; en rojo, lo que duró la alerta de helada (con `clase="riego"`, en ámbar)."""
     a = f["alerta"]
     marcas = "".join(f'<i style="left:{p:.2f}%"></i>' for p in (16.67, 33.33, 50, 66.67, 83.33))
     if a is None:
         cuerpo = '<em>sin alerta registrada</em>' if f["estado"] == "helada" else ""
     else:
         ancho = max(0.8, (a["hasta"] - a["desde"]) * 100)
-        cuerpo = (f'<b class="{"abierta" if a["en_curso"] else ""}" style="left:{a["desde"] * 100:.2f}%;width:{ancho:.2f}%"></b>')
+        cuerpo = (f'<b class="{"abierta " if a["en_curso"] else ""}{clase}" style="left:{a["desde"] * 100:.2f}%;width:{ancho:.2f}%"></b>')
     rotulo = "" if a is None else f"Alerta de {hora(a['inicio'])} a {'la mañana' if a['fin'] is None else hora(a['fin'])}"
     return f'<div class="barra" role="img" aria-label="{escape(rotulo or "Sin alerta en la noche")}">{marcas}{cuerpo}</div>'
 
 
 def tabla(filas: list[dict], fecha: date) -> str:
-    eje = "".join(f'<span style="left:{i * 16.667:.2f}%">{h}</span>' for i, h in enumerate(["18", "21", "00", "03", "06", "09", "12"]))
+    eje = "".join(f'<span style="left:{i * 16.667:.2f}%">{h}</span>' for i, h in enumerate(EJE_NOCHE))
     cab = ("<tr><th>Estado</th><th>Parcela</th><th>Etapa</th><th class='num'>Mínima en el brote</th>"
            f"<th><div class='eje' aria-hidden='true'>{eje}</div></th><th class='num'>Bajo el umbral</th>"
            "<th>Riesgo</th><th>Riego</th></tr>")

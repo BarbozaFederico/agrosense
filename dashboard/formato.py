@@ -47,6 +47,16 @@ def noche_texto(d: date) -> str:
     return f"Noche del {previo.day} de {MESES[previo.month - 1]} al {d.day} de {MESES[d.month - 1]} de {d.year}"
 
 
+TIPO_TEXTO = {"helada": "Helada", "riego": "Riego"}
+
+
+def marca_tipo(tipo: str) -> str:
+    """Marca de una alerta: la helada usa el rombo rojo del estado; el riego, el triángulo ámbar de 'atención'."""
+    estado = "helada" if tipo == "helada" else "atencion"
+    return (f'<span class="marca-estado {estado}"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">'
+            f'{ESTADO_FORMA[estado]}</svg>{TIPO_TEXTO.get(tipo, tipo)}</span>')
+
+
 def marca(estado: str) -> str:
     return (f'<span class="marca-estado {estado}"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">'
             f'{ESTADO_FORMA[estado]}</svg>{ESTADO_TEXTO[estado]}</span>')

@@ -58,6 +58,7 @@ table.noche .sec{color:var(--tinta-2);font-size:.82rem;display:block}
 .barra i{position:absolute;top:0;bottom:0;width:1px;background:var(--costura)}
 .barra b{position:absolute;top:3px;bottom:3px;background:var(--helada);border-radius:1px;
 transform-origin:left;animation:crece .7s var(--ease) both}
+.barra b.riego{background:var(--atencion)}
 .barra b.abierta{border-radius:1px 0 0 1px}
 .barra em{position:absolute;top:0;bottom:0;display:flex;align-items:center;left:.5rem;font-style:normal;
 font-size:.74rem;color:var(--tinta-2)}
@@ -91,10 +92,11 @@ a.enlace:hover{text-decoration-color:var(--atencion);color:var(--atencion)}
 .aviso-nodos{color:var(--atencion);font-size:.9rem;margin:.3rem 0 .8rem}
 .semanas{color:var(--tinta-2);font-size:.85rem;margin-top:.7rem;line-height:1.6;font-variant-numeric:tabular-nums}
 .semanas b{color:var(--tinta);font-weight:600}
-table.riegos{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.9rem}
-table.riegos th{font-weight:500;font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--tinta-2);text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--costura);white-space:nowrap}
-table.riegos td{padding:.5rem .5rem;border-bottom:1px solid var(--costura);white-space:nowrap}
-table.riegos .num{text-align:right}
-table.riegos tr.esta-noche td{background:rgba(236,230,216,.05)}
+table.riegos,table.q8{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.9rem}
+table.riegos th,table.q8 th{font-weight:500;font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--tinta-2);text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--costura);white-space:nowrap}
+table.riegos td,table.q8 td{padding:.5rem .5rem;border-bottom:1px solid var(--costura);white-space:nowrap}
+table.q8 .sec{display:block;color:var(--tinta-2);font-size:.82rem}
+table.riegos .num,table.q8 .num{text-align:right}
+table.riegos tr.esta-noche td,table.q8 tr.esta-noche td{background:rgba(236,230,216,.05)}
 </style>
 """

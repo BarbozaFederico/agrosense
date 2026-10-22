@@ -10,8 +10,9 @@ from datetime import date, datetime, timedelta
 import streamlit as st
 
 from db.conexion import obtener_base
-from db.queries import (comun, detalle_parcela as dp, q1_horas_bajo_cero as q1, q5_nodos_sin_reportar as q5,
-                        q6_humedad_suelo_horaria as q6, q7_litros_por_semana as q7, q9_etapa_por_grados_dia as q9,
+from db.queries import (alertas_pantalla as ap, comun, detalle_parcela as dp, q1_horas_bajo_cero as q1, q5_nodos_sin_reportar as q5,
+                        q6_humedad_suelo_horaria as q6, q7_litros_por_semana as q7, q8_heladas_por_departamento as q8,
+                        q9_etapa_por_grados_dia as q9,
                         q10_riesgo_de_helada as q10, resumen_manana as rm)
 
 VENTANA_H = 18                      # la noche: de las 18:00 a las 12:00
@@ -179,6 +180,55 @@ def armar_detalle(fecha: date, parcela_id: str, catalogo: dict, riesgo: dict | N
     }
 
 
+# --------------------------------------------------------------------------- alertas (puro)
+
+def nombre_de_etapa(bbch: int, etapas: list[dict]) -> str:
+    """Nombre de la etapa a la que pertenece un número BBCH (las alertas guardan solo el número)."""
+    for e in etapas:
+        if e["bbch_desde"] <= bbch <= e["bbch_hasta"]:
+            return e["nombre"]
+    return f"BBCH {bbch}"
+
+
+def _fila_de_alerta(a: dict, parcelas: dict, fincas: dict, etapas: list[dict], inicio: datetime, ahora: datetime) -> dict:
+    p = parcelas[a["parcela_id"]]
+    f = fincas[p["finca_id"]]
+    a_ini = comun.a_utc(a["inicio"])
+    a_fin = comun.a_utc(a["fin"]) if a["fin"] else None
+    return {
+        "tipo": a["tipo"], "parcela_id": a["parcela_id"], "parcela": p["nombre"], "finca_id": f["_id"],
+        "finca": f["nombre"], "departamento": f["departamento"], "etapa": nombre_de_etapa(a["etapa_bbch"], etapas),
+        "umbral": a["umbral"], "valor_extremo": a["valor_extremo"],
+        "nivel": (a.get("riesgo") or {}).get("nivel"), "agravantes": (a.get("riesgo") or {}).get("agravantes", []),
+        "inicio": _local(a_ini), "fin": None if a_fin is None else _local(a_fin),
+        "horas": ((a_fin or ahora) - a_ini).total_seconds() / 3600,
+        "alerta": _alerta(a, inicio, ahora),
+    }
+
+
+def armar_alertas(fecha: date, noche: list[dict], historial: list[dict], semanas: list[dict], catalogo: dict,
+                  etapas: list[dict]) -> dict:
+    """Junta los resultados de las consultas en lo que muestra "Alertas".
+
+    `noche` y `historial` son alertas de ambos tipos; `semanas`, el resultado de Q8 (solo helada); `etapas`, las de la
+    variedad. `alerta` de cada fila de la noche tiene la posición de su barra de tiempo (como en "Resumen de la mañana")."""
+    inicio, ahora = comun.ventana_noche(fecha)
+    fincas = {f["_id"]: f for f in catalogo["fincas"]}
+    parcelas = {p["_id"]: p for p in catalogo["parcelas"]}
+    departamentos = sorted({f["departamento"] for f in catalogo["fincas"]})
+    lunes = _local(comun.medianoche_local(fecha - timedelta(days=fecha.weekday())))
+    por_semana: dict[datetime, dict] = {}
+    for s in semanas:
+        por_semana.setdefault(_local(s["semana"]), {})[s["departamento"]] = {
+            "alertas": s["alertas"], "parcelas": s["parcelas_afectadas"], "minima_brote_c": s["minima_brote_c"]}
+    return {
+        "fecha": fecha, "inicio": _local(inicio), "ahora": _local(ahora), "departamentos": departamentos,
+        "noche": [_fila_de_alerta(a, parcelas, fincas, etapas, inicio, ahora) for a in noche],
+        "historial": [_fila_de_alerta(a, parcelas, fincas, etapas, inicio, ahora) for a in historial],
+        "semanas": [{"semana": s, "por_departamento": por_semana[s], "actual": s == lunes} for s in sorted(por_semana)],
+    }
+
+
 # --------------------------------------------------------------------------- con caché
 
 @st.cache_data(show_spinner="Consultando la base…")
@@ -224,6 +274,24 @@ def consultas_mongosh_detalle(fecha: date, parcela_id: str) -> dict[str, str]:
         "Alertas de helada de la noche": comun.texto_mongosh("alertas", rm.pipeline_alertas_de_helada(fecha)),
         "Riesgo de helada (Q10)": comun.texto_mongosh("lecturas", q10.pipeline(
             fecha, q9.etapas_estimadas(bd, fecha), q10.umbral_de_riego_por_parcela(bd, fecha), comun.configuracion(bd))),
+    }
+
+
+@st.cache_data(show_spinner="Consultando la base…")
+def alertas(fecha: date) -> dict:
+    """Todo lo que necesita "Alertas" para la noche que termina en la mañana `fecha`."""
+    bd = base()
+    return armar_alertas(fecha, ap.alertas_de_la_noche(bd, fecha), ap.historial(bd, fecha), q8.consultar(bd),
+                         rm.catalogo(bd), ap.etapas_del_malbec(bd))
+
+
+@st.cache_data
+def consultas_mongosh_alertas(fecha: date) -> dict[str, str]:
+    """El texto de mongosh de cada consulta que alimenta "Alertas" (panel 'Ver consulta')."""
+    return {
+        "Alertas de la noche": comun.texto_mongosh("alertas", ap.pipeline_alertas_de_la_noche(fecha)),
+        "Historial de la temporada": comun.texto_mongosh("alertas", ap.pipeline_historial(fecha)),
+        "Heladas por departamento y semana (Q8)": comun.texto_mongosh("alertas", q8.pipeline()),
     }
 
 

@@ -92,6 +92,33 @@ def main() -> None:
         at = abrir("paginas/detalle.py", parcela="P-SM-2", fecha=dia)
         r.chequear(not at.exception, f"Detalle abre sin errores en el borde de la temporada ({dia})")
 
+    # ---- Alertas
+    at = abrir("paginas/alertas.py", fecha="2026-10-05")
+    t = textos(at)
+    r.chequear(not at.exception and "2 alertas de helada esta noche, en Finca Los Álamos (San Rafael)" in t, "Alertas abre el 5/10 y dice 2 alertas de helada en San Rafael")
+    r.chequear(t.count('class="enlace"') == 2 and "detalle?parcela=P-SR-1&fecha=2026-10-05" in t, "Alertas enlaza cada alerta de la noche con el detalle de su parcela")
+    r.chequear("Semana del 5 de oct" in t and "semana elegida" in t, "Alertas muestra el resumen semanal con la semana elegida")
+    r.chequear(len(at.dataframe) == 1, "Alertas muestra el historial como tabla ordenable")
+    r.chequear(at.sidebar.selectbox[0].label == "Finca" and at.segmented_control[0].value == "Todas", "Alertas muestra el filtro de finca y el de tipo (Todas)")
+    at.segmented_control[0].set_value("Riego").run()
+    r.chequear(not at.exception and "No hubo alertas de riego esta noche" in textos(at), "el filtro Riego deja sin alertas la noche del 5/10")
+    at.segmented_control[0].set_value("Helada").run()
+    r.chequear(not at.exception and "2 alertas de helada" in textos(at), "el filtro Helada deja las 2 alertas")
+    at.sidebar.selectbox[0].set_value("F-TU").run()
+    r.chequear(not at.exception and "No hubo alertas de helada esta noche" in textos(at) and "Tupungato" in textos(at),
+               "el filtro de finca (Tupungato) deja sin alertas esa noche y el resumen muestra solo su departamento")
+
+    at = abrir("paginas/alertas.py", fecha="2026-11-17")
+    r.chequear(not at.exception and "1 alerta de riego esta noche, en Finca Los Cipreses (Tupungato)" in textos(at), "una noche con alerta de riego (17/11) la muestra")
+    at = abrir("paginas/alertas.py", fecha="2026-10-08")
+    r.chequear(not at.exception and "No hubo alertas esta noche" in textos(at) and "Sin alertas con este filtro" in textos(at), "una noche sin alertas (8/10) muestra el estado vacío")
+    at = abrir("paginas/alertas.py", fecha="2026-09-01")
+    r.chequear(not at.exception and "Todavía no hay alertas en la temporada" in textos(at), "el primer día de la temporada no tiene historial y no se rompe")
+    at = abrir("paginas/alertas.py", fecha="2027-03-31")
+    r.chequear(not at.exception and "35</b> alertas en la temporada" in textos(at), "el último día la temporada suma las 35 alertas")
+    at.sidebar.button[0].click().run()
+    r.chequear(not at.exception and at.sidebar.date_input[0].value == date(2026, 9, 22), "el botón de una noche con helada cambia la fecha en Alertas")
+
     print(f"\n{r.total - r.fallas} de {r.total} casos pasaron.")
     sys.exit(1 if r.fallas else 0)
 
