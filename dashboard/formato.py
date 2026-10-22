@@ -32,6 +32,19 @@ def duracion(horas: float) -> str:
     return f"{minutos // 60} h {minutos % 60:02d} min" if minutos >= 60 else f"{minutos} min"
 
 
+def duracion_larga(minutos: float) -> str:
+    """Un lapso en minutos escrito para leer rápido: '5 min', '12 h 05 min', '3 días 4 h' o '14 días'."""
+    minutos = round(minutos)
+    if minutos < 60:
+        return f"{minutos} min"
+    if minutos < 1440:
+        return f"{minutos // 60} h {minutos % 60:02d} min"
+    dias, resto = divmod(minutos, 1440)
+    horas = resto // 60
+    texto = f"{dias} día" + ("s" if dias != 1 else "")
+    return texto + (f" {horas} h" if horas else "")
+
+
 def hora(d: datetime) -> str:
     return f"{d:%H:%M}"
 
@@ -55,6 +68,13 @@ def marca_tipo(tipo: str) -> str:
     estado = "helada" if tipo == "helada" else "atencion"
     return (f'<span class="marca-estado {estado}"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">'
             f'{ESTADO_FORMA[estado]}</svg>{TIPO_TEXTO.get(tipo, tipo)}</span>')
+
+
+def marca_reporte(reporta: bool) -> str:
+    """Marca del reporte de un nodo: círculo verde si reporta, triángulo ámbar si no (forma y palabra, no solo color)."""
+    estado = "normal" if reporta else "atencion"
+    return (f'<span class="marca-estado {estado}"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">'
+            f'{ESTADO_FORMA[estado]}</svg>{"Reporta" if reporta else "Sin reportar"}</span>')
 
 
 def marca(estado: str) -> str:

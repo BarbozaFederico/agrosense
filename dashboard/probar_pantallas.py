@@ -119,6 +119,28 @@ def main() -> None:
     at.sidebar.button[0].click().run()
     r.chequear(not at.exception and at.sidebar.date_input[0].value == date(2026, 9, 22), "el botón de una noche con helada cambia la fecha en Alertas")
 
+    # ---- Estado de nodos
+    at = abrir("paginas/nodos.py", fecha="2026-10-05")
+    t = textos(at)
+    r.chequear(not at.exception and "Los 12 nodos reportan." in t and t.count("fila sin-reporte") == 0, "Nodos abre el 5/10 y dice que los 12 reportan")
+    r.chequear(t.count('class="enlace"') == 12 and "detalle?parcela=P-TU-2&fecha=2026-10-05" in t, "Nodos lista los 12 nodos con enlace al detalle de su parcela")
+    r.chequear("Mantenimiento" in t and "sigue reportando" in t, "Nodos aclara que N-TU-2-B figura en mantenimiento pero sigue reportando")
+    at = abrir("paginas/nodos.py", fecha="2027-03-31")
+    t = textos(at)
+    r.chequear(not at.exception and "1 de 12 nodos sin reportar: N-TU-2-B." in t and t.count("fila sin-reporte") == 1 and "14 días 12 h" in t,
+               "el 31/3 Nodos pone primero a N-TU-2-B sin reportar hace 14 días 12 h")
+    at.sidebar.selectbox[0].set_value("F-SR").run()
+    r.chequear(not at.exception and "Los 4 nodos reportan." in textos(at), "el filtro de finca (San Rafael) deja sus 4 nodos, todos reportando")
+    at.sidebar.selectbox[0].set_value("F-TU").run()
+    r.chequear(not at.exception and "1 de 4 nodos sin reportar: N-TU-2-B." in textos(at), "el filtro de finca (Tupungato) deja 4 nodos y el que no reporta")
+    for dia, esperado in (("2026-12-03", "N-SM-2-B"), ("2027-03-02", "N-SM-1-B")):
+        at = abrir("paginas/nodos.py", fecha=dia)
+        r.chequear(not at.exception and f"1 de 12 nodos sin reportar: {esperado}." in textos(at), f"el {dia} Nodos detecta el corte de reporte de {esperado}")
+    at = abrir("paginas/nodos.py", fecha="2026-09-01")
+    r.chequear(not at.exception and "Los 12 nodos reportan." in textos(at), "el primer día de la temporada los 12 nodos reportan")
+    at.sidebar.date_input[0].set_value(date(2027, 3, 31)).run()
+    r.chequear(not at.exception and "N-TU-2-B" in textos(at), "cambiar la fecha en Nodos redibuja la pantalla")
+
     print(f"\n{r.total - r.fallas} de {r.total} casos pasaron.")
     sys.exit(1 if r.fallas else 0)
 

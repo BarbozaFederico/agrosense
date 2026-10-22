@@ -66,6 +66,8 @@ font-size:.74rem;color:var(--tinta-2)}
 text-transform:none;letter-spacing:0}
 .eje span{position:absolute;transform:translateX(-50%)}
 .eje span:first-child{transform:none}.eje span:last-child{transform:translateX(-100%)}
+.chip.neutro{color:var(--neutro)}
+table.noche tr.sin-reporte td{background:rgba(240,184,74,.07)}
 .chip{display:inline-block;border:1px solid currentColor;border-radius:3px;padding:.05rem .45rem;font-size:.8rem;font-weight:600}
 @keyframes crece{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media (prefers-reduced-motion:reduce){.barra b{animation:none}}

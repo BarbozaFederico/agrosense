@@ -15,8 +15,8 @@ from dashboard.formato import fecha_corta
 FECHA_INICIAL = date(2026, 10, 5)               # la noche de helada precargada (RF-13)
 TEMPORADA = (date(2026, 9, 1), date(2027, 3, 31))
 PANTALLAS_HECHAS = [("paginas/resumen.py", "Resumen de la mañana"), ("paginas/detalle.py", "Detalle de parcela"),
-                    ("paginas/alertas.py", "Alertas")]
-PANTALLAS_PENDIENTES = ["Estado de nodos"]
+                    ("paginas/alertas.py", "Alertas"), ("paginas/nodos.py", "Estado de nodos")]
+PANTALLAS_PENDIENTES: list[str] = []          # las 4 pantallas están hechas
 
 
 def fecha_de_la_url() -> date | None:
@@ -41,8 +41,10 @@ def barra_lateral(con_finca: bool = False, con_parcela: bool = False) -> str | N
         st.markdown('<div class="marca">agrosense <span>· viñedos</span></div>', unsafe_allow_html=True)
         for ruta, titulo in PANTALLAS_HECHAS:
             st.page_link(ruta, label=titulo)
-        st.markdown('<ul class="nav">' + "".join(f"<li>{t}<small>en construcción</small></li>" for t in PANTALLAS_PENDIENTES)
-                    + "</ul>", unsafe_allow_html=True)
+        if PANTALLAS_PENDIENTES:
+            st.markdown('<ul class="nav">' + "".join(f"<li>{t}<small>en construcción</small></li>" for t in PANTALLAS_PENDIENTES)
+                        + "</ul>", unsafe_allow_html=True)
+        st.divider()
         resumen = data.resumen(st.session_state["fecha"])
         if con_finca:
             nombres = {f["_id"]: f"{f['nombre']} · {f['departamento']}" for f in resumen["catalogo"]["fincas"]}

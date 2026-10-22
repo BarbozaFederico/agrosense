@@ -19,5 +19,6 @@ pagina = st.navigation([
     st.Page("paginas/resumen.py", title="Resumen de la mañana", url_path="resumen", default=True),
     st.Page("paginas/detalle.py", title="Detalle de parcela", url_path="detalle"),
     st.Page("paginas/alertas.py", title="Alertas", url_path="alertas"),
-], position="hidden")                                # el menú lo dibuja `lateral.py`, con las pantallas pendientes
+    st.Page("paginas/nodos.py", title="Estado de nodos", url_path="nodos"),
+], position="hidden")                                # el menú lo dibuja `lateral.py`
 pagina.run()

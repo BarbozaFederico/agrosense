@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta
 import streamlit as st
 
 from db.conexion import obtener_base
-from db.queries import (alertas_pantalla as ap, comun, detalle_parcela as dp, q1_horas_bajo_cero as q1, q5_nodos_sin_reportar as q5,
+from db.queries import (alertas_pantalla as ap, comun, detalle_parcela as dp, estado_nodos as en, q1_horas_bajo_cero as q1, q5_nodos_sin_reportar as q5,
                         q6_humedad_suelo_horaria as q6, q7_litros_por_semana as q7, q8_heladas_por_departamento as q8,
                         q9_etapa_por_grados_dia as q9,
                         q10_riesgo_de_helada as q10, resumen_manana as rm)
@@ -229,6 +229,35 @@ def armar_alertas(fecha: date, noche: list[dict], historial: list[dict], semanas
     }
 
 
+# --------------------------------------------------------------------------- estado de nodos (puro)
+
+def armar_nodos(fecha: date, nodos: list[dict], catalogo: dict, limite_min: int) -> dict:
+    """Junta el último reporte de cada nodo en lo que muestra "Estado de nodos".
+
+    `nodos` es el resultado de `estado_nodos.ultimo_reporte`; `limite_min`, `configuracion.nodo_inactivo_min`.
+    Un nodo no reporta si pasó más del límite desde su última lectura o si no tiene ninguna (igual que Q5).
+    Los que no reportan van primero (el de más tiempo arriba) y después el resto por nombre."""
+    _, ahora = comun.ventana_noche(fecha)
+    parcelas = {p["_id"]: p for p in catalogo["parcelas"]}
+    fincas = {f["_id"]: f for f in catalogo["fincas"]}
+    filas = []
+    for n in nodos:
+        minutos = n["minutos_sin_reportar"]
+        p = parcelas[n["parcela_id"]]
+        f = fincas[n["finca_id"]]
+        filas.append({
+            "nodo_id": n["nodo_id"], "parcela_id": n["parcela_id"], "parcela": p["nombre"], "finca_id": f["_id"],
+            "finca": f["nombre"], "departamento": f["departamento"], "estado_nodo": n["estado"],
+            "ultima": None if n["ultima_lectura"] is None else _local(n["ultima_lectura"]),
+            "minutos": minutos, "reporta": minutos is not None and minutos <= limite_min})
+    # sin reportar primero (sin lecturas, luego el de más tiempo); los que reportan, por nombre
+    filas.sort(key=lambda x: (x["reporta"], 0 if x["reporta"] else -(float("inf") if x["minutos"] is None else x["minutos"]),
+                              x["nodo_id"]))
+    ultimas = [f["ultima"] for f in filas if f["ultima"] is not None]
+    return {"fecha": fecha, "ahora": _local(ahora), "limite_min": limite_min, "filas": filas,
+            "ultima_de_la_red": max(ultimas) if ultimas else None}
+
+
 # --------------------------------------------------------------------------- con caché
 
 @st.cache_data(show_spinner="Consultando la base…")
@@ -292,6 +321,25 @@ def consultas_mongosh_alertas(fecha: date) -> dict[str, str]:
         "Alertas de la noche": comun.texto_mongosh("alertas", ap.pipeline_alertas_de_la_noche(fecha)),
         "Historial de la temporada": comun.texto_mongosh("alertas", ap.pipeline_historial(fecha)),
         "Heladas por departamento y semana (Q8)": comun.texto_mongosh("alertas", q8.pipeline()),
+    }
+
+
+@st.cache_data(show_spinner="Consultando la base…")
+def nodos(fecha: date) -> dict:
+    """Todo lo que necesita "Estado de nodos": el último reporte de cada nodo hasta las 12:00 de la mañana `fecha`."""
+    bd = base()
+    ahora = dp.cierre_de_la_noche(fecha)
+    return armar_nodos(fecha, en.ultimo_reporte(bd, ahora), rm.catalogo(bd), comun.configuracion(bd)["nodo_inactivo_min"])
+
+
+@st.cache_data
+def consultas_mongosh_nodos(fecha: date) -> dict[str, str]:
+    """El texto de mongosh de cada consulta que alimenta "Estado de nodos" (panel 'Ver consulta')."""
+    bd = base()
+    ahora = dp.cierre_de_la_noche(fecha)
+    return {
+        "Último reporte de cada nodo": comun.texto_mongosh("nodos", en.pipeline_ultimo_reporte(ahora)),
+        "Nodos sin reportar (Q5)": comun.texto_mongosh("nodos", q5.pipeline(ahora, comun.configuracion(bd)["nodo_inactivo_min"])),
     }
 
 
