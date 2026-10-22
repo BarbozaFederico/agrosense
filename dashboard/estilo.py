@@ -24,9 +24,9 @@ header[data-testid="stHeader"]{background:transparent}
 section[data-testid="stSidebar"]{width:15.5rem!important;min-width:15.5rem!important}
 [data-testid="stSidebar"]{background:var(--panel);border-right:1px solid var(--costura)}
 [data-testid="stSidebar"] .block-container{padding-top:1.4rem}
-.marca{font-weight:700;font-size:1.15rem;letter-spacing:.01em}
+.marca{font-weight:700;font-size:1.15rem;letter-spacing:.01em;margin-bottom:.7rem}
 .marca span{color:var(--tinta-2);font-weight:400}
-.nav{list-style:none;margin:.9rem 0 1.2rem;padding:0}
+.nav{list-style:none;margin:.15rem 0 1.2rem;padding:0}
 .nav li{padding:.45rem .6rem;border-radius:4px;font-size:.92rem;color:var(--tinta-2)}
 .nav li.activa{background:var(--pista);color:var(--tinta);font-weight:600}
 .nav li small{display:block;font-size:.72rem;color:var(--neutro)}
@@ -74,5 +74,27 @@ text-transform:none;letter-spacing:0}
 .punto.hueco{background:transparent;border-color:var(--atencion)}
 .vacio{border:1px dashed var(--costura);border-radius:4px;padding:1.4rem;color:var(--tinta-2)}
 div[data-testid="stExpander"]{border:1px solid var(--costura);border-radius:4px;background:transparent}
+
+[data-testid="stSidebar"] [data-testid="stPageLink"]{margin:0}
+[data-testid="stSidebar"] [data-testid="stPageLink"] a{min-height:0;line-height:1.3;padding:.45rem .6rem;border-radius:4px;color:var(--tinta-2);font-size:.92rem;text-decoration:none}
+[data-testid="stSidebar"] [data-testid="stPageLink"] a:hover{background:var(--pista);color:var(--tinta)}
+[data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-current="page"]{background:var(--pista);color:var(--tinta);font-weight:600}
+[data-testid="stSidebar"] [data-testid="stPageLink"] p{font-size:.92rem;line-height:1.3;margin:0}
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]{gap:.15rem}
+a.enlace{color:var(--tinta);text-decoration:underline;text-decoration-color:var(--costura);text-underline-offset:.2em;text-decoration-thickness:1px}
+a.enlace:hover{text-decoration-color:var(--atencion);color:var(--atencion)}
+.cifras{display:flex;flex-wrap:wrap;gap:.4rem 2.4rem;margin:.2rem 0 1.6rem;padding:0;font-variant-numeric:tabular-nums}
+.cifras div{display:flex;flex-direction:column;gap:.1rem}
+.cifras dt{font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--tinta-2);font-weight:500}
+.cifras dd{margin:0;font-size:1.05rem;font-weight:600}
+.cifras dd small{font-weight:400;color:var(--tinta-2);font-size:.82rem;margin-left:.3rem}
+.aviso-nodos{color:var(--atencion);font-size:.9rem;margin:.3rem 0 .8rem}
+.semanas{color:var(--tinta-2);font-size:.85rem;margin-top:.7rem;line-height:1.6;font-variant-numeric:tabular-nums}
+.semanas b{color:var(--tinta);font-weight:600}
+table.riegos{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.9rem}
+table.riegos th{font-weight:500;font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--tinta-2);text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--costura);white-space:nowrap}
+table.riegos td{padding:.5rem .5rem;border-bottom:1px solid var(--costura);white-space:nowrap}
+table.riegos .num{text-align:right}
+table.riegos tr.esta-noche td{background:rgba(236,230,216,.05)}
 </style>
 """

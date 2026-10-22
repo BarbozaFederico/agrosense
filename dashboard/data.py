@@ -10,10 +10,14 @@ from datetime import date, datetime, timedelta
 import streamlit as st
 
 from db.conexion import obtener_base
-from db.queries import (comun, q5_nodos_sin_reportar as q5, q9_etapa_por_grados_dia as q9,
+from db.queries import (comun, detalle_parcela as dp, q1_horas_bajo_cero as q1, q5_nodos_sin_reportar as q5,
+                        q6_humedad_suelo_horaria as q6, q7_litros_por_semana as q7, q9_etapa_por_grados_dia as q9,
                         q10_riesgo_de_helada as q10, resumen_manana as rm)
 
 VENTANA_H = 18                      # la noche: de las 18:00 a las 12:00
+CORTE_MAX_MIN = 10                  # más de 10 minutos sin lectura (un nodo reporta cada 5) corta la línea de la curva
+SEMANAS_DE_RIEGO = 4                # semanas que se resumen en el panel de riegos
+CORTES_POR_DEFECTO = {"margen_alto_c": 0, "margen_bajo_c": 2}      # los de `configuracion.riesgo` (ADR-005)
 ORDEN_ESTADO = {"helada": 0, "atencion": 1, "normal": 2, "sin_umbral": 3}
 
 
@@ -113,6 +117,68 @@ def armar_resumen(fecha: date, riesgo: list[dict], etapas: dict[str, dict], aler
     }
 
 
+# --------------------------------------------------------------------------- detalle de parcela (puro)
+
+def con_cortes(puntos: list[tuple[datetime, float]], max_min: int = CORTE_MAX_MIN) -> tuple[list, list]:
+    """(x, y) de una serie, con un hueco (None) donde faltan más de `max_min` minutos de lecturas:
+    Plotly no une los dos lados de un hueco, así un corte de reporte se ve como corte y no como una recta."""
+    xs, ys = [], []
+    for i, (t, v) in enumerate(puntos):
+        if i and (t - puntos[i - 1][0]).total_seconds() > max_min * 60:
+            xs.append(t)
+            ys.append(None)
+        xs.append(t)
+        ys.append(v)
+    return xs, ys
+
+
+def armar_detalle(fecha: date, parcela_id: str, catalogo: dict, riesgo: dict | None, etapa: dict,
+                  horas_bajo_cero: dict | None, curva: list[dict], humedad: list[dict], riegos: list[dict],
+                  semanas: list[dict], alertas: list[dict], umbral_riego: float, delta_c: float) -> dict:
+    """Junta los resultados de las consultas en lo que muestra "Detalle de parcela".
+
+    `riesgo` es la fila de Q10 de la parcela (None si su etapa no tiene umbral); `etapa`, la de q9.etapas_estimadas;
+    `horas_bajo_cero`, la de Q1. La temperatura del brote es la del nodo más frío en cada instante menos `delta_c`."""
+    inicio, ahora = comun.ventana_noche(fecha)
+    parcela = next(p for p in catalogo["parcelas"] if p["_id"] == parcela_id)
+    finca = next(f for f in catalogo["fincas"] if f["_id"] == parcela["finca_id"])
+    nodos_catalogo = {n["_id"]: n for n in catalogo["nodos"] if n["parcela_id"] == parcela_id}
+
+    por_nodo: dict[str, list] = {}
+    mas_frio: dict[datetime, float] = {}
+    for fila in curva:
+        t = _local(fila["ts"])
+        por_nodo.setdefault(fila["nodo_id"], []).append((t, fila["temperatura_c"]))
+        mas_frio[t] = min(fila["temperatura_c"], mas_frio.get(t, float("inf")))
+    nodos = []
+    for nid in sorted(nodos_catalogo):
+        puntos = por_nodo.get(nid, [])
+        x, y = con_cortes(puntos)
+        nodos.append({"nodo_id": nid, "estado": nodos_catalogo[nid]["estado"], "lecturas": len(puntos), "x": x, "y": y})
+    brote_x, brote_y = con_cortes([(t, round(v - delta_c, 2)) for t, v in sorted(mas_frio.items())])
+
+    alerta = min(alertas, key=lambda a: a["valor_extremo"]) if alertas else None
+    return {
+        "fecha": fecha, "parcela_id": parcela_id, "parcela": parcela["nombre"], "finca": finca["nombre"],
+        "departamento": finca["departamento"], "etapa": etapa["etapa"],
+        "umbral_c": None if riesgo is None else riesgo["umbral_helada_c"],
+        "estado": "sin_umbral" if riesgo is None else _estado(riesgo["margen_c"], CORTES_POR_DEFECTO),
+        "minima_brote_c": None if riesgo is None else riesgo["minima_brote_c"],
+        "margen_c": None if riesgo is None else riesgo["margen_c"],
+        "nivel": None if riesgo is None else riesgo["nivel"],
+        "agravantes": [] if riesgo is None else riesgo["agravantes"],
+        "horas_bajo_cero": None if horas_bajo_cero is None else horas_bajo_cero["horas_bajo_cero"],
+        "minima_sensor_c": None if horas_bajo_cero is None else horas_bajo_cero["minima_c"],
+        "alerta": _alerta(alerta, inicio, ahora), "inicio": _local(inicio), "ahora": _local(ahora),
+        "nodos": nodos, "brote": {"x": brote_x, "y": brote_y}, "hay_curva": bool(curva),
+        "humedad": [{"hora": _local(h["hora"]), "pct": h["humedad_suelo_pct"]} for h in humedad],
+        "umbral_riego_pct": umbral_riego,
+        "riegos": [{"inicio": _local(r["inicio"]), "fin": _local(r["fin"]), "lamina_mm": r["lamina_mm"],
+                    "litros": r["litros"], "origen": r["origen"], "sistema": r["sistema"]} for r in riegos],
+        "semanas": [{"semana": _local(w["semana"]), "litros": w["litros"], "riegos": w["riegos"]} for w in semanas],
+    }
+
+
 # --------------------------------------------------------------------------- con caché
 
 @st.cache_data(show_spinner="Consultando la base…")
@@ -124,6 +190,41 @@ def resumen(fecha: date) -> dict:
     return armar_resumen(
         fecha, q10.consultar(bd, fecha), q9.etapas_estimadas(bd, fecha), rm.alertas_de_helada(bd, fecha), rm.ultimo_riego(bd, fecha),
         q5.consultar(bd, ahora), rm.ultima_lectura(bd, ahora), rm.catalogo(bd), config)
+
+
+@st.cache_data(show_spinner="Consultando la base…")
+def detalle(fecha: date, parcela_id: str) -> dict:
+    """Todo lo que necesita "Detalle de parcela" para una parcela y la noche que termina en la mañana `fecha`."""
+    bd = base()
+    config = comun.configuracion(bd)
+    ahora = dp.cierre_de_la_noche(fecha)
+    riesgo = next((r for r in q10.consultar(bd, fecha) if r["parcela_id"] == parcela_id), None)
+    h0 = next(iter(q1.consultar(bd, fecha, parcela_id)), None)
+    return armar_detalle(
+        fecha, parcela_id, rm.catalogo(bd), riesgo, q9.etapas_estimadas(bd, fecha)[parcela_id], h0,
+        dp.curva_de_la_noche(bd, fecha, parcela_id), q6.consultar(bd, ahora, parcela_id),
+        dp.riegos_recientes(bd, fecha, parcela_id),
+        q7.consultar(bd, parcela_id, ahora - timedelta(weeks=SEMANAS_DE_RIEGO), ahora),
+        [a for a in rm.alertas_de_helada(bd, fecha) if a["parcela_id"] == parcela_id],
+        q10.umbral_de_riego_por_parcela(bd, fecha)[parcela_id], config["delta_brote_c"])
+
+
+@st.cache_data
+def consultas_mongosh_detalle(fecha: date, parcela_id: str) -> dict[str, str]:
+    """El texto de mongosh de cada consulta que alimenta "Detalle de parcela" (panel 'Ver consulta')."""
+    bd = base()
+    ahora = dp.cierre_de_la_noche(fecha)
+    desde = ahora - timedelta(weeks=SEMANAS_DE_RIEGO)
+    return {
+        "Curva de temperatura de la noche": comun.texto_mongosh("lecturas", dp.pipeline_curva_de_la_noche(fecha, parcela_id)),
+        "Horas bajo 0 °C (Q1)": comun.texto_mongosh("lecturas", q1.pipeline(fecha, parcela_id)),
+        "Humedad de suelo por hora (Q6)": comun.texto_mongosh("lecturas", q6.pipeline(ahora, parcela_id)),
+        "Riegos recientes": comun.texto_mongosh("riegos", dp.pipeline_riegos_recientes(fecha, parcela_id)),
+        "Litros por semana (Q7)": comun.texto_mongosh("riegos", q7.pipeline(parcela_id, desde, ahora)),
+        "Alertas de helada de la noche": comun.texto_mongosh("alertas", rm.pipeline_alertas_de_helada(fecha)),
+        "Riesgo de helada (Q10)": comun.texto_mongosh("lecturas", q10.pipeline(
+            fecha, q9.etapas_estimadas(bd, fecha), q10.umbral_de_riego_por_parcela(bd, fecha), comun.configuracion(bd))),
+    }
 
 
 @st.cache_data
