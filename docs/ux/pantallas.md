@@ -23,7 +23,7 @@ Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [AD
 
 ## 2. Elementos comunes
 
-- Barra lateral con la navegación entre las 4 pantallas, el selector de la pantalla (**finca** en el resumen, **parcela** en el detalle), el **selector de fecha** y un botón por cada mañana con alerta de helada. La fecha y la parcela viajan también en la URL (`?fecha=2026-10-05&parcela=P-SR-1`).
+- Barra lateral con la marca "agrosense" (grande, con una barra ámbar), la navegación entre las 4 pantallas (un botón por pantalla, con ícono y separados entre sí; la actual lleva borde ámbar y letra más gruesa), el selector de la pantalla (**finca** en el resumen, **parcela** en el detalle), el **selector de fecha** y un botón por cada mañana con alerta de helada. La fecha y la parcela viajan también en la URL (`?fecha=2026-10-05&parcela=P-SR-1`).
 - Etiqueta visible **"datos simulados"**.
 - Panel desplegable **"Ver consulta"** con las consultas de MongoDB que alimentan la pantalla, escritas para `mongosh`.
 - Indicador "último dato" y cantidad de nodos que reportan.

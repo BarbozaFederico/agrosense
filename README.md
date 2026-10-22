@@ -131,7 +131,7 @@ python -m dashboard.probar_datos         # 37 casos de los datos y del mapa de "
 python -m dashboard.probar_detalle       # 53 casos de "Detalle de parcela": datos, textos, gráficos y consultas de apoyo
 python -m dashboard.probar_alertas       # 44 casos de "Alertas": datos, textos, filtros, historial, semanas y consultas de apoyo
 python -m dashboard.probar_nodos         # 31 casos de "Estado de nodos": datos, textos y la coincidencia con Q5
-python -m dashboard.probar_pantallas     # 46 casos de punta a punta: abre las cuatro pantallas, con las 6 parcelas, y prueba los controles
+python -m dashboard.probar_pantallas     # 50 casos de punta a punta: abre las cuatro pantallas, con las 6 parcelas, y prueba los controles
 ```
 
 Dashboard (con la base cargada; se abre en `http://localhost:8501`). Tiene las 4 pantallas: "Resumen de la mañana" ([ADR-018](docs/decisions/ADR-018-resumen-de-la-manana.md)), "Detalle de parcela" ([ADR-019](docs/decisions/ADR-019-detalle-de-parcela.md)), "Alertas" ([ADR-020](docs/decisions/ADR-020-alertas.md)) y "Estado de nodos" ([ADR-021](docs/decisions/ADR-021-estado-de-nodos.md)):
