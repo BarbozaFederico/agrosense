@@ -199,3 +199,12 @@ La pantalla "Resumen de la mañana" (ADR-018) reutiliza Q5, Q9 y Q10 y suma cuat
 | `noches_con_helada` | Las mañanas con al menos una alerta de helada (la mañana de una alerta es la fecha local de `inicio` + 6 h) | `$match`, `$group` con `$dateToString` y `$dateAdd`, `$sort` |
 
 Cada una tiene su `pipeline_xxx(...)`, de donde sale el texto de `mongosh` del panel "Ver consulta". Se prueban con `python -m dashboard.probar_datos`.
+
+La pantalla "Detalle de parcela" (ADR-019) reutiliza Q1, Q6, Q7, Q9 y Q10 y suma dos consultas de `db/queries/detalle_parcela.py`, tampoco Q11:
+
+| Función | Qué devuelve | Etapas |
+|---|---|---|
+| `curva_de_la_noche` | La temperatura de cada nodo de la parcela cada 5 minutos, de las 18:00 a las 12:00 (216 lecturas por nodo) | `$match` por parcela y rango de `ts`, `$project`, `$sort` por hora |
+| `riegos_recientes` | Los últimos riegos de la parcela que empezaron antes del cierre de la noche | `$match`, `$sort` descendente, `$limit`, `$project` |
+
+Se prueban con `python -m dashboard.probar_detalle`.

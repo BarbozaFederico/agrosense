@@ -23,7 +23,7 @@
 
 ## Consecuencias
 
-- **Faltan 3 pantallas** (detalle de parcela, alertas y estado de nodos). En la barra lateral aparecen marcadas "en construcción" y no son navegables. Cuando estén, `app.py` pasa a `st.navigation`.
+- **Faltan 3 pantallas** (detalle de parcela, alertas y estado de nodos). En la barra lateral aparecen marcadas "en construcción" y no son navegables. La navegación pasó a `st.navigation` con el detalle de parcela (ADR-019) y esta pantalla vive ahora en `dashboard/paginas/resumen.py`.
 - Las tres decisiones que quedaron abiertas en el brief (cómo se dibuja la barra, qué es "ya se regó" y cuál es la vista por defecto) quedan cerradas en las filas 3, 5 y 7.
 - **"Bajo el umbral" es la duración de la alerta guardada** (que cierra con 1 h de histéresis, ADR-013), no el tiempo exacto con el brote bajo el umbral. Una parcela puede tener un margen negativo sin alerta registrada (hay 8 noches de helada y 5 con alerta): la tabla la marca "Helada" con la leyenda "sin alerta registrada" en lugar de la barra.
 - La etapa que se muestra es la **estimada** (la misma que usan las alertas, ADR-014). Si hay una observación manual distinta, la pantalla no la muestra todavía.

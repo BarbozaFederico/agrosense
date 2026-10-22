@@ -25,7 +25,8 @@
 ## Flujos
 
 1. **Revisar la mañana** (hecho, [ADR-018](../decisions/ADR-018-resumen-de-la-manana.md)): el encargado abre "Resumen de la mañana", lee la frase de estado, mira en la tabla qué parcelas se helaron, desde cuándo y si se regaron, y ubica la parcela en el mapa.
-2. *A completar:* investigar una alerta de helada en detalle, verificar nodos inactivos.
+2. **Investigar una alerta** (hecho, [ADR-019](../decisions/ADR-019-detalle-de-parcela.md)): desde la tabla del resumen, un clic en la parcela abre su detalle con la misma noche; ahí se ve la curva contra el umbral, cuánto duró y qué pasó con el suelo y el riego.
+3. *A completar:* verificar nodos inactivos.
 
 ## Wireframes
 

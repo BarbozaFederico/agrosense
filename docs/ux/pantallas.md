@@ -1,6 +1,6 @@
 # Pantallas y comportamiento del dashboard
 
-**Estado:** v0.3 (21/10/2026). La primera pantalla está construida: "Resumen de la mañana" ([ADR-018](../decisions/ADR-018-resumen-de-la-manana.md)). Las otras tres están pendientes.
+**Estado:** v0.4 (22/10/2026). Hechas "Resumen de la mañana" ([ADR-018](../decisions/ADR-018-resumen-de-la-manana.md)) y "Detalle de parcela" ([ADR-019](../decisions/ADR-019-detalle-de-parcela.md)). Faltan alertas y estado de nodos.
 Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [ADR-002](../decisions/ADR-002-interfaz-streamlit.md).
 
 ---
@@ -12,7 +12,7 @@ Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [AD
 | Objetivo | Demo vistosa del sistema completo. **Parte obligatoria de la entrega** |
 | Plataforma | Web de escritorio, en local. Móvil fuera de alcance |
 | Tecnología | Streamlit + Plotly + pymongo |
-| Pantallas | Resumen de la mañana (hecha), detalle de parcela, alertas, estado de nodos (pendientes) |
+| Pantallas | Resumen de la mañana y detalle de parcela (hechas); alertas y estado de nodos (pendientes) |
 | Estilo | Tema oscuro, mundo "Boletín agrometeorológico" (ADR-018): grafito, tinta cálida y color solo para el estado |
 | Noche de helada | **Precargada** en el seed (obligatoria) |
 | Simulación en vivo | Opcional; **es lo primero que se recorta** si falta tiempo |
@@ -23,7 +23,7 @@ Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [AD
 
 ## 2. Elementos comunes
 
-- Barra lateral con la navegación entre las 4 pantallas (las pendientes figuran "en construcción"), el **selector de finca**, el **selector de fecha** y un botón por cada mañana con alerta de helada.
+- Barra lateral con la navegación entre las 4 pantallas (las pendientes figuran "en construcción"), el selector de la pantalla (**finca** en el resumen, **parcela** en el detalle), el **selector de fecha** y un botón por cada mañana con alerta de helada. La fecha y la parcela viajan también en la URL (`?fecha=2026-10-05&parcela=P-SR-1`).
 - Etiqueta visible **"datos simulados"**.
 - Panel desplegable **"Ver consulta"** con las consultas de MongoDB que alimentan la pantalla, escritas para `mongosh`.
 - Indicador "último dato" y cantidad de nodos que reportan.
@@ -45,15 +45,20 @@ Para el encargado de finca que abre el panel después de una noche fría. Respon
 | Consultas | Q10, Q9 y Q5, más las de apoyo de `db/queries/resumen_manana.py` |
 | Estados | Con helada, solo atención, sin helada, sin umbral en la etapa (no se evalúa), nodos sin reportar, sin lecturas en las últimas horas, alerta en curso al cierre |
 
-### 3.2 Detalle de parcela (pendiente)
+### 3.2 Detalle de parcela (hecha)
+
+Para el técnico agrónomo, o para quien llega desde una fila del resumen. Responde: ¿por qué saltó la alerta? Se entra con un clic en el nombre de la parcela de la tabla del resumen o eligiéndola en la barra lateral (arranca en la de peor estado de la noche).
 
 | Elemento | Detalle |
 |---|---|
-| Selector | Elegir parcela |
-| Curva de temperatura | La noche, con línea de umbral |
-| Humedad de suelo | Serie de las últimas 24 horas |
-| Riegos | Últimos eventos |
-| Consultas | Q1, Q6, Q7 |
+| Frase de estado | Una oración con lo que pasó ("Cuartel 1 bajó a −8,3 °C en el brote, 4,4 °C bajo su umbral") y el detalle: horario y duración de la alerta, riesgo y si se regó. A la derecha, el estado con su forma y su palabra |
+| Curva de la noche (protagonista) | De 18:00 a 12:00: temperatura del brote (línea gruesa), los 2 sensores (líneas finas con raya distinta), línea del umbral de la etapa, tramo bajo el umbral en rojo y franja de la alerta. Un corte de reporte se ve como corte. Fija: sin zoom ni arrastre |
+| Cifras | Mínima en el brote, umbral, mínima del sensor, horas bajo 0 °C y riesgo, en una fila de texto |
+| Humedad de suelo | Promedio por hora de las últimas 24 horas con el umbral de riego del suelo |
+| Riegos recientes | Hasta 8, con inicio, duración, lámina, litros y origen; los de esta noche resaltados; litros de las últimas 4 semanas |
+| Ver consulta | Curva, Q1, Q6, riegos, Q7, alertas y Q10 |
+| Consultas | Q1, Q6, Q7, Q9 y Q10, más las de apoyo de `db/queries/detalle_parcela.py` |
+| Estados | Con helada (con o sin alerta registrada), solo atención, sin helada, sin umbral en la etapa (la curva se dibuja sin línea de umbral), nodo en mantenimiento o sin lecturas (aviso), sin lecturas en la noche, sin riegos |
 
 ### 3.3 Alertas (pendiente)
 
