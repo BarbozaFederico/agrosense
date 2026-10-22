@@ -15,7 +15,7 @@ from dashboard.piezas import frase_de_estado, tabla
 
 # --------------------------------------------------------------------------- pantalla
 
-finca_id = barra_lateral(con_finca=True)
+finca_id = barra_lateral("paginas/resumen.py", con_finca=True)
 fecha = st.session_state["fecha"]
 r = data.resumen(fecha)
 filas = [f for f in r["filas"] if finca_id is None or f["finca_id"] == finca_id]

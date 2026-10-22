@@ -15,7 +15,7 @@ from dashboard.lateral import barra_lateral
 from dashboard.piezas_alertas import (TIPOS, filas_de_historial, filtrar, frase_de_alertas, tabla_de_la_noche,
                                       tabla_de_semanas)
 
-finca_id = barra_lateral(con_finca=True)
+finca_id = barra_lateral("paginas/alertas.py", con_finca=True)
 fecha = st.session_state["fecha"]
 r = data.alertas(fecha)
 

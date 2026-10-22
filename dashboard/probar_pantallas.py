@@ -141,6 +141,13 @@ def main() -> None:
     at.sidebar.date_input[0].set_value(date(2027, 3, 31)).run()
     r.chequear(not at.exception and "N-TU-2-B" in textos(at), "cambiar la fecha en Nodos redibuja la pantalla")
 
+    # ---- Menú lateral
+    for ruta in ("paginas/resumen.py", "paginas/detalle.py", "paginas/alertas.py", "paginas/nodos.py"):
+        at = abrir(ruta, fecha="2026-10-05")
+        t = textos(at)
+        r.chequear(not at.exception and t.count('class="pantalla-actual"') == 1 and '<div class="marca">agrosense<span>viñedos</span></div>' in t,
+                   f"{ruta} marca una sola pantalla como actual en el menú y muestra la marca agrosense")
+
     print(f"\n{r.total - r.fallas} de {r.total} casos pasaron.")
     sys.exit(1 if r.fallas else 0)
 

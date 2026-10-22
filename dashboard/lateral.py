@@ -14,8 +14,10 @@ from dashboard.formato import fecha_corta
 
 FECHA_INICIAL = date(2026, 10, 5)               # la noche de helada precargada (RF-13)
 TEMPORADA = (date(2026, 9, 1), date(2027, 3, 31))
-PANTALLAS_HECHAS = [("paginas/resumen.py", "Resumen de la mañana"), ("paginas/detalle.py", "Detalle de parcela"),
-                    ("paginas/alertas.py", "Alertas"), ("paginas/nodos.py", "Estado de nodos")]
+PANTALLAS_HECHAS = [("paginas/resumen.py", "Resumen de la mañana", ":material/wb_twilight:"),
+                    ("paginas/detalle.py", "Detalle de parcela", ":material/grass:"),
+                    ("paginas/alertas.py", "Alertas", ":material/notifications:"),
+                    ("paginas/nodos.py", "Estado de nodos", ":material/sensors:")]
 PANTALLAS_PENDIENTES: list[str] = []          # las 4 pantallas están hechas
 
 
@@ -32,15 +34,21 @@ def _ir_a(dia: date) -> None:
     st.session_state["fecha"] = dia
 
 
-def barra_lateral(con_finca: bool = False, con_parcela: bool = False) -> str | None:
-    """Dibuja la barra lateral y devuelve la finca o la parcela elegida (None = todas las fincas)."""
+def barra_lateral(pantalla: str, con_finca: bool = False, con_parcela: bool = False) -> str | None:
+    """Dibuja la barra lateral y devuelve la finca o la parcela elegida (None = todas las fincas).
+
+    `pantalla` es la ruta de la pantalla actual (la de `PANTALLAS_HECHAS`): se resalta en el menú. Esta versión de Streamlit
+    no marca el enlace de la página actual con un atributo que el CSS pueda usar, así que se pone una marca invisible
+    justo antes del enlace y el CSS resalta el que la sigue."""
     if "fecha" not in st.session_state:
         st.session_state["fecha"] = fecha_de_la_url() or FECHA_INICIAL
     elegido = None
     with st.sidebar:
-        st.markdown('<div class="marca">agrosense <span>· viñedos</span></div>', unsafe_allow_html=True)
-        for ruta, titulo in PANTALLAS_HECHAS:
-            st.page_link(ruta, label=titulo)
+        st.markdown('<div class="marca">agrosense<span>viñedos</span></div>', unsafe_allow_html=True)
+        for ruta, titulo, icono in PANTALLAS_HECHAS:
+            if ruta == pantalla:
+                st.markdown('<span class="pantalla-actual"></span>', unsafe_allow_html=True)
+            st.page_link(ruta, label=titulo, icon=icono)
         if PANTALLAS_PENDIENTES:
             st.markdown('<ul class="nav">' + "".join(f"<li>{t}<small>en construcción</small></li>" for t in PANTALLAS_PENDIENTES)
                         + "</ul>", unsafe_allow_html=True)

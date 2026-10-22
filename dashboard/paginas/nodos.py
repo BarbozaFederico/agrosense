@@ -13,7 +13,7 @@ from dashboard.formato import fecha_corta, hora
 from dashboard.lateral import barra_lateral
 from dashboard.piezas_nodos import filtrar, frase_de_nodos, tabla_de_nodos
 
-finca_id = barra_lateral(con_finca=True)
+finca_id = barra_lateral("paginas/nodos.py", con_finca=True)
 fecha = st.session_state["fecha"]
 r = data.nodos(fecha)
 filas = filtrar(r["filas"], finca_id)

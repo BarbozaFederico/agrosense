@@ -17,7 +17,7 @@ from dashboard.piezas import aviso_de_nodos, cifras, frase_de_la_parcela, semana
 
 # --------------------------------------------------------------------------- pantalla
 
-parcela_id = barra_lateral(con_parcela=True)
+parcela_id = barra_lateral("paginas/detalle.py", con_parcela=True)
 fecha = st.session_state["fecha"]
 d = data.detalle(fecha, parcela_id)
 
