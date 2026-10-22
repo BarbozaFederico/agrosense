@@ -34,7 +34,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - Pasos para ejecutar el proyecto en el README y estado actual en `CLAUDE.md`.
 - Primera pantalla del dashboard, "Resumen de la mañana" (`dashboard/app.py`, `data.py`, `estilo.py`, `.streamlit/config.toml`): frase de estado, tabla de la noche por parcela con barra de tiempo de 18:00 a 12:00, mapa por finca sin mapa base y panel "Ver consulta". Corre con `python -m streamlit run dashboard/app.py`. ADR-018.
 - `db/queries/resumen_manana.py`: cuatro consultas de apoyo de esa pantalla (alertas de helada de la noche, último riego, última lectura y mañanas con helada); no son Q11.
-- `dashboard/probar_datos.py`: 21 casos de los datos de la pantalla (`python -m dashboard.probar_datos`).
+- `dashboard/probar_datos.py`: casos de los datos y del mapa de la pantalla (`python -m dashboard.probar_datos`).
 - `PRODUCT.md`: contexto de producto (usuarios, propósito, restricciones y principios) para el trabajo de diseño de la interfaz.
 
 ### Cambiado
@@ -56,6 +56,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - `eventos_climaticos.tipo` solo admite `"helada"`: el granizo queda fuera del modelo porque ningún sensor del MVP lo mide (ADR-006, decisión 12).
 
 ### Corregido
+- Mapa de "Resumen de la mañana": al arrastrar el mouse sobre el dibujo se hacía zoom y se deformaban las parcelas y desaparecían los nodos. El mapa pasa a `dashboard/mapa.py` y queda fijo (sin arrastre, zoom ni doble clic), con el rango calculado y bloqueado; los rótulos de las parcelas van en dos líneas. `dashboard.probar_datos` pasa a 37 casos (ADR-018).
 - Ejemplo de `variedades` en `modelo-datos.md`: la etapa "Floración y cuaje" lleva 260 grados-día desde la brotación (Zapata 2017), no 230.
 - Mínimas récord de septiembre del SMN (San Rafael −4,5 °C y San Martín −2,8 °C) y altura de la estación San Martín (653 m), que venían mal de una fuente secundaria.
 - Fin de línea LF en los scripts `.sh` (`.gitattributes`), para que funcionen al clonar en Windows.

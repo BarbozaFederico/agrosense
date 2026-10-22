@@ -127,7 +127,7 @@ python -m simulator.probar_simulador     # 51 casos del simulador (~1 min)
 python -m db.queries.probar_consultas    # 43 casos de las consultas contra cálculos independientes (~30 s)
 python -m db.indexes.probar_indices      # 19 casos: los índices existen, se usan y no cambian ninguna respuesta
 python -m scripts.backup_restore.probar_respaldo        # 19 casos: backup, rotación, restauración y protecciones (unos segundos)
-python -m dashboard.probar_datos         # 21 casos de los datos de la pantalla "Resumen de la mañana" (unos segundos)
+python -m dashboard.probar_datos         # 37 casos de los datos y del mapa de la pantalla "Resumen de la mañana" (unos segundos)
 ```
 
 Dashboard (con la base cargada; se abre en `http://localhost:8501`). Hoy tiene la primera pantalla, "Resumen de la mañana" ([ADR-018](docs/decisions/ADR-018-resumen-de-la-manana.md)); las otras tres están en construcción:

@@ -19,7 +19,7 @@ flowchart LR
 | Seeds | `db/seeds/` | Datos iniciales, incluida la noche de helada precargada |
 | Consultas | `db/queries/` | Q1 a Q10 como módulos de Python con `pymongo` (ADR-014); `dashboard/data.py` los llama |
 | Simulador | `simulator/` | Genera lecturas y escenarios; expone funciones importables |
-| Dashboard | `dashboard/` | `data.py` (único acceso a MongoDB desde la interfaz: llama a `db/queries` y cachea), `estilo.py` (paleta y CSS) y `app.py` (presentación) |
+| Dashboard | `dashboard/` | `data.py` (único acceso a MongoDB desde la interfaz: llama a `db/queries` y cachea), `mapa.py` (mapa de una finca), `estilo.py` (paleta y CSS) y `app.py` (presentación) |
 | Resguardo | `scripts/backup_restore/` | Backup y restauración |
 
 ## Decisiones de arquitectura
