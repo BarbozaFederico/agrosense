@@ -208,3 +208,13 @@ La pantalla "Detalle de parcela" (ADR-019) reutiliza Q1, Q6, Q7, Q9 y Q10 y suma
 | `riegos_recientes` | Los últimos riegos de la parcela que empezaron antes del cierre de la noche | `$match`, `$sort` descendente, `$limit`, `$project` |
 
 Se prueban con `python -m dashboard.probar_detalle`.
+
+La pantalla "Alertas" (ADR-020) reutiliza Q8 y suma tres consultas de `db/queries/alertas_pantalla.py`, tampoco Q11:
+
+| Función | Qué devuelve | Etapas |
+|---|---|---|
+| `alertas_de_la_noche` | Las alertas de ambos tipos que se solapan con la noche (de las 18:00 a las 12:00) | `$match` (`inicio` antes del cierre y `fin` nulo o posterior al comienzo), `$project`, `$sort` |
+| `historial` | Las últimas alertas (hasta 200) que empezaron antes del cierre de la noche, las más recientes primero | `$match`, `$sort` descendente, `$limit`, `$project` |
+| `etapas_del_malbec` | Nombre y rango BBCH de cada etapa, para traducir el número que guarda la alerta | `find` sobre `variedades` |
+
+Se prueban con `python -m dashboard.probar_alertas`.

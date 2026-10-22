@@ -1,6 +1,6 @@
 # Pantallas y comportamiento del dashboard
 
-**Estado:** v0.4 (22/10/2026). Hechas "Resumen de la mañana" ([ADR-018](../decisions/ADR-018-resumen-de-la-manana.md)) y "Detalle de parcela" ([ADR-019](../decisions/ADR-019-detalle-de-parcela.md)). Faltan alertas y estado de nodos.
+**Estado:** v0.5 (22/10/2026). Hechas "Resumen de la mañana" ([ADR-018](../decisions/ADR-018-resumen-de-la-manana.md)), "Detalle de parcela" ([ADR-019](../decisions/ADR-019-detalle-de-parcela.md)) y "Alertas" ([ADR-020](../decisions/ADR-020-alertas.md)). Falta estado de nodos.
 Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [ADR-002](../decisions/ADR-002-interfaz-streamlit.md).
 
 ---
@@ -12,7 +12,7 @@ Contexto: [`vision.md`](../vision.md), [`requisitos.md`](../requisitos.md) y [AD
 | Objetivo | Demo vistosa del sistema completo. **Parte obligatoria de la entrega** |
 | Plataforma | Web de escritorio, en local. Móvil fuera de alcance |
 | Tecnología | Streamlit + Plotly + pymongo |
-| Pantallas | Resumen de la mañana y detalle de parcela (hechas); alertas y estado de nodos (pendientes) |
+| Pantallas | Resumen de la mañana, detalle de parcela y alertas (hechas); estado de nodos (pendiente) |
 | Estilo | Tema oscuro, mundo "Boletín agrometeorológico" (ADR-018): grafito, tinta cálida y color solo para el estado |
 | Noche de helada | **Precargada** en el seed (obligatoria) |
 | Simulación en vivo | Opcional; **es lo primero que se recorta** si falta tiempo |
@@ -60,14 +60,20 @@ Para el técnico agrónomo, o para quien llega desde una fila del resumen. Respo
 | Consultas | Q1, Q6, Q7, Q9 y Q10, más las de apoyo de `db/queries/detalle_parcela.py` |
 | Estados | Con helada (con o sin alerta registrada), solo atención, sin helada, sin umbral en la etapa (la curva se dibuja sin línea de umbral), nodo en mantenimiento o sin lecturas (aviso), sin lecturas en la noche, sin riegos |
 
-### 3.3 Alertas (pendiente)
+### 3.3 Alertas (hecha)
+
+Para el encargado o el técnico después de ver el resumen. Responde: ¿qué alertas hubo en esta noche y cómo viene la temporada? Las "activas" son las de la noche elegida (de las 18:00 a las 12:00), abiertas o cerradas: en la base todas cierran antes del mediodía.
 
 | Elemento | Detalle |
 |---|---|
-| Activas | Parcela, mínima registrada, inicio |
-| Historial | Alertas cerradas, con inicio, fin y mínima |
-| Resumen | Eventos de helada por departamento y semana |
-| Consultas | Q1, Q2, Q8 |
+| Control de tipo | Todas, Helada o Riego: filtra la lista de la noche y el historial. El resumen semanal es siempre de helada. Hay además un filtro de finca en la barra lateral |
+| Frase de estado | Una oración con cuántas alertas hubo y en qué finca ("2 alertas de helada esta noche, en Finca Los Álamos (San Rafael)"), y el detalle de la más fuerte. A la derecha, las alertas de la temporada hasta esa fecha |
+| Alertas de la noche (protagonista) | Una fila por alerta, la más grave primero: tipo, parcela (enlace al detalle), etapa, valor extremo contra umbral (°C del brote o % de humedad de suelo), barra de tiempo de 18:00 a 12:00 (roja en helada, ámbar en riego), duración y riesgo |
+| Historial de la temporada | Tabla ordenable con las alertas hasta el cierre de la noche elegida: tipo, parcela, etapa, inicio, fin, duración, valor extremo, umbral y estado |
+| Heladas por departamento y semana | Tabla semana × departamento con la cantidad de alertas y la mínima del brote (Q8, toda la temporada); la semana elegida va resaltada |
+| Ver consulta | Alertas de la noche, historial y Q8 |
+| Consultas | Q8, más las de apoyo de `db/queries/alertas_pantalla.py` |
+| Estados | Noche sin alertas, filtro sin resultados, alerta en curso al cierre, historial vacío (antes de la primera alerta), noche con solo riego |
 
 ### 3.4 Estado de nodos (pendiente)
 

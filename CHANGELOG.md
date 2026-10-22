@@ -40,6 +40,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - Navegación entre pantallas con `st.navigation` (`dashboard/app.py`, `paginas/`, `lateral.py`): la fecha y la parcela viajan en la URL.
 - `db/queries/detalle_parcela.py`: dos consultas de apoyo (`curva_de_la_noche` y `riegos_recientes`); no son Q11.
 - `dashboard/probar_detalle.py` (53 casos) y `dashboard/probar_pantallas.py` (23 casos de punta a punta con `streamlit.testing`).
+- Tercera pantalla del dashboard, "Alertas" (`dashboard/paginas/alertas.py`): las alertas de la noche elegida (helada y riego, con filtro de tipo y de finca), el historial de la temporada en una tabla ordenable y las heladas por departamento y semana (Q8). ADR-020.
+- `db/queries/alertas_pantalla.py`: tres consultas de apoyo (`alertas_de_la_noche`, `historial` y `etapas_del_malbec`); no son Q11.
+- `dashboard/probar_alertas.py` (44 casos) y 13 casos de punta a punta de Alertas en `dashboard/probar_pantallas.py` (36 en total).
 
 ### Cambiado
 - Regla permanente en `CLAUDE.md`: `CLAUDE.md`, `README.md` y `CHANGELOG.md` se actualizan en el mismo cambio.
@@ -47,6 +50,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - San Rafael brota ~30/9 con la regla de Q9, no ~1/10 (ADR-013).
 - Índices propuestos en `docs/modelo-datos.md` corregidos con las mediciones: `alertas {tipo, inicio}` en lugar de `{parcela_id, inicio}` y `{estado, tipo}` (ninguna consulta filtra por `estado`), y se agrega el de `lecturas` para Q5 (ADR-015). El criterio de aceptación de mediciones queda cumplido.
 - Q5 documentaba que usaba el índice automático de la serie temporal; no era cierto (examinaba 5.053 documentos). Corregido en `q5_nodos_sin_reportar.py`.
+- `docs/ux/pantallas.md` v0.5: "Alertas" pasa a hecha (ADR-020).
 - `docs/ux/pantallas.md` v0.4: "Detalle de parcela" pasa a hecha (ADR-019).
 - `docs/ux/pantallas.md` v0.3: "Resumen de finca" pasa a ser "Resumen de la mañana" (ADR-018), con la tabla de la noche como protagonista; las otras tres pantallas quedan marcadas como pendientes.
 - Las consultas Q1 a Q10 pasan de `mongosh` a Python (ADR-014, reemplaza una frase de ADR-008); `dashboard/data.py` las llama en lugar de reescribirlas (ajuste a ADR-002). La helada (Q2 y Q10) usa la etapa estimada y no la observada, igual que las alertas (excepción a ADR-004).
