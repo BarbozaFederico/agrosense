@@ -47,6 +47,56 @@ def armar(riesgos, alertas=(), riegos=None, inactivos=(), ultima=None) -> dict:
                               CATALOGO, CONFIG)
 
 
+def cuadrado(x: float, y: float, lado: float = 0.0015) -> dict:
+    anillo = [[x, y], [x + lado, y], [x + lado, y + lado], [x, y + lado], [x, y]]
+    return {"type": "Polygon", "coordinates": [anillo]}
+
+
+def probar_mapa(r: Resumen) -> None:
+    """El mapa no se puede mover (arrastrar lo deformaba y sacaba los nodos) y muestra todo lo que tiene que mostrar."""
+    from dashboard import mapa
+
+    finca = {"_id": "F-A", "nombre": "Finca A"}
+    catalogo = {
+        "parcelas": [{"_id": "P-A-1", "finca_id": "F-A", "nombre": "Cuartel 1", "geometria": cuadrado(-68.33, -34.61)},
+                     {"_id": "P-A-2", "finca_id": "F-A", "nombre": "Cuartel <2>", "geometria": cuadrado(-68.32, -34.61)},
+                     {"_id": "P-B-1", "finca_id": "F-B", "nombre": "Otra", "geometria": cuadrado(-69.0, -33.0)}],
+        "nodos": [{"_id": "N-A-1", "finca_id": "F-A", "ubicacion": {"type": "Point", "coordinates": [-68.3295, -34.6095]}},
+                  {"_id": "N-A-2", "finca_id": "F-A", "ubicacion": {"type": "Point", "coordinates": [-68.3185, -34.6105]}},
+                  {"_id": "N-B-1", "finca_id": "F-B", "ubicacion": {"type": "Point", "coordinates": [-69.0, -33.0]}}],
+    }
+    filas = [{"parcela_id": "P-A-1", "estado": "helada"}, {"parcela_id": "P-A-2", "estado": "normal"}]
+    fig = mapa.figura_finca(finca, filas, catalogo, {"N-A-2"})
+    lay = fig.layout
+
+    r.chequear(lay.dragmode is False, "el mapa no tiene modo de arrastre ni de zoom")
+    r.chequear(lay.xaxis.fixedrange is True and lay.yaxis.fixedrange is True, "los dos ejes tienen el rango bloqueado")
+    r.chequear(mapa.CONFIG["scrollZoom"] is False and mapa.CONFIG["doubleClick"] is False
+               and mapa.CONFIG["displayModeBar"] is False, "sin zoom con la rueda, sin doble clic y sin barra de herramientas")
+    xs = [v for t in fig.data for v in t.x]
+    ys = [v for t in fig.data for v in t.y]
+    r.chequear(lay.xaxis.range[0] < min(xs) and max(xs) < lay.xaxis.range[1], "todos los puntos caen dentro del rango horizontal")
+    r.chequear(lay.yaxis.range[0] < min(ys) and max(ys) < lay.yaxis.range[1], "todos los puntos caen dentro del rango vertical")
+    nodos = [t for t in fig.data if t.mode == "markers"]
+    r.chequear(sum(len(t.x) for t in nodos) == 2 and {t.name for t in nodos} == {"nodos que reportan", "nodos sin reportar"},
+               "se dibujan los 2 nodos de la finca, separando los que no reportan")
+    r.chequear(len([t for t in fig.data if t.fill == "toself"]) == 2, "se dibujan solo las 2 parcelas de esa finca")
+    r.chequear(all("-33" not in str(t.y) for t in fig.data), "no se cuelan parcelas ni nodos de otra finca")
+    r.chequear(len(fig.layout.annotations) == 2 and "&lt;2&gt;" in fig.layout.annotations[1].text,
+               "cada parcela lleva su rótulo, con el texto escapado")
+    r.chequear(abs(lay.yaxis.scaleratio - 1 / 0.8228) < 0.01, "la proporción corrige la latitud (1 / cos 34,6°)")
+    r.chequear(mapa.rango([5.0, 5.0])[0] < 5.0 < mapa.rango([5.0, 5.0])[1], "un solo valor abre un rango mínimo")
+    sin_parcelas = False
+    try:
+        mapa.figura_finca({"_id": "F-X"}, [], catalogo, set())
+    except ValueError:
+        sin_parcelas = True
+    r.chequear(sin_parcelas, "una finca sin parcelas da un error claro")
+    sin_filas = mapa.figura_finca(finca, [], catalogo, set())
+    r.chequear(all(t.fillcolor == mapa.RELLENO["sin_umbral"] for t in sin_filas.data if t.fill == "toself"),
+               "una parcela sin fila de estado se dibuja como 'sin umbral'")
+
+
 def main() -> None:
     preparar_consola()
     r = Resumen()
@@ -92,6 +142,9 @@ def main() -> None:
     r.chequear(res["minutos_desde_ultima"] == 5, "los minutos desde la última lectura se miden contra el cierre")
     r.chequear(armar([riesgo("P-A-1", 5)])["ultima_lectura"] is None, "sin lecturas, la última lectura es None")
 
+    # ---- mapa de la finca (ver dashboard/mapa.py): fijo, con todo dentro del cuadro
+    probar_mapa(r)
+
     # ---- consultas de apoyo contra la base de prueba
     bd = obtener_base("agrosense_tests")
     if bd.alertas.count_documents({}) == 0:
@@ -108,6 +161,14 @@ def main() -> None:
                    "hay un último riego para cada una de las 6 parcelas")
         r.chequear(all(comun.a_utc(x["inicio"]) < comun.ventana_noche(FECHA)[1] for x in riegos_bd.values()),
                    "ningún riego empieza después del cierre de la noche")
+        from dashboard import mapa
+        cat = rm.catalogo(bd)
+        for finca in cat["fincas"]:
+            fig = mapa.figura_finca(finca, [], cat, set())
+            n_nodos = sum(len(t.x) for t in fig.data if t.mode == "markers")
+            fuera = [v for t in fig.data for v in t.x if not fig.layout.xaxis.range[0] < v < fig.layout.xaxis.range[1]]
+            fuera += [v for t in fig.data for v in t.y if not fig.layout.yaxis.range[0] < v < fig.layout.yaxis.range[1]]
+            r.chequear(n_nodos == 4 and not fuera, f"mapa real de {finca['_id']}: 4 nodos y todo dentro del cuadro")
         ahora = rm.ahora_de_la_noche(FECHA)
         r.chequear(rm.ultima_lectura(bd, ahora) == ahora, "la última lectura a las 12:00 es de las 12:00")
         r.chequear(rm.ultima_lectura(bd, datetime(2025, 1, 1, tzinfo=timezone.utc)) is None, "antes de la temporada no hay lecturas")

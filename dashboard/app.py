@@ -4,25 +4,23 @@ Solo presenta: todo lo que sale de MongoDB lo trae `data.py`.
 Se corre desde la raíz del repo:  streamlit run dashboard/app.py
 """
 
-import math
 import sys
 from datetime import date
 from html import escape
 from pathlib import Path
 
-import plotly.graph_objects as go
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))   # para importar `db` y `dashboard` desde la raíz
 
 from dashboard import data                      # noqa: E402
-from dashboard.estilo import COLORES, CSS       # noqa: E402
+from dashboard.estilo import CSS                # noqa: E402
+from dashboard.mapa import CONFIG as CONFIG_MAPA, ESTADO_TEXTO, figura_finca   # noqa: E402
 
 FECHA_INICIAL = date(2026, 10, 5)               # la noche de helada precargada (RF-13)
 TEMPORADA = (date(2026, 9, 1), date(2027, 3, 31))
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre",
          "noviembre", "diciembre"]
-ESTADO_TEXTO = {"helada": "Helada", "atencion": "Atención", "normal": "Sin helada", "sin_umbral": "Sin umbral"}
 ESTADO_FORMA = {   # una forma distinta por estado, para no depender solo del color
     "helada": '<path d="M7 1 13 7 7 13 1 7Z" fill="currentColor"/>',
     "atencion": '<path d="M7 1.5 13 12.5H1Z" fill="currentColor"/>',
@@ -137,45 +135,6 @@ def tabla(filas: list[dict]) -> str:
     return f'<div class="envoltorio"><table class="noche"><thead>{cab}</thead><tbody>{"".join(cuerpo)}</tbody></table></div>'
 
 
-def mapa(finca: dict, filas: list[dict], catalogo: dict, inactivos: set[str]) -> go.Figure:
-    """Parcelas y nodos de una finca, sin mapa base: polígonos en longitud y latitud."""
-    relleno = {"helada": "rgba(255,122,107,.38)", "atencion": "rgba(240,184,74,.30)",
-               "normal": "rgba(108,196,150,.18)", "sin_umbral": "rgba(140,143,149,.18)"}
-    borde = {"helada": COLORES["helada"], "atencion": COLORES["atencion"],
-             "normal": COLORES["normal"], "sin_umbral": COLORES["neutro"]}
-    por_parcela = {f["parcela_id"]: f for f in filas}
-    fig = go.Figure()
-    lats = []
-    for p in (p for p in catalogo["parcelas"] if p["finca_id"] == finca["_id"]):
-        anillo = p["geometria"]["coordinates"][0]
-        xs, ys = [c[0] for c in anillo], [c[1] for c in anillo]
-        lats += ys
-        f = por_parcela.get(p["_id"])
-        estado = f["estado"] if f else "sin_umbral"
-        fig.add_trace(go.Scatter(
-            x=xs, y=ys, mode="lines", fill="toself", fillcolor=relleno[estado], line=dict(color=borde[estado], width=2),
-            hoverinfo="text", text=f'{p["nombre"]}: {ESTADO_TEXTO[estado]}', showlegend=False))
-        fig.add_annotation(x=sum(xs[:4]) / 4, y=max(ys), yshift=12, showarrow=False,
-                           text=f'<b>{escape(p["nombre"])}</b> · {ESTADO_TEXTO[estado]}',
-                           font=dict(color=COLORES["tinta"], size=12))
-    nodos = [n for n in catalogo["nodos"] if n["finca_id"] == finca["_id"]]
-    for activo in (True, False):
-        grupo = [n for n in nodos if (n["_id"] not in inactivos) == activo]
-        if grupo:
-            fig.add_trace(go.Scatter(
-                x=[n["ubicacion"]["coordinates"][0] for n in grupo], y=[n["ubicacion"]["coordinates"][1] for n in grupo],
-                mode="markers", showlegend=False, hoverinfo="text", text=[n["_id"] for n in grupo],
-                marker=dict(size=9, color=COLORES["tinta"] if activo else "rgba(0,0,0,0)",
-                            line=dict(color=COLORES["tinta"] if activo else COLORES["atencion"], width=2))))
-    lat0 = sum(lats) / len(lats)
-    fig.update_layout(
-        height=250, margin=dict(l=0, r=0, t=6, b=0), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(visible=False, constrain="domain"),
-        yaxis=dict(visible=False, scaleanchor="x", scaleratio=1 / math.cos(math.radians(lat0))),
-        hoverlabel=dict(bgcolor=COLORES["panel"], font_color=COLORES["tinta"]))
-    return fig
-
-
 # --------------------------------------------------------------------------- pantalla
 
 st.set_page_config(page_title="agrosense · Resumen de la mañana", layout="wide")
@@ -250,7 +209,7 @@ columnas = st.columns(len(fincas_visibles))
 for col, finca in zip(columnas, fincas_visibles):
     with col:
         st.markdown(f'<div class="mapa-titulo">{escape(finca["nombre"])} · {escape(finca["departamento"])}</div>', unsafe_allow_html=True)
-        st.plotly_chart(mapa(finca, filas, r["catalogo"], inactivos), width="stretch", config={"displayModeBar": False},
+        st.plotly_chart(figura_finca(finca, filas, r["catalogo"], inactivos), width="stretch", config=CONFIG_MAPA,
                         key=f"mapa-{finca['_id']}")
 
 with st.expander("Ver consulta"):
