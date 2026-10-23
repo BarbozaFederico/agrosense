@@ -1,0 +1,14 @@
+# Tema oscuro del dashboard (ADR-017). Los colores de estado y el resto del estilo van en dashboard/estilo.py.
+[theme]
+base = "dark"
+primaryColor = "#f0b84a"
+backgroundColor = "#14161a"
+secondaryBackgroundColor = "#1b1e23"
+textColor = "#ece6d8"
+font = "sans-serif"
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false

@@ -32,13 +32,32 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - Backup y restauración (`scripts/backup_restore/backup.py`, `scripts/backup_restore/restaurar.py`, `scripts/backup_restore/comun.py`): `mongodump --archive --gzip` de la base `agrosense` en un archivo con su manifiesto (sha256 y resumen de cada colección), rotación de 7 diarios y 4 semanales, respaldos siempre fuera del repositorio, y restauración a una base aparte que se niega a pisar una base existente, detecta un archivo alterado y se verifica contra el manifiesto y con Q1, Q5, Q9 y Q10. Probado sobre la base real (727.980 lecturas restauradas como serie temporal, con los mismos índices y validadores). `scripts/backup_restore/probar_respaldo.py` (19 casos) y `docs/backup-restore.md` completo con la prueba de restauración. ADR-016. Instalación: MongoDB Database Tools 100.19.1.
 - `db.queries.probar_consultas`: 43 casos que comparan cada consulta con un cálculo independiente, y el texto de `mongosh` de Q1, Q4 y Q7 con el resultado de Python.
 - Pasos para ejecutar el proyecto en el README y estado actual en `CLAUDE.md`.
+- Primera pantalla del dashboard, "Resumen de la mañana" (`dashboard/paginas/resumen.py`, `data.py`, `estilo.py`, `.streamlit/config.toml`): frase de estado, tabla de la noche por parcela con barra de tiempo de 18:00 a 12:00, mapa por finca sin mapa base y panel "Ver consulta". Corre con `python -m streamlit run dashboard/app.py`. ADR-018. Cada fila de la tabla enlaza con su detalle.
+- `db/queries/resumen_manana.py`: cuatro consultas de apoyo de esa pantalla (alertas de helada de la noche, último riego, última lectura y mañanas con helada); no son Q11.
+- `dashboard/probar_datos.py`: casos de los datos y del mapa de la pantalla (`python -m dashboard.probar_datos`).
+- `PRODUCT.md`: contexto de producto (usuarios, propósito, restricciones y principios) para el trabajo de diseño de la interfaz.
+- Segunda pantalla del dashboard, "Detalle de parcela" (`dashboard/paginas/detalle.py`): frase con lo que le pasó a la parcela, curva de la noche (brote, sensores, umbral y alerta), cifras, humedad de suelo de 24 horas y riegos recientes. Se llega con un clic en la parcela de la tabla del resumen o con el selector. ADR-019.
+- Navegación entre pantallas con `st.navigation` (`dashboard/app.py`, `paginas/`, `lateral.py`): la fecha y la parcela viajan en la URL.
+- `db/queries/detalle_parcela.py`: dos consultas de apoyo (`curva_de_la_noche` y `riegos_recientes`); no son Q11.
+- `dashboard/probar_detalle.py` (53 casos) y `dashboard/probar_pantallas.py` (23 casos de punta a punta con `streamlit.testing`).
+- Tercera pantalla del dashboard, "Alertas" (`dashboard/paginas/alertas.py`): las alertas de la noche elegida (helada y riego, con filtro de tipo y de finca), el historial de la temporada en una tabla ordenable y las heladas por departamento y semana (Q8). ADR-020.
+- `db/queries/alertas_pantalla.py`: tres consultas de apoyo (`alertas_de_la_noche`, `historial` y `etapas_del_malbec`); no son Q11.
+- `dashboard/probar_alertas.py` (44 casos) y 13 casos de punta a punta de Alertas en `dashboard/probar_pantallas.py` (36 en total).
+- Cuarta y última pantalla del dashboard, "Estado de nodos" (`dashboard/paginas/nodos.py`): cuántos de los 12 nodos reportan, cuáles no y desde cuándo, con el estado del reporte (calculado) separado del estado administrativo del nodo. Con ella quedan hechas las 4 pantallas del MVP. ADR-021.
+- `db/queries/estado_nodos.py`: consulta de apoyo con el último reporte de los 12 nodos, armada con las etapas de Q5 para que nunca discrepen; no es Q11.
+- `dashboard/probar_nodos.py` (31 casos, incluida la comparación con Q5 en 75 fechas) y 10 casos de punta a punta de Estado de nodos en `dashboard/probar_pantallas.py` (46 en total).
 
 ### Cambiado
+- Barra lateral del dashboard: la marca "agrosense" más grande y con una barra ámbar, y un botón por pantalla con ícono, más separados entre sí; la pantalla actual se resalta con borde ámbar y letra más gruesa (una marca invisible antes del enlace, porque esta versión de Streamlit no marca la página actual para el CSS). `barra_lateral` recibe ahora la pantalla actual (4 casos nuevos en `probar_pantallas`, 50 en total).
 - Regla permanente en `CLAUDE.md`: `CLAUDE.md`, `README.md` y `CHANGELOG.md` se actualizan en el mismo cambio.
 - Umbrales de riego: los valores anteriores (21 y 13,5 %) no salían de la FAO-56 y se reemplazaron (ADR-011).
 - San Rafael brota ~30/9 con la regla de Q9, no ~1/10 (ADR-013).
 - Índices propuestos en `docs/modelo-datos.md` corregidos con las mediciones: `alertas {tipo, inicio}` en lugar de `{parcela_id, inicio}` y `{estado, tipo}` (ninguna consulta filtra por `estado`), y se agrega el de `lecturas` para Q5 (ADR-015). El criterio de aceptación de mediciones queda cumplido.
 - Q5 documentaba que usaba el índice automático de la serie temporal; no era cierto (examinaba 5.053 documentos). Corregido en `q5_nodos_sin_reportar.py`.
+- `docs/ux/pantallas.md` v0.6: "Estado de nodos" pasa a hecha; las 4 pantallas están completas (ADR-021).
+- `docs/ux/pantallas.md` v0.5: "Alertas" pasa a hecha (ADR-020).
+- `docs/ux/pantallas.md` v0.4: "Detalle de parcela" pasa a hecha (ADR-019).
+- `docs/ux/pantallas.md` v0.3: "Resumen de finca" pasa a ser "Resumen de la mañana" (ADR-018), con la tabla de la noche como protagonista; las otras tres pantallas quedan marcadas como pendientes.
 - Las consultas Q1 a Q10 pasan de `mongosh` a Python (ADR-014, reemplaza una frase de ADR-008); `dashboard/data.py` las llama en lugar de reescribirlas (ajuste a ADR-002). La helada (Q2 y Q10) usa la etapa estimada y no la observada, igual que las alertas (excepción a ADR-004).
 - Alcance: de 30 días sin variedad definida a una temporada de Malbec (1/9/2026 a 31/3/2027, unas 732.700 lecturas).
 - Umbrales de helada: valores de vid por etapa BBCH en lugar de los de frutales (IDR + DACC).
@@ -51,6 +70,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - `eventos_climaticos.tipo` solo admite `"helada"`: el granizo queda fuera del modelo porque ningún sensor del MVP lo mide (ADR-006, decisión 12).
 
 ### Corregido
+- Mapa de "Resumen de la mañana": al arrastrar el mouse sobre el dibujo se hacía zoom y se deformaban las parcelas y desaparecían los nodos. El mapa pasa a `dashboard/mapa.py` y queda fijo (sin arrastre, zoom ni doble clic), con el rango calculado y bloqueado; los rótulos de las parcelas van en dos líneas. `dashboard.probar_datos` pasa a 37 casos (ADR-018).
 - Ejemplo de `variedades` en `modelo-datos.md`: la etapa "Floración y cuaje" lleva 260 grados-día desde la brotación (Zapata 2017), no 230.
 - Mínimas récord de septiembre del SMN (San Rafael −4,5 °C y San Martín −2,8 °C) y altura de la estación San Martín (653 m), que venían mal de una fuente secundaria.
 - Fin de línea LF en los scripts `.sh` (`.gitattributes`), para que funcionen al clonar en Windows.

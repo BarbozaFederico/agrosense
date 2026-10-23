@@ -186,3 +186,43 @@ Se crean con `python -m db.indexes.crear_indices`. Mediciones completas, costo e
 ## Cómo se probó
 
 `python -m db.queries.probar_consultas` (43 casos, base `agrosense_tests`, ~30 s): cada consulta se compara con un cálculo independiente (Python con `find`, el escenario del simulador o la colección `alertas`) y el texto de `mongosh` de Q1, Q4 y Q7 se ejecuta en `mongosh` y se compara con el resultado de Python. Detalle de lo que verifica cada caso en la salida de la prueba.
+
+## Consultas de apoyo del dashboard
+
+La pantalla "Resumen de la mañana" (ADR-018) reutiliza Q5, Q9 y Q10 y suma cuatro consultas de `db/queries/resumen_manana.py`. **No son Q11**: no responden a un requisito nuevo, solo traen lo que la pantalla muestra. Ninguna escribe en la base.
+
+| Función | Qué devuelve | Etapas |
+|---|---|---|
+| `alertas_de_helada` | Alertas de helada que se solapan con la noche (de las 18:00 a las 12:00, hora de Argentina) | `$match` (`inicio` antes del cierre y `fin` nulo o posterior al comienzo), `$project`, `$sort` |
+| `ultimo_riego` | El último riego de cada parcela que empezó antes del cierre de la noche | `$match`, `$sort` descendente, `$group` con `$first`, `$project` |
+| `ultima_lectura` | Momento de la última lectura hasta un "ahora" (se busca solo en las 6 horas previas) | `$match` por rango de `ts`, `$sort`, `$limit` 1 |
+| `noches_con_helada` | Las mañanas con al menos una alerta de helada (la mañana de una alerta es la fecha local de `inicio` + 6 h) | `$match`, `$group` con `$dateToString` y `$dateAdd`, `$sort` |
+
+Cada una tiene su `pipeline_xxx(...)`, de donde sale el texto de `mongosh` del panel "Ver consulta". Se prueban con `python -m dashboard.probar_datos`.
+
+La pantalla "Detalle de parcela" (ADR-019) reutiliza Q1, Q6, Q7, Q9 y Q10 y suma dos consultas de `db/queries/detalle_parcela.py`, tampoco Q11:
+
+| Función | Qué devuelve | Etapas |
+|---|---|---|
+| `curva_de_la_noche` | La temperatura de cada nodo de la parcela cada 5 minutos, de las 18:00 a las 12:00 (216 lecturas por nodo) | `$match` por parcela y rango de `ts`, `$project`, `$sort` por hora |
+| `riegos_recientes` | Los últimos riegos de la parcela que empezaron antes del cierre de la noche | `$match`, `$sort` descendente, `$limit`, `$project` |
+
+Se prueban con `python -m dashboard.probar_detalle`.
+
+La pantalla "Alertas" (ADR-020) reutiliza Q8 y suma tres consultas de `db/queries/alertas_pantalla.py`, tampoco Q11:
+
+| Función | Qué devuelve | Etapas |
+|---|---|---|
+| `alertas_de_la_noche` | Las alertas de ambos tipos que se solapan con la noche (de las 18:00 a las 12:00) | `$match` (`inicio` antes del cierre y `fin` nulo o posterior al comienzo), `$project`, `$sort` |
+| `historial` | Las últimas alertas (hasta 200) que empezaron antes del cierre de la noche, las más recientes primero | `$match`, `$sort` descendente, `$limit`, `$project` |
+| `etapas_del_malbec` | Nombre y rango BBCH de cada etapa, para traducir el número que guarda la alerta | `find` sobre `variedades` |
+
+Se prueban con `python -m dashboard.probar_alertas`.
+
+La pantalla "Estado de nodos" (ADR-021) reutiliza Q5 y suma una consulta de `db/queries/estado_nodos.py`, tampoco Q11:
+
+| Función | Qué devuelve | Etapas |
+|---|---|---|
+| `ultimo_reporte` | Los 12 nodos con el momento de su última lectura hasta el "ahora" y los minutos desde entonces | Las 3 primeras etapas de Q5 (`$lookup` a la última lectura y los dos `$set`), `$project`, `$sort` |
+
+Q5 devuelve solo los nodos que no reportan; esta trae todos, con la misma búsqueda. Se prueba con `python -m dashboard.probar_nodos`, que compara los nodos sin reportar contra Q5 en 75 fechas de la temporada.
