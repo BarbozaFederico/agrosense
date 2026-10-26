@@ -47,7 +47,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - `db/queries/estado_nodos.py`: consulta de apoyo con el último reporte de los 12 nodos, armada con las etapas de Q5 para que nunca discrepen; no es Q11.
 - `dashboard/probar_nodos.py` (31 casos, incluida la comparación con Q5 en 75 fechas) y 10 casos de punta a punta de Estado de nodos en `dashboard/probar_pantallas.py` (46 en total).
 
+- Formato del código con `black` 26.10.1: `pyproject.toml` con líneas de 120 caracteres y `black==26.10.1` en `requirements.txt`. Comprobación en la lista de verificación de cada tarea (`python -m black --check .`).
+
 ### Cambiado
+- Todo el código Python (96 archivos, 85 reformateados) quedó con el formato de `black` a 120 caracteres. Es un cambio solo de formato: las 10 suites de pruebas (409 casos) dan lo mismo antes y después.
 - Barra lateral del dashboard: la marca "agrosense" más grande y con una barra ámbar, y un botón por pantalla con ícono, más separados entre sí; la pantalla actual se resalta con borde ámbar y letra más gruesa (una marca invisible antes del enlace, porque esta versión de Streamlit no marca la página actual para el CSS). `barra_lateral` recibe ahora la pantalla actual (4 casos nuevos en `probar_pantallas`, 50 en total).
 - Regla permanente en `CLAUDE.md`: `CLAUDE.md`, `README.md` y `CHANGELOG.md` se actualizan en el mismo cambio.
 - Umbrales de riego: los valores anteriores (21 y 13,5 %) no salían de la FAO-56 y se reemplazaron (ADR-011).
