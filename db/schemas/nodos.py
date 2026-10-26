@@ -13,10 +13,10 @@ ESQUEMA = {
     "required": ["_id", "parcela_id", "finca_id", "ubicacion", "estado", "instalado", "variables"],
     "additionalProperties": False,
     "properties": {
-        "_id": c.CODIGO_NODO,                                    # "N-SR-1-A"
+        "_id": c.CODIGO_NODO,  # "N-SR-1-A"
         "parcela_id": c.CODIGO_PARCELA,
         "finca_id": c.CODIGO_FINCA,
-        "ubicacion": c.PUNTO,                                    # Q3 ($geoNear)
+        "ubicacion": c.PUNTO,  # Q3 ($geoNear)
         "estado": {"enum": ["activo", "mantenimiento", "baja"]},
         "instalado": c.FECHA,
         # Lista de variables que mide el nodo, sin repetir (uniqueItems).

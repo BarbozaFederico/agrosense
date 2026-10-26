@@ -35,13 +35,15 @@ def validar_documentos(bd: Database, esquema: dict, documentos: list[dict]) -> t
 
     indices_validos: set[int] = set()
     for inicio in range(0, len(documentos), TAMANO_PARTE):
-        parte = documentos[inicio:inicio + TAMANO_PARTE]
+        parte = documentos[inicio : inicio + TAMANO_PARTE]
         etiquetados = [{**doc, "__i": inicio + i} for i, doc in enumerate(parte)]
-        resultado = bd.aggregate([
-            {"$documents": etiquetados},
-            {"$match": {"$jsonSchema": esquema_con_etiqueta}},
-            {"$project": {"_id": 0, "__i": 1}},
-        ])
+        resultado = bd.aggregate(
+            [
+                {"$documents": etiquetados},
+                {"$match": {"$jsonSchema": esquema_con_etiqueta}},
+                {"$project": {"_id": 0, "__i": 1}},
+            ]
+        )
         indices_validos.update(d["__i"] for d in resultado)
 
     validos = [doc for i, doc in enumerate(documentos) if i in indices_validos]

@@ -14,7 +14,7 @@ from datetime import date, datetime, timedelta
 
 from db.queries import comun
 
-FRESCURA_MAX_H = 6      # cuánto hacia atrás se busca la última lectura (acota el barrido)
+FRESCURA_MAX_H = 6  # cuánto hacia atrás se busca la última lectura (acota el barrido)
 
 
 def ahora_de_la_noche(fecha: date) -> datetime:
@@ -24,14 +24,25 @@ def ahora_de_la_noche(fecha: date) -> datetime:
 
 # --------------------------------------------------------------------------- alertas
 
+
 def pipeline_alertas_de_helada(fecha: date) -> list:
     """Alertas de helada que empezaron antes del cierre de la noche y no terminaron antes de su comienzo."""
     inicio, fin = comun.ventana_noche(fecha)
     return [
-        {"$match": {"tipo": "helada", "inicio": {"$lt": fin},
-                    "$or": [{"fin": None}, {"fin": {"$gte": inicio}}]}},
-        {"$project": {"_id": 0, "parcela_id": 1, "inicio": 1, "fin": 1, "estado": 1, "etapa_bbch": 1,
-                      "umbral": 1, "valor_extremo": 1, "riesgo": 1}},
+        {"$match": {"tipo": "helada", "inicio": {"$lt": fin}, "$or": [{"fin": None}, {"fin": {"$gte": inicio}}]}},
+        {
+            "$project": {
+                "_id": 0,
+                "parcela_id": 1,
+                "inicio": 1,
+                "fin": 1,
+                "estado": 1,
+                "etapa_bbch": 1,
+                "umbral": 1,
+                "valor_extremo": 1,
+                "riesgo": 1,
+            }
+        },
         {"$sort": {"inicio": 1}},
     ]
 
@@ -42,14 +53,22 @@ def alertas_de_helada(bd, fecha: date | str = comun.FECHA_NOCHE) -> list[dict]:
 
 # --------------------------------------------------------------------------- riego
 
+
 def pipeline_ultimo_riego(fecha: date) -> list:
     """Para cada parcela, su riego más reciente que haya empezado antes del cierre de la noche."""
     _, fin = comun.ventana_noche(fecha)
     return [
         {"$match": {"inicio": {"$lt": fin}}},
         {"$sort": {"inicio": -1}},
-        {"$group": {"_id": "$parcela_id", "inicio": {"$first": "$inicio"}, "fin": {"$first": "$fin"},
-                    "lamina_mm": {"$first": "$lamina_mm"}, "origen": {"$first": "$origen"}}},
+        {
+            "$group": {
+                "_id": "$parcela_id",
+                "inicio": {"$first": "$inicio"},
+                "fin": {"$first": "$fin"},
+                "lamina_mm": {"$first": "$lamina_mm"},
+                "origen": {"$first": "$origen"},
+            }
+        },
         {"$project": {"_id": 0, "parcela_id": "$_id", "inicio": 1, "fin": 1, "lamina_mm": 1, "origen": 1}},
         {"$sort": {"parcela_id": 1}},
     ]
@@ -61,6 +80,7 @@ def ultimo_riego(bd, fecha: date | str = comun.FECHA_NOCHE) -> dict[str, dict]:
 
 
 # --------------------------------------------------------------------------- frescura
+
 
 def pipeline_ultima_lectura(ahora: datetime) -> list:
     return [
@@ -80,13 +100,22 @@ def ultima_lectura(bd, ahora: datetime | str) -> datetime | None:
 
 # --------------------------------------------------------------------------- noches con helada
 
+
 def pipeline_noches_con_helada() -> list:
     """La mañana de una alerta es la fecha local de (inicio + 6 h): una alerta a las 20:00 es de la mañana siguiente."""
     return [
         {"$match": {"tipo": "helada"}},
-        {"$group": {"_id": {"$dateToString": {
-            "date": {"$dateAdd": {"startDate": "$inicio", "unit": "hour", "amount": 6}},
-            "format": "%Y-%m-%d", "timezone": comun.ZONA}}}},
+        {
+            "$group": {
+                "_id": {
+                    "$dateToString": {
+                        "date": {"$dateAdd": {"startDate": "$inicio", "unit": "hour", "amount": 6}},
+                        "format": "%Y-%m-%d",
+                        "timezone": comun.ZONA,
+                    }
+                }
+            }
+        },
         {"$project": {"_id": 0, "fecha": "$_id"}},
         {"$sort": {"fecha": 1}},
     ]
@@ -98,10 +127,13 @@ def noches_con_helada(bd) -> list[date]:
 
 # --------------------------------------------------------------------------- catálogo
 
+
 def catalogo(bd) -> dict:
     """Fincas, parcelas y nodos con sus geometrías (para el mapa y para poner nombre a cada parcela)."""
     return {
-        "fincas": list(bd.fincas.find({}, {"nombre": 1, "departamento": 1, "sistema_riego": 1, "tipo_suelo": 1}).sort("_id", 1)),
+        "fincas": list(
+            bd.fincas.find({}, {"nombre": 1, "departamento": 1, "sistema_riego": 1, "tipo_suelo": 1}).sort("_id", 1)
+        ),
         "parcelas": list(bd.parcelas.find({}, {"finca_id": 1, "nombre": 1, "geometria": 1}).sort("_id", 1)),
         "nodos": list(bd.nodos.find({}, {"parcela_id": 1, "finca_id": 1, "ubicacion": 1, "estado": 1}).sort("_id", 1)),
     }

@@ -17,8 +17,8 @@ ESQUEMA = {
         "parcela_id": c.CODIGO_PARCELA,
         "fecha": c.FECHA,
         "etapa_bbch": c.ETAPA_BBCH,
-        "observador": {"enum": ["tecnico", "encargado"]},        # un rol, no un nombre (repo público)
+        "observador": {"enum": ["tecnico", "encargado"]},  # un rol, no un nombre (repo público)
         "notas": c.TEXTO,
-        "fuente": {"enum": ["seed"]},                            # solo precargadas (ADR-004)
+        "fuente": {"enum": ["seed"]},  # solo precargadas (ADR-004)
     },
 }

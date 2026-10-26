@@ -19,8 +19,8 @@ import numpy as np
 from db.seeds.ubicaciones import CENTROS_FINCA
 from simulator import parametros as P
 
-
 # --------------------------------------------------------------------------- calendario
+
 
 def fechas() -> list[date]:
     """Los 212 días de la temporada."""
@@ -61,6 +61,7 @@ def dia_de_cada_paso() -> np.ndarray:
 
 # --------------------------------------------------------------------------- astronomía
 
+
 def astronomia(finca_id: str) -> tuple[np.ndarray, np.ndarray]:
     """Hora local del amanecer y de la puesta del sol de cada día (incluye un día de margen
     a cada lado, para la noche que empieza antes del 1/9 y la que termina después del 31/3).
@@ -77,9 +78,9 @@ def astronomia(finca_id: str) -> tuple[np.ndarray, np.ndarray]:
         n = f.timetuple().tm_yday
         decl = math.radians(23.45) * math.sin(2 * math.pi * (284 + n) / 365)
         horaria = math.acos(max(-1.0, min(1.0, -math.tan(lat) * math.tan(decl))))
-        duracion = math.degrees(horaria) * 2 / 15 + 0.13          # +8 min: refracción y disco solar
+        duracion = math.degrees(horaria) * 2 / 15 + 0.13  # +8 min: refracción y disco solar
         b = 2 * math.pi * (n - 81) / 364
-        ecuacion_tiempo = 9.87 * math.sin(2 * b) - 7.53 * math.cos(b) - 1.5 * math.sin(b)   # minutos
+        ecuacion_tiempo = 9.87 * math.sin(2 * b) - 7.53 * math.cos(b) - 1.5 * math.sin(b)  # minutos
         mediodia = 12 + (P.MERIDIANO_ARGENTINA - longitud) / 15 - ecuacion_tiempo / 60
         amanecer.append(mediodia - duracion / 2)
         atardecer.append(mediodia + duracion / 2)
@@ -88,9 +89,10 @@ def astronomia(finca_id: str) -> tuple[np.ndarray, np.ndarray]:
 
 # --------------------------------------------------------------------------- temperaturas diarias
 
+
 def _ar1(rng: np.random.Generator, n: int, sigma: float, phi: float) -> np.ndarray:
     """Serie con memoria: cada día se parece al anterior (AR(1) con desvío `sigma`)."""
-    ruido = rng.normal(0, sigma * math.sqrt(1 - phi ** 2), n)
+    ruido = rng.normal(0, sigma * math.sqrt(1 - phi**2), n)
     serie = np.empty(n)
     serie[0] = rng.normal(0, sigma)
     for i in range(1, n):
@@ -111,7 +113,7 @@ def temperaturas_diarias(rng: np.random.Generator, finca_id: str) -> tuple[np.nd
     tmax = normal_max + anomalia + rng.normal(0, P.SIGMA_PROPIA_C, P.DIAS)
     tmin = normal_min + anomalia + rng.normal(0, P.SIGMA_PROPIA_C, P.DIAS)
     tmin = np.maximum(tmin, P.PISO_MINIMA_COMUN_C)
-    tmax = np.maximum(tmax, tmin + 6.0)                          # amplitud mínima razonable
+    tmax = np.maximum(tmax, tmin + 6.0)  # amplitud mínima razonable
     return tmax, tmin
 
 
@@ -122,14 +124,16 @@ def maxima_normal(finca_id: str) -> np.ndarray:
 
 # --------------------------------------------------------------------------- curva dentro del día
 
+
 def _noche_normalizada(x: np.ndarray) -> np.ndarray:
     """Curva exponencial que va de 1 (puesta del sol) a 0 (amanecer), con x entre 0 y 1."""
     b = P.COEF_NOCHE
     return (np.exp(-b * x) - math.exp(-b)) / (1 - math.exp(-b))
 
 
-def temperatura_en_puesta(tmax: float | np.ndarray, tmin: float | np.ndarray,
-                          amanecer: float | np.ndarray, atardecer: float | np.ndarray):
+def temperatura_en_puesta(
+    tmax: float | np.ndarray, tmin: float | np.ndarray, amanecer: float | np.ndarray, atardecer: float | np.ndarray
+):
     """Temperatura a la puesta del sol del día (Parton y Logan)."""
     duracion = atardecer - amanecer
     return tmin + (tmax - tmin) * np.sin(np.pi * duracion / (duracion + 2 * P.RETRASO_H))
@@ -142,14 +146,16 @@ def perfil_5min(tmax: np.ndarray, tmin: np.ndarray, amanecer: np.ndarray, atarde
     De noche: exponencial que baja desde la temperatura de la puesta del sol hasta la mínima
     del día siguiente, que se alcanza justo al amanecer.
     """
-    def ext(a):                       # un día de margen a cada lado
+
+    def ext(a):  # un día de margen a cada lado
         return np.concatenate([a[:1], a, a[-1:]])
+
     tx, tn = ext(tmax), ext(tmin)
-    sr, ss = amanecer, atardecer      # ya vienen con margen
+    sr, ss = amanecer, atardecer  # ya vienen con margen
     duracion = ss - sr
     t_puesta = tn + (tx - tn) * np.sin(np.pi * duracion / (duracion + 2 * P.RETRASO_H))
 
-    k = dia_de_cada_paso() + 1        # posición en los arreglos con margen
+    k = dia_de_cada_paso() + 1  # posición en los arreglos con margen
     h = horas_del_dia()
 
     de_dia = (h >= sr[k]) & (h < ss[k])
@@ -169,6 +175,7 @@ def perfil_5min(tmax: np.ndarray, tmin: np.ndarray, amanecer: np.ndarray, atarde
 
 # --------------------------------------------------------------------------- noche de helada
 
+
 def horas_bajo_cero(minima_c: float, extrema: bool = False) -> float:
     """Cuántas horas dura una helada según su profundidad (ADR-012, decisión 13).
 
@@ -179,9 +186,16 @@ def horas_bajo_cero(minima_c: float, extrema: bool = False) -> float:
     return float(min(P.HORAS_BAJO_CERO_MAX, max(P.HORAS_BAJO_CERO_MIN, abs(minima_c) / P.VELOCIDAD_MAX_ENFRIAMIENTO)))
 
 
-def noche_de_helada(temp: np.ndarray, dia_manana: int, minima_c: float, t_puesta_c: float,
-                    amanecer: np.ndarray, atardecer: np.ndarray, extrema: bool = False,
-                    nivel_cero_c: float = 0.0) -> np.ndarray:
+def noche_de_helada(
+    temp: np.ndarray,
+    dia_manana: int,
+    minima_c: float,
+    t_puesta_c: float,
+    amanecer: np.ndarray,
+    atardecer: np.ndarray,
+    extrema: bool = False,
+    nivel_cero_c: float = 0.0,
+) -> np.ndarray:
     """Reemplaza, en `temp`, la noche que termina en el amanecer del día `dia_manana`.
 
     La curva tiene tres tramos (horas desde la puesta del sol):
@@ -194,9 +208,9 @@ def noche_de_helada(temp: np.ndarray, dia_manana: int, minima_c: float, t_puesta
     más frío está `nivel_cero_c` bajo la curva (desvío fijo del nodo), así que cruza 0 °C
     justo en t0 y las horas bajo cero se miden en él, no en la curva.
     """
-    k = dia_manana + 1                                           # posición con margen
+    k = dia_manana + 1  # posición con margen
     puesta_previa = atardecer[k - 1]
-    largo = 24 - puesta_previa + amanecer[k]                    # horas de noche
+    largo = 24 - puesta_previa + amanecer[k]  # horas de noche
     # la profundidad que cuenta es la del nodo más frío: de `nivel_cero_c` (su 0 °C) a la mínima
     duracion_bajo_cero = horas_bajo_cero(minima_c - nivel_cero_c, extrema)
     t0 = largo - duracion_bajo_cero
@@ -224,6 +238,7 @@ def noche_de_helada(temp: np.ndarray, dia_manana: int, minima_c: float, t_puesta
 
 # --------------------------------------------------------------------------- humedad del aire
 
+
 def presion_vapor(t):
     """Presión de vapor de saturación (hPa) a la temperatura `t` (Magnus)."""
     return 6.112 * np.exp(17.62 * t / (243.12 + t))
@@ -239,8 +254,10 @@ def punto_rocio_mensual(finca_id: str) -> dict[int, float]:
     """Punto de rocío medio de cada mes: medido (SMN) o derivado (Tupungato)."""
     if finca_id in P.PUNTO_ROCIO_C:
         return P.PUNTO_ROCIO_C[finca_id]
-    return {m: punto_rocio_desde_humedad(P.NORMALES_C[finca_id][m][1], P.HUMEDAD_NOCHE_TUPUNGATO_PCT[m])
-            for m in P.MESES_TEMPORADA}
+    return {
+        m: punto_rocio_desde_humedad(P.NORMALES_C[finca_id][m][1], P.HUMEDAD_NOCHE_TUPUNGATO_PCT[m])
+        for m in P.MESES_TEMPORADA
+    }
 
 
 def anomalia_rocio(rng: np.random.Generator) -> np.ndarray:

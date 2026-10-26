@@ -35,18 +35,31 @@ def pipeline(fecha: date = comun.FECHA_NOCHE, parcela_id: str | None = None) -> 
         # temperatura de la parcela en cada instante: la del nodo más frío
         {"$group": {"_id": {"parcela": "$meta.parcela_id", "ts": "$ts"}, "tmin": {"$min": "$temperatura_c"}}},
         # tiempo acumulado bajo cero, en horas
-        {"$setWindowFields": {
-            "partitionBy": "$_id.parcela", "sortBy": {"_id.ts": 1},
-            "output": {"horas": {
-                "$integral": {"input": {"$cond": [{"$lt": ["$tmin", 0]}, 1, 0]}, "unit": "hour"},
-                "window": {"range": ["unbounded", "current"], "unit": "hour"}}}}},
+        {
+            "$setWindowFields": {
+                "partitionBy": "$_id.parcela",
+                "sortBy": {"_id.ts": 1},
+                "output": {
+                    "horas": {
+                        "$integral": {"input": {"$cond": [{"$lt": ["$tmin", 0]}, 1, 0]}, "unit": "hour"},
+                        "window": {"range": ["unbounded", "current"], "unit": "hour"},
+                    }
+                },
+            }
+        },
         # el total de la noche es el último valor acumulado
-        {"$group": {"_id": "$_id.parcela", "horas_bajo_cero": {"$max": "$horas"},
-                    "minima_c": {"$min": "$tmin"}}},
+        {"$group": {"_id": "$_id.parcela", "horas_bajo_cero": {"$max": "$horas"}, "minima_c": {"$min": "$tmin"}}},
         {"$lookup": {"from": "parcelas", "localField": "_id", "foreignField": "_id", "as": "parcela"}},
         {"$unwind": "$parcela"},
-        {"$project": {"_id": 0, "parcela_id": "$_id", "finca_id": "$parcela.finca_id",
-                      "horas_bajo_cero": {"$round": ["$horas_bajo_cero", 2]}, "minima_c": 1}},
+        {
+            "$project": {
+                "_id": 0,
+                "parcela_id": "$_id",
+                "finca_id": "$parcela.finca_id",
+                "horas_bajo_cero": {"$round": ["$horas_bajo_cero", 2]},
+                "minima_c": 1,
+            }
+        },
         {"$sort": {"horas_bajo_cero": -1, "parcela_id": 1}},
     ]
 
@@ -65,8 +78,9 @@ def main() -> None:
     if a.mongosh:
         print(comun.texto_mongosh(COLECCION, pipeline(comun.a_fecha(a.fecha), a.parcela)))
         return
-    comun.imprimir_tabla(consultar(obtener_base(), a.fecha, a.parcela),
-                         ["parcela_id", "finca_id", "horas_bajo_cero", "minima_c"])
+    comun.imprimir_tabla(
+        consultar(obtener_base(), a.fecha, a.parcela), ["parcela_id", "finca_id", "horas_bajo_cero", "minima_c"]
+    )
 
 
 if __name__ == "__main__":

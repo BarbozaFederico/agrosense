@@ -60,5 +60,7 @@ for nombre in ["ts_sin_id", "ts_con_id", "comun_sin_id", "comun_con_id"]:
 # ¿Qué tipo de colección quedó y con qué validación?
 for nombre in ["ts_sin_id", "ts_con_id", "comun_sin_id", "comun_con_id"]:
     info = next(bd.list_collections(filter={"name": nombre}))
-    print(f"{nombre}: tipo {info['type']} | validador: {'validator' in info['options']} | "
-          f"documentos: {bd[nombre].count_documents({})}")
+    print(
+        f"{nombre}: tipo {info['type']} | validador: {'validator' in info['options']} | "
+        f"documentos: {bd[nombre].count_documents({})}"
+    )

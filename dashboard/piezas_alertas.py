@@ -10,7 +10,7 @@ from html import escape
 from dashboard.formato import AGRAVANTES, TIPO_TEXTO, duracion, fecha_corta, grados, marca_tipo, numero
 from dashboard.piezas import EJE_NOCHE, barra
 
-TIPOS = {"Todas": None, "Helada": "helada", "Riego": "riego"}      # etiqueta del control -> tipo de alerta
+TIPOS = {"Todas": None, "Helada": "helada", "Riego": "riego"}  # etiqueta del control -> tipo de alerta
 
 
 def valor(a: dict, campo: str) -> str:
@@ -38,8 +38,10 @@ def frase_de_alertas(filas: list[dict], tipo: str | None = None) -> tuple[str, s
     """La respuesta en una frase (cuántas alertas hubo en la noche) y el detalle (la más fuerte). `tipo` es el filtro."""
     de = f" de {tipo}" if tipo else ""
     if not filas:
-        return (f"No hubo alertas{de} esta noche.",
-                "Las noches con alerta de helada están en la barra lateral." if tipo != "riego" else "")
+        return (
+            f"No hubo alertas{de} esta noche.",
+            "Las noches con alerta de helada están en la barra lateral." if tipo != "riego" else "",
+        )
     n_h = sum(1 for a in filas if a["tipo"] == "helada")
     n_r = len(filas) - n_h
     partes = []
@@ -53,26 +55,34 @@ def frase_de_alertas(filas: list[dict], tipo: str | None = None) -> tuple[str, s
     fuerte = ordenar_por_gravedad(filas)[0]
     if fuerte["tipo"] == "helada":
         extra = f" Riesgo {fuerte['nivel']}." if fuerte["nivel"] else ""
-        detalle = (f"La más fuerte: {fuerte['parcela']} de {fuerte['finca']}, {grados(fuerte['valor_extremo'])} en el brote "
-                   f"(umbral {grados(fuerte['umbral'])}), {duracion(fuerte['horas'])}.{extra}")
+        detalle = (
+            f"La más fuerte: {fuerte['parcela']} de {fuerte['finca']}, {grados(fuerte['valor_extremo'])} en el brote "
+            f"(umbral {grados(fuerte['umbral'])}), {duracion(fuerte['horas'])}.{extra}"
+        )
     else:
-        detalle = (f"La más baja: {fuerte['parcela']} de {fuerte['finca']} llegó a {valor(fuerte, 'valor_extremo')} de "
-                   f"humedad de suelo (umbral {valor(fuerte, 'umbral')}).")
+        detalle = (
+            f"La más baja: {fuerte['parcela']} de {fuerte['finca']} llegó a {valor(fuerte, 'valor_extremo')} de "
+            f"humedad de suelo (umbral {valor(fuerte, 'umbral')})."
+        )
     return frase, detalle
 
 
 def tabla_de_la_noche(filas: list[dict], fecha: date) -> str:
     """Las alertas de la noche, con la barra de tiempo de 18:00 a 12:00 (la misma de "Resumen de la mañana")."""
     eje = "".join(f'<span style="left:{i * 16.667:.2f}%">{h}</span>' for i, h in enumerate(EJE_NOCHE))
-    cab = ("<tr><th>Tipo</th><th>Parcela</th><th>Etapa</th><th class='num'>Valor extremo</th>"
-           f"<th><div class='eje' aria-hidden='true'>{eje}</div></th><th class='num'>Duración</th><th>Riesgo</th></tr>")
+    cab = (
+        "<tr><th>Tipo</th><th>Parcela</th><th>Etapa</th><th class='num'>Valor extremo</th>"
+        f"<th><div class='eje' aria-hidden='true'>{eje}</div></th><th class='num'>Duración</th><th>Riesgo</th></tr>"
+    )
     cuerpo = []
     for a in ordenar_por_gravedad(filas):
         riesgo = "-"
         if a["nivel"]:
             det = ", ".join(AGRAVANTES[x] for x in a["agravantes"])
-            riesgo = (f'<span class="chip {"helada" if a["nivel"] == "alto" else "atencion"}">{a["nivel"].capitalize()}</span>'
-                      + (f'<span class="sec">{det}</span>' if det else ""))
+            riesgo = (
+                f'<span class="chip {"helada" if a["nivel"] == "alto" else "atencion"}">{a["nivel"].capitalize()}</span>'
+                + (f'<span class="sec">{det}</span>' if det else "")
+            )
         cuerpo.append(
             f'<tr class="fila"><td>{marca_tipo(a["tipo"])}</td>'
             f'<td class="parcela"><a class="enlace" href="detalle?parcela={a["parcela_id"]}&fecha={fecha:%Y-%m-%d}" target="_self">'
@@ -80,18 +90,28 @@ def tabla_de_la_noche(filas: list[dict], fecha: date) -> str:
             f'<td>{escape(a["etapa"])}</td>'
             f'<td class="num"><b>{valor(a, "valor_extremo")}</b><span class="sec">umbral {valor(a, "umbral")}</span></td>'
             f'<td>{barra(a, "" if a["tipo"] == "helada" else "riego")}</td>'
-            f'<td class="num">{duracion(a["horas"])}{"+" if a["alerta"]["en_curso"] else ""}</td><td>{riesgo}</td></tr>')
+            f'<td class="num">{duracion(a["horas"])}{"+" if a["alerta"]["en_curso"] else ""}</td><td>{riesgo}</td></tr>'
+        )
     return f'<div class="envoltorio"><table class="noche"><thead>{cab}</thead><tbody>{"".join(cuerpo)}</tbody></table></div>'
 
 
 def filas_de_historial(historial: list[dict]) -> list[dict]:
     """El historial como filas de una tabla ordenable. El valor extremo y el umbral van como texto con su unidad
     (°C del brote o % de humedad): ordenar por un valor que mezcla unidades no tendría sentido."""
-    return [{
-        "Tipo": TIPO_TEXTO.get(a["tipo"], a["tipo"]), "Parcela": f"{a['parcela']} · {a['finca']}", "Etapa": a["etapa"],
-        "Inicio": a["inicio"], "Fin": a["fin"], "Duración (h)": round(a["horas"], 2),
-        "Valor extremo": valor(a, "valor_extremo"), "Umbral": valor(a, "umbral"),
-        "Estado": "En curso" if a["fin"] is None else "Cerrada"} for a in historial]
+    return [
+        {
+            "Tipo": TIPO_TEXTO.get(a["tipo"], a["tipo"]),
+            "Parcela": f"{a['parcela']} · {a['finca']}",
+            "Etapa": a["etapa"],
+            "Inicio": a["inicio"],
+            "Fin": a["fin"],
+            "Duración (h)": round(a["horas"], 2),
+            "Valor extremo": valor(a, "valor_extremo"),
+            "Umbral": valor(a, "umbral"),
+            "Estado": "En curso" if a["fin"] is None else "Cerrada",
+        }
+        for a in historial
+    ]
 
 
 def tabla_de_semanas(semanas: list[dict], departamentos: list[str]) -> str:
@@ -104,10 +124,17 @@ def tabla_de_semanas(semanas: list[dict], departamentos: list[str]) -> str:
         celdas = []
         for d in departamentos:
             c = s["por_departamento"].get(d)
-            celdas.append('<td class="num">-</td>' if c is None else
-                          f'<td class="num"><b>{c["alertas"]}</b> alerta{"s" if c["alertas"] > 1 else ""}'
-                          f'<span class="sec">mín. {grados(c["minima_brote_c"])}</span></td>')
-        filas.append(f'<tr class="{"esta-noche" if s["actual"] else ""}"><td>Semana del {fecha_corta(s["semana"])}'
-                     f'{"<span class=sec> semana elegida</span>" if s["actual"] else ""}</td>{"".join(celdas)}</tr>')
-    return (f'<div class="envoltorio"><table class="q8"><thead><tr><th>Semana</th>{cab}</tr></thead>'
-            f'<tbody>{"".join(filas)}</tbody></table></div>')
+            celdas.append(
+                '<td class="num">-</td>'
+                if c is None
+                else f'<td class="num"><b>{c["alertas"]}</b> alerta{"s" if c["alertas"] > 1 else ""}'
+                f'<span class="sec">mín. {grados(c["minima_brote_c"])}</span></td>'
+            )
+        filas.append(
+            f'<tr class="{"esta-noche" if s["actual"] else ""}"><td>Semana del {fecha_corta(s["semana"])}'
+            f'{"<span class=sec> semana elegida</span>" if s["actual"] else ""}</td>{"".join(celdas)}</tr>'
+        )
+    return (
+        f'<div class="envoltorio"><table class="q8"><thead><tr><th>Semana</th>{cab}</tr></thead>'
+        f'<tbody>{"".join(filas)}</tbody></table></div>'
+    )

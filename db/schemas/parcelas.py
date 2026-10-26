@@ -10,16 +10,24 @@ SERIE_TEMPORAL = False
 
 ESQUEMA = {
     "bsonType": "object",
-    "required": ["_id", "finca_id", "nombre", "variedad_id", "superficie_ha", "geometria",
-                 "conduccion", "densidad_plantas_ha"],
+    "required": [
+        "_id",
+        "finca_id",
+        "nombre",
+        "variedad_id",
+        "superficie_ha",
+        "geometria",
+        "conduccion",
+        "densidad_plantas_ha",
+    ],
     "additionalProperties": False,
     "properties": {
-        "_id": c.CODIGO_PARCELA,                                 # "P-SR-1"
-        "finca_id": c.CODIGO_FINCA,                              # referencia a fincas._id
+        "_id": c.CODIGO_PARCELA,  # "P-SR-1"
+        "finca_id": c.CODIGO_FINCA,  # referencia a fincas._id
         "nombre": c.TEXTO,
-        "variedad_id": c.TEXTO,                                  # referencia a variedades._id
-        "superficie_ha": c.POSITIVO,                             # mayor que 0
-        "geometria": c.POLIGONO,                                 # Q4 ($geoIntersects)
+        "variedad_id": c.TEXTO,  # referencia a variedades._id
+        "superficie_ha": c.POSITIVO,  # mayor que 0
+        "geometria": c.POLIGONO,  # Q4 ($geoIntersects)
         "conduccion": {"enum": ["espaldero", "parral"]},
         "densidad_plantas_ha": {"bsonType": ["int", "long"], "minimum": 1},
     },

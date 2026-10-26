@@ -10,15 +10,24 @@ from datetime import datetime
 
 from db.queries import comun, q5_nodos_sin_reportar as q5
 
-ETAPAS_DE_Q5_COMPARTIDAS = 3        # $lookup a la última lectura, `ultima_lectura` y `minutos_sin_reportar`
+ETAPAS_DE_Q5_COMPARTIDAS = 3  # $lookup a la última lectura, `ultima_lectura` y `minutos_sin_reportar`
 
 
 def pipeline_ultimo_reporte(ahora: datetime) -> list:
     """Cada nodo con el momento de su última lectura hasta `ahora` y los minutos que pasaron desde entonces."""
-    compartidas = q5.pipeline(ahora, 0)[:ETAPAS_DE_Q5_COMPARTIDAS]      # el límite no se usa antes del $match
+    compartidas = q5.pipeline(ahora, 0)[:ETAPAS_DE_Q5_COMPARTIDAS]  # el límite no se usa antes del $match
     return compartidas + [
-        {"$project": {"_id": 0, "nodo_id": "$_id", "parcela_id": 1, "finca_id": 1, "estado": 1,
-                      "ultima_lectura": 1, "minutos_sin_reportar": 1}},
+        {
+            "$project": {
+                "_id": 0,
+                "nodo_id": "$_id",
+                "parcela_id": 1,
+                "finca_id": 1,
+                "estado": 1,
+                "ultima_lectura": 1,
+                "minutos_sin_reportar": 1,
+            }
+        },
         {"$sort": {"nodo_id": 1}},
     ]
 

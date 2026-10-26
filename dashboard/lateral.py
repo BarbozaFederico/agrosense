@@ -12,13 +12,15 @@ import streamlit as st
 from dashboard import data
 from dashboard.formato import fecha_corta
 
-FECHA_INICIAL = date(2026, 10, 5)               # la noche de helada precargada (RF-13)
+FECHA_INICIAL = date(2026, 10, 5)  # la noche de helada precargada (RF-13)
 TEMPORADA = (date(2026, 9, 1), date(2027, 3, 31))
-PANTALLAS_HECHAS = [("paginas/resumen.py", "Resumen de la mañana", ":material/wb_twilight:"),
-                    ("paginas/detalle.py", "Detalle de parcela", ":material/grass:"),
-                    ("paginas/alertas.py", "Alertas", ":material/notifications:"),
-                    ("paginas/nodos.py", "Estado de nodos", ":material/sensors:")]
-PANTALLAS_PENDIENTES: list[str] = []          # las 4 pantallas están hechas
+PANTALLAS_HECHAS = [
+    ("paginas/resumen.py", "Resumen de la mañana", ":material/wb_twilight:"),
+    ("paginas/detalle.py", "Detalle de parcela", ":material/grass:"),
+    ("paginas/alertas.py", "Alertas", ":material/notifications:"),
+    ("paginas/nodos.py", "Estado de nodos", ":material/sensors:"),
+]
+PANTALLAS_PENDIENTES: list[str] = []  # las 4 pantallas están hechas
 
 
 def fecha_de_la_url() -> date | None:
@@ -50,24 +52,40 @@ def barra_lateral(pantalla: str, con_finca: bool = False, con_parcela: bool = Fa
                 st.markdown('<span class="pantalla-actual"></span>', unsafe_allow_html=True)
             st.page_link(ruta, label=titulo, icon=icono)
         if PANTALLAS_PENDIENTES:
-            st.markdown('<ul class="nav">' + "".join(f"<li>{t}<small>en construcción</small></li>" for t in PANTALLAS_PENDIENTES)
-                        + "</ul>", unsafe_allow_html=True)
+            st.markdown(
+                '<ul class="nav">'
+                + "".join(f"<li>{t}<small>en construcción</small></li>" for t in PANTALLAS_PENDIENTES)
+                + "</ul>",
+                unsafe_allow_html=True,
+            )
         st.divider()
         resumen = data.resumen(st.session_state["fecha"])
         if con_finca:
             nombres = {f["_id"]: f"{f['nombre']} · {f['departamento']}" for f in resumen["catalogo"]["fincas"]}
-            elegido = st.selectbox("Finca", [None, *nombres],
-                                   format_func=lambda k: "Todas las fincas" if k is None else nombres[k])
+            elegido = st.selectbox(
+                "Finca", [None, *nombres], format_func=lambda k: "Todas las fincas" if k is None else nombres[k]
+            )
         if con_parcela:
             elegido = _selector_de_parcela(resumen)
-        st.date_input("Mañana de la noche", min_value=TEMPORADA[0], max_value=TEMPORADA[1], key="fecha",
-                      format="DD/MM/YYYY",
-                      help="Define la noche que se muestra: de las 18:00 del día anterior a las 12:00 de esta fecha.")
+        st.date_input(
+            "Mañana de la noche",
+            min_value=TEMPORADA[0],
+            max_value=TEMPORADA[1],
+            key="fecha",
+            format="DD/MM/YYYY",
+            help="Define la noche que se muestra: de las 18:00 del día anterior a las 12:00 de esta fecha.",
+        )
         st.query_params["fecha"] = st.session_state["fecha"].isoformat()
         st.caption("Noches con alerta de helada")
         for i, dia in enumerate(data.noches_con_helada()):
-            st.button(fecha_corta(dia), key=f"noche{i}", on_click=_ir_a, args=(dia,),
-                      type="primary" if dia == st.session_state["fecha"] else "secondary", width="stretch")
+            st.button(
+                fecha_corta(dia),
+                key=f"noche{i}",
+                on_click=_ir_a,
+                args=(dia,),
+                type="primary" if dia == st.session_state["fecha"] else "secondary",
+                width="stretch",
+            )
         st.markdown('<span class="etiqueta-sim">datos simulados</span>', unsafe_allow_html=True)
     return elegido
 

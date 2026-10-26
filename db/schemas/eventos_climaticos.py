@@ -15,10 +15,10 @@ ESQUEMA = {
     "additionalProperties": False,
     "properties": {
         "_id": c.OBJECT_ID,
-        "tipo": {"enum": ["helada"]},                            # solo heladas: ningún sensor del MVP mide granizo
+        "tipo": {"enum": ["helada"]},  # solo heladas: ningún sensor del MVP mide granizo
         "inicio": c.FECHA,
         "fin": c.FECHA,
-        "area": c.POLIGONO,                                      # Q4 ($geoIntersects)
+        "area": c.POLIGONO,  # Q4 ($geoIntersects)
         "temperatura_minima_c": c.NUMERO,
         "descripcion": c.TEXTO,
         "fuente": {"enum": ["simulado", "seed"]},

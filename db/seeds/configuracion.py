@@ -31,19 +31,24 @@ def documentos(umbrales=None) -> list[dict]:
             "Faltan los umbrales de riego (db/seeds/umbrales_riego.py: UMBRALES_RIEGO es None). "
             "Hay que verificarlos con la Tabla 19 de la FAO-56 antes de cargar `configuracion`."
         )
-    return [{
-        "_id": "general",
-        "delta_brote_c": 2,                    # Δ entre sensor y brote. Supuesto, ADR-005 (configurable)
-        "nodo_inactivo_min": 30,               # minutos sin lecturas para considerar inactivo un nodo
-        "sospechoso_minimo_c": {               # récord de septiembre de las normales 1991-2020 del SMN
-            "san_rafael": -4.5,                # San Rafael Aero (verificacion-fuentes.md, sección 1)
-            "san_martin": -2.8,                # San Martín
-            "tupungato": -5.6,                 # sin estación del SMN: supuesto adoptado (ADR-012, decisión 2)
-        },
-        "noche_extrema": NOCHE_EXTREMA,
-        "riesgo": {                            # cortes del índice de riesgo, adaptados de la FAO (ADR-005)
-            "margen_bajo_c": 2, "margen_alto_c": 0, "horas_duracion": 2,
-            "margen_duracion_c": 1, "aire_seco_pct": 60,
-        },
-        "umbrales_riego": umbrales,
-    }]
+    return [
+        {
+            "_id": "general",
+            "delta_brote_c": 2,  # Δ entre sensor y brote. Supuesto, ADR-005 (configurable)
+            "nodo_inactivo_min": 30,  # minutos sin lecturas para considerar inactivo un nodo
+            "sospechoso_minimo_c": {  # récord de septiembre de las normales 1991-2020 del SMN
+                "san_rafael": -4.5,  # San Rafael Aero (verificacion-fuentes.md, sección 1)
+                "san_martin": -2.8,  # San Martín
+                "tupungato": -5.6,  # sin estación del SMN: supuesto adoptado (ADR-012, decisión 2)
+            },
+            "noche_extrema": NOCHE_EXTREMA,
+            "riesgo": {  # cortes del índice de riesgo, adaptados de la FAO (ADR-005)
+                "margen_bajo_c": 2,
+                "margen_alto_c": 0,
+                "horas_duracion": 2,
+                "margen_duracion_c": 1,
+                "aire_seco_pct": 60,
+            },
+            "umbrales_riego": umbrales,
+        }
+    ]

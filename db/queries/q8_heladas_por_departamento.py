@@ -30,13 +30,34 @@ def pipeline() -> list:
         {"$unwind": "$parcela"},
         {"$lookup": {"from": "fincas", "localField": "parcela.finca_id", "foreignField": "_id", "as": "finca"}},
         {"$unwind": "$finca"},
-        {"$group": {"_id": {"departamento": "$finca.departamento",
-                            "semana": {"$dateTrunc": {"date": "$inicio", "unit": "week", "startOfWeek": "monday",
-                                                      "timezone": comun.ZONA}}},
-                    "alertas": {"$sum": 1}, "parcelas": {"$addToSet": "$parcela_id"},
-                    "minima_brote_c": {"$min": "$valor_extremo"}}},
-        {"$project": {"_id": 0, "departamento": "$_id.departamento", "semana": "$_id.semana", "alertas": 1,
-                      "parcelas_afectadas": {"$size": "$parcelas"}, "minima_brote_c": 1}},
+        {
+            "$group": {
+                "_id": {
+                    "departamento": "$finca.departamento",
+                    "semana": {
+                        "$dateTrunc": {
+                            "date": "$inicio",
+                            "unit": "week",
+                            "startOfWeek": "monday",
+                            "timezone": comun.ZONA,
+                        }
+                    },
+                },
+                "alertas": {"$sum": 1},
+                "parcelas": {"$addToSet": "$parcela_id"},
+                "minima_brote_c": {"$min": "$valor_extremo"},
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "departamento": "$_id.departamento",
+                "semana": "$_id.semana",
+                "alertas": 1,
+                "parcelas_afectadas": {"$size": "$parcelas"},
+                "minima_brote_c": 1,
+            }
+        },
         {"$sort": {"semana": 1, "departamento": 1}},
     ]
 
@@ -53,8 +74,9 @@ def main() -> None:
     if a.mongosh:
         print(comun.texto_mongosh(COLECCION, pipeline()))
         return
-    comun.imprimir_tabla(consultar(obtener_base()), ["semana", "departamento", "alertas", "parcelas_afectadas",
-                                                     "minima_brote_c"])
+    comun.imprimir_tabla(
+        consultar(obtener_base()), ["semana", "departamento", "alertas", "parcelas_afectadas", "minima_brote_c"]
+    )
 
 
 if __name__ == "__main__":

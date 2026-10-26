@@ -23,18 +23,18 @@ ESQUEMA = {
     "required": ["ts", "meta", "temperatura_c", "humedad_suelo_pct", "humedad_aire_pct"],
     "additionalProperties": False,
     "properties": {
-        "_id": c.OBJECT_ID,                                      # lo agrega MongoDB al guardar
+        "_id": c.OBJECT_ID,  # lo agrega MongoDB al guardar
         "ts": c.FECHA,
         "meta": {
             "bsonType": "object",
             "required": ["nodo_id", "parcela_id", "finca_id", "fuente"],
-            "additionalProperties": False,                       # meta también cerrado
+            "additionalProperties": False,  # meta también cerrado
             "properties": {
                 "nodo_id": c.CODIGO_NODO,
                 "parcela_id": c.CODIGO_PARCELA,
                 "finca_id": c.CODIGO_FINCA,
                 "fuente": c.FUENTE_SIMULADA,
-                "escenario_id": c.TEXTO,                         # solo en simulaciones en vivo (RF-15)
+                "escenario_id": c.TEXTO,  # solo en simulaciones en vivo (RF-15)
             },
         },
         # Rango amplio de control: descarta valores imposibles (por ejemplo, 500 °C),

@@ -32,9 +32,13 @@ def crear_con_collmod(nombre: str, incluir_id: bool) -> None:
         print(f"ERROR | crear {nombre} | {e}")
         return
     try:
-        bd.command("collMod", nombre,
-                   validator={"$jsonSchema": esquema_lectura(incluir_id)},
-                   validationLevel="strict", validationAction="error")
+        bd.command(
+            "collMod",
+            nombre,
+            validator={"$jsonSchema": esquema_lectura(incluir_id)},
+            validationLevel="strict",
+            validationAction="error",
+        )
         info = next(bd.list_collections(filter={"name": nombre}))
         print(f"OK    | collMod {nombre} | tipo: {info['type']} | validador guardado: {'validator' in info['options']}")
     except Exception as e:  # noqa: BLE001

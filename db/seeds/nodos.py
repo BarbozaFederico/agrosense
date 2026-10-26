@@ -19,10 +19,16 @@ def documentos() -> list[dict]:
     for finca_id, parcelas in PARCELAS_DE_FINCA.items():
         for parcela_id in parcelas:
             for letra in ("A", "B"):
-                nodo_id = f"N-{parcela_id[2:]}-{letra}"            # P-SR-1 → N-SR-1-A
-                docs.append({
-                    "_id": nodo_id, "parcela_id": parcela_id, "finca_id": finca_id,
-                    "ubicacion": ubicacion_nodo(nodo_id), "estado": "activo",
-                    "instalado": INSTALADO, "variables": list(VARIABLES),
-                })
+                nodo_id = f"N-{parcela_id[2:]}-{letra}"  # P-SR-1 → N-SR-1-A
+                docs.append(
+                    {
+                        "_id": nodo_id,
+                        "parcela_id": parcela_id,
+                        "finca_id": finca_id,
+                        "ubicacion": ubicacion_nodo(nodo_id),
+                        "estado": "activo",
+                        "instalado": INSTALADO,
+                        "variables": list(VARIABLES),
+                    }
+                )
     return docs

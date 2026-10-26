@@ -31,21 +31,47 @@ def pipeline(parcela_id: str | None = None, desde: datetime | None = None, hasta
         filtro["inicio"] = {**({"$gte": desde} if desde else {}), **({"$lt": hasta} if hasta else {})}
     return [
         {"$match": filtro},
-        {"$group": {"_id": {"parcela": "$parcela_id",
-                            "semana": {"$dateTrunc": {"date": "$inicio", "unit": "week", "startOfWeek": "monday",
-                                                      "timezone": comun.ZONA}}},
-                    "litros": {"$sum": "$litros"}, "lamina_mm": {"$sum": "$lamina_mm"}, "riegos": {"$sum": 1}}},
-        {"$project": {"_id": 0, "parcela_id": "$_id.parcela", "semana": "$_id.semana",
-                      "litros": 1, "lamina_mm": {"$round": ["$lamina_mm", 1]}, "riegos": 1}},
+        {
+            "$group": {
+                "_id": {
+                    "parcela": "$parcela_id",
+                    "semana": {
+                        "$dateTrunc": {
+                            "date": "$inicio",
+                            "unit": "week",
+                            "startOfWeek": "monday",
+                            "timezone": comun.ZONA,
+                        }
+                    },
+                },
+                "litros": {"$sum": "$litros"},
+                "lamina_mm": {"$sum": "$lamina_mm"},
+                "riegos": {"$sum": 1},
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "parcela_id": "$_id.parcela",
+                "semana": "$_id.semana",
+                "litros": 1,
+                "lamina_mm": {"$round": ["$lamina_mm", 1]},
+                "riegos": 1,
+            }
+        },
         {"$sort": {"parcela_id": 1, "semana": 1}},
     ]
 
 
-def consultar(bd, parcela_id: str | None = None, desde: datetime | str | None = None,
-              hasta: datetime | str | None = None) -> list[dict]:
+def consultar(
+    bd, parcela_id: str | None = None, desde: datetime | str | None = None, hasta: datetime | str | None = None
+) -> list[dict]:
     """Litros regados por parcela y semana (lunes a domingo, hora de Argentina)."""
-    return list(bd[COLECCION].aggregate(pipeline(
-        parcela_id, comun.a_utc(desde) if desde else None, comun.a_utc(hasta) if hasta else None)))
+    return list(
+        bd[COLECCION].aggregate(
+            pipeline(parcela_id, comun.a_utc(desde) if desde else None, comun.a_utc(hasta) if hasta else None)
+        )
+    )
 
 
 def main() -> None:
@@ -60,8 +86,9 @@ def main() -> None:
     if a.mongosh:
         print(comun.texto_mongosh(COLECCION, pipeline(a.parcela, desde, hasta)))
         return
-    comun.imprimir_tabla(consultar(obtener_base(), a.parcela, desde, hasta),
-                         ["parcela_id", "semana", "litros", "lamina_mm", "riegos"])
+    comun.imprimir_tabla(
+        consultar(obtener_base(), a.parcela, desde, hasta), ["parcela_id", "semana", "litros", "lamina_mm", "riegos"]
+    )
 
 
 if __name__ == "__main__":

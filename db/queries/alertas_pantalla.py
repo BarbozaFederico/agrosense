@@ -13,8 +13,18 @@ from datetime import date
 
 from db.queries import comun
 
-CAMPOS = {"_id": 0, "tipo": 1, "parcela_id": 1, "estado": 1, "inicio": 1, "fin": 1, "etapa_bbch": 1, "umbral": 1,
-          "valor_extremo": 1, "riesgo": 1}
+CAMPOS = {
+    "_id": 0,
+    "tipo": 1,
+    "parcela_id": 1,
+    "estado": 1,
+    "inicio": 1,
+    "fin": 1,
+    "etapa_bbch": 1,
+    "umbral": 1,
+    "valor_extremo": 1,
+    "riesgo": 1,
+}
 HISTORIAL_MAXIMO = 200
 
 
@@ -49,5 +59,7 @@ def historial(bd, fecha: date | str = comun.FECHA_NOCHE, limite: int = HISTORIAL
 
 def etapas_del_malbec(bd) -> list[dict]:
     """Las etapas de `variedades` ("malbec") con su rango de BBCH y su nombre."""
-    doc = bd.variedades.find_one({"_id": "malbec"}, {"etapas.bbch_desde": 1, "etapas.bbch_hasta": 1, "etapas.nombre": 1})
+    doc = bd.variedades.find_one(
+        {"_id": "malbec"}, {"etapas.bbch_desde": 1, "etapas.bbch_hasta": 1, "etapas.nombre": 1}
+    )
     return doc["etapas"] if doc else []

@@ -76,12 +76,12 @@ def nivel_riesgo(margen_c: float, agravantes: list[str], riesgo: dict) -> str:
 @dataclass
 class AlertaHeladaSim:
     parcela_id: str
-    inicio: int                      # paso en que se abrió
-    fin: int | None                  # paso en que se cerró
-    posicion_etapa: int              # posición en variedad["etapas"] al abrirse
-    umbral_c: float                  # umbral del brote con que se abrió
-    valor_extremo_c: float           # mínima de la temperatura del brote
-    riesgo: dict | None = None       # {nivel, margen_c, agravantes} al cerrar
+    inicio: int  # paso en que se abrió
+    fin: int | None  # paso en que se cerró
+    posicion_etapa: int  # posición en variedad["etapas"] al abrirse
+    umbral_c: float  # umbral del brote con que se abrió
+    valor_extremo_c: float  # mínima de la temperatura del brote
+    riesgo: dict | None = None  # {nivel, margen_c, agravantes} al cerrar
 
 
 def temperatura_del_brote(parcela: ParcelaSim, nodos: dict[str, NodoSim], delta_c: float) -> np.ndarray:
@@ -90,8 +90,9 @@ def temperatura_del_brote(parcela: ParcelaSim, nodos: dict[str, NodoSim], delta_
     return np.fmin(a, b) - delta_c
 
 
-def detectar_heladas(parcela: ParcelaSim, nodos: dict[str, NodoSim], humedad_suelo: np.ndarray,
-                     config: dict, variedad: dict) -> list[AlertaHeladaSim]:
+def detectar_heladas(
+    parcela: ParcelaSim, nodos: dict[str, NodoSim], humedad_suelo: np.ndarray, config: dict, variedad: dict
+) -> list[AlertaHeladaSim]:
     """Alertas de helada de una parcela en toda la temporada, con su riesgo al cerrar."""
     brote = temperatura_del_brote(parcela, nodos, config["delta_brote_c"])
     etapas = variedad["etapas"]
@@ -99,7 +100,7 @@ def detectar_heladas(parcela: ParcelaSim, nodos: dict[str, NodoSim], humedad_sue
     umbral_dia = umbral_etapa[parcela.etapa]
 
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore", RuntimeWarning)           # nodos sin reportar: NaN
+        warnings.simplefilter("ignore", RuntimeWarning)  # nodos sin reportar: NaN
         aire = np.nanmean([nodos[n].humedad_aire for n in parcela.nodos], axis=0)
     a, b = (nodos[n] for n in parcela.nodos)
     suelo = humedad_suelo + (a.desvio_suelo + b.desvio_suelo) / 2
@@ -120,8 +121,9 @@ def detectar_heladas(parcela: ParcelaSim, nodos: dict[str, NodoSim], humedad_sue
     return alertas
 
 
-def _riesgo_al_cerrar(alerta: AlertaHeladaSim, brote: np.ndarray, aire: np.ndarray, suelo: np.ndarray,
-                      parcela: ParcelaSim, config: dict) -> dict:
+def _riesgo_al_cerrar(
+    alerta: AlertaHeladaSim, brote: np.ndarray, aire: np.ndarray, suelo: np.ndarray, parcela: ParcelaSim, config: dict
+) -> dict:
     """Riesgo de la alerta (ADR-005): margen entre la mínima del brote y el umbral, más agravantes."""
     cortes = config["riesgo"]
     tramo = slice(alerta.inicio, alerta.fin + 1)
@@ -136,5 +138,4 @@ def _riesgo_al_cerrar(alerta: AlertaHeladaSim, brote: np.ndarray, aire: np.ndarr
     umbral_riego = config["umbrales_riego"][parcela.suelo][P.PERIODO_RIEGO[mes]]
     if suelo[alerta.inicio] < umbral_riego:
         agravantes.append("suelo_seco")
-    return {"nivel": nivel_riesgo(margen, agravantes, cortes), "margen_c": round(margen, 2),
-            "agravantes": agravantes}
+    return {"nivel": nivel_riesgo(margen, agravantes, cortes), "margen_c": round(margen, 2), "agravantes": agravantes}

@@ -21,13 +21,18 @@ parcela_id = barra_lateral("paginas/detalle.py", con_parcela=True)
 fecha = st.session_state["fecha"]
 d = data.detalle(fecha, parcela_id)
 
-st.markdown(f'<h1 class="titulo">{escape(d["parcela"])} · {escape(d["finca"])}</h1>'
-            f'<p class="subtitulo">{escape(d["departamento"])} · etapa {escape(d["etapa"])} · {noche_texto(fecha)}, '
-            f'de 18:00 a 12:00, hora de Argentina</p>', unsafe_allow_html=True)
+st.markdown(
+    f'<h1 class="titulo">{escape(d["parcela"])} · {escape(d["finca"])}</h1>'
+    f'<p class="subtitulo">{escape(d["departamento"])} · etapa {escape(d["etapa"])} · {noche_texto(fecha)}, '
+    f"de 18:00 a 12:00, hora de Argentina</p>",
+    unsafe_allow_html=True,
+)
 frase, detalle = frase_de_la_parcela(d)
-st.markdown(f'<div class="estado" role="status"><div><div class="frase">{frase}</div>'
-            f'<div class="detalle">{detalle}</div></div><div class="datos">{marca(d["estado"])}</div></div>',
-            unsafe_allow_html=True)
+st.markdown(
+    f'<div class="estado" role="status"><div><div class="frase">{frase}</div>'
+    f'<div class="detalle">{detalle}</div></div><div class="datos">{marca(d["estado"])}</div></div>',
+    unsafe_allow_html=True,
+)
 
 st.markdown('<h2 class="seccion">La noche, minuto a minuto</h2>', unsafe_allow_html=True)
 st.markdown(aviso_de_nodos(d), unsafe_allow_html=True)
@@ -43,7 +48,9 @@ with izquierda:
     if d["humedad"]:
         st.plotly_chart(figura_humedad(d), width="stretch", config=CONFIG_GRAFICO, key="humedad")
     else:
-        st.markdown('<div class="vacio">Sin lecturas de humedad de suelo en las últimas 24 horas.</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="vacio">Sin lecturas de humedad de suelo en las últimas 24 horas.</div>', unsafe_allow_html=True
+        )
 with derecha:
     st.markdown('<h2 class="seccion">Riegos recientes</h2>', unsafe_allow_html=True)
     st.markdown(tabla_de_riegos(d) + semanas(d), unsafe_allow_html=True)

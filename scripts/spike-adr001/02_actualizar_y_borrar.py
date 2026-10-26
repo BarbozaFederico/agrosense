@@ -38,14 +38,16 @@ def preparar() -> None:
         "lecturas",
         timeseries={"timeField": "ts", "metaField": "meta", "granularity": "minutes"},
     )
-    bd.lecturas.insert_many([
-        {"ts": hora(3, 0), "meta": meta("N-01"), "temperatura": -0.4},
-        {"ts": hora(3, 5), "meta": meta("N-01"), "temperatura": -0.8},
-        {"ts": hora(3, 0), "meta": meta("N-02"), "temperatura": -0.2},
-        # Lecturas de una simulación en vivo (se marcan con escenario_id)
-        {"ts": hora(4, 0), "meta": meta("N-01", escenario_id="demo-1"), "temperatura": -3.0},
-        {"ts": hora(4, 5), "meta": meta("N-01", escenario_id="demo-1"), "temperatura": -3.2},
-    ])
+    bd.lecturas.insert_many(
+        [
+            {"ts": hora(3, 0), "meta": meta("N-01"), "temperatura": -0.4},
+            {"ts": hora(3, 5), "meta": meta("N-01"), "temperatura": -0.8},
+            {"ts": hora(3, 0), "meta": meta("N-02"), "temperatura": -0.2},
+            # Lecturas de una simulación en vivo (se marcan con escenario_id)
+            {"ts": hora(4, 0), "meta": meta("N-01", escenario_id="demo-1"), "temperatura": -3.0},
+            {"ts": hora(4, 5), "meta": meta("N-01", escenario_id="demo-1"), "temperatura": -3.2},
+        ]
+    )
 
 
 def probar(descripcion: str, accion) -> None:
@@ -54,8 +56,9 @@ def probar(descripcion: str, accion) -> None:
     preparar()
     try:
         resultado = accion()
-        print(f"OK    | {descripcion} | resultado: {resultado} | "
-              f"quedan {bd.lecturas.count_documents({})} documentos")
+        print(
+            f"OK    | {descripcion} | resultado: {resultado} | " f"quedan {bd.lecturas.count_documents({})} documentos"
+        )
     except Exception as e:  # noqa: BLE001 — en un spike queremos ver cualquier error
         # Los mensajes de pymongo traen detalles extra al final: mostramos la primera parte.
         print(f"ERROR | {descripcion} | {str(e).split(', full error')[0]}")
@@ -73,38 +76,53 @@ print("Versión del servidor:", cliente.server_info()["version"])
 print("---")
 
 # 1) Actualizar un valor medido de una lectura puntual (filtro: nodo + hora exacta)
-probar("1. Actualizar temperatura de una lectura puntual (update_one)", lambda: actualizados(
-    bd.lecturas.update_one({"meta.nodo_id": "N-01", "ts": hora(3, 0)}, {"$set": {"temperatura": -9.9}})))
+probar(
+    "1. Actualizar temperatura de una lectura puntual (update_one)",
+    lambda: actualizados(
+        bd.lecturas.update_one({"meta.nodo_id": "N-01", "ts": hora(3, 0)}, {"$set": {"temperatura": -9.9}})
+    ),
+)
 
 # 1b) Lo mismo con update_many: separa "¿falla por usar update_one?" de
 #     "¿falla por querer modificar un valor medido?".
-probar("1b. Actualizar temperatura con update_many (nodo + hora exacta)", lambda: actualizados(
-    bd.lecturas.update_many({"meta.nodo_id": "N-01", "ts": hora(3, 0)}, {"$set": {"temperatura": -9.9}})))
+probar(
+    "1b. Actualizar temperatura con update_many (nodo + hora exacta)",
+    lambda: actualizados(
+        bd.lecturas.update_many({"meta.nodo_id": "N-01", "ts": hora(3, 0)}, {"$set": {"temperatura": -9.9}})
+    ),
+)
 
 # 1c) Filtro SOLO por meta, pero lo que se modifica sigue siendo un valor medido.
-probar("1c. Actualizar temperatura con filtro solo por meta (todo el nodo N-01)", lambda: actualizados(
-    bd.lecturas.update_many({"meta.nodo_id": "N-01"}, {"$set": {"temperatura": -9.9}})))
+probar(
+    "1c. Actualizar temperatura con filtro solo por meta (todo el nodo N-01)",
+    lambda: actualizados(bd.lecturas.update_many({"meta.nodo_id": "N-01"}, {"$set": {"temperatura": -9.9}})),
+)
 
 # 2) Actualizar un campo dentro de meta, para todo un nodo
-probar("2. Cambiar meta.parcela_id de todo el nodo N-02", lambda: actualizados(
-    bd.lecturas.update_many({"meta.nodo_id": "N-02"}, {"$set": {"meta.parcela_id": "P-2"}})))
+probar(
+    "2. Cambiar meta.parcela_id de todo el nodo N-02",
+    lambda: actualizados(bd.lecturas.update_many({"meta.nodo_id": "N-02"}, {"$set": {"meta.parcela_id": "P-2"}})),
+)
 
 # 3) Borrar por un campo de meta: es lo que usaría "Reiniciar demo"
-probar("3. Borrar por meta.escenario_id", lambda: borrados(
-    bd.lecturas.delete_many({"meta.escenario_id": "demo-1"})))
+probar("3. Borrar por meta.escenario_id", lambda: borrados(bd.lecturas.delete_many({"meta.escenario_id": "demo-1"})))
 
 # 4) Borrar por rango de fechas
-probar("4. Borrar lecturas anteriores a las 03:05", lambda: borrados(
-    bd.lecturas.delete_many({"ts": {"$lt": hora(3, 5)}})))
+probar(
+    "4. Borrar lecturas anteriores a las 03:05", lambda: borrados(bd.lecturas.delete_many({"ts": {"$lt": hora(3, 5)}}))
+)
 
 # 5) Borrar por un valor medido (un campo común, no meta ni ts)
-probar("5. Borrar lecturas con temperatura menor a -1", lambda: borrados(
-    bd.lecturas.delete_many({"temperatura": {"$lt": -1}})))
+probar(
+    "5. Borrar lecturas con temperatura menor a -1",
+    lambda: borrados(bd.lecturas.delete_many({"temperatura": {"$lt": -1}})),
+)
 
 # 6) Borrar una sola lectura (nodo + hora exacta)
-probar("6. Borrar una sola lectura (delete_one)", lambda: borrados(
-    bd.lecturas.delete_one({"meta.nodo_id": "N-02", "ts": hora(3, 0)})))
+probar(
+    "6. Borrar una sola lectura (delete_one)",
+    lambda: borrados(bd.lecturas.delete_one({"meta.nodo_id": "N-02", "ts": hora(3, 0)})),
+)
 
 # 7) Borrar todo con filtro vacío
-probar("7. Borrar todo (delete_many con filtro vacío)", lambda: borrados(
-    bd.lecturas.delete_many({})))
+probar("7. Borrar todo (delete_many con filtro vacío)", lambda: borrados(bd.lecturas.delete_many({})))

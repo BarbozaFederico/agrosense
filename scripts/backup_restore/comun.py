@@ -23,9 +23,9 @@ from bson import json_util
 
 from db.conexion import URI_POR_DEFECTO
 
-RAIZ = Path(__file__).resolve().parents[2]      # scripts/backup_restore/comun.py → raíz del repositorio
-DIARIOS = 7        # política (supuesto adoptado, ADR-016): copias de los últimos 7 días...
-SEMANALES = 4      # ...y de los últimos 4 domingos
+RAIZ = Path(__file__).resolve().parents[2]  # scripts/backup_restore/comun.py → raíz del repositorio
+DIARIOS = 7  # política (supuesto adoptado, ADR-016): copias de los últimos 7 días...
+SEMANALES = 4  # ...y de los últimos 4 domingos
 SUFIJO = ".archive.gz"
 PATRON = re.compile(r"^(?P<bd>.+)_(?P<dia>\d{8})_(?P<hora>\d{6})\.archive\.gz$")
 CONSULTAS_A_COMPARAR = ("Q1", "Q5", "Q9", "Q10")
@@ -50,8 +50,10 @@ def buscar_herramienta(nombre: str) -> str:
     for bin_ in sorted(instalaciones.glob("*/bin"), reverse=True):
         if ruta := shutil.which(nombre, path=str(bin_)):
             return ruta
-    raise ErrorDeRespaldo(f"No encuentro {nombre}. Instalá MongoDB Database Tools (winget install MongoDB.DatabaseTools) "
-                          "o indicá su carpeta en la variable AGROSENSE_HERRAMIENTAS.")
+    raise ErrorDeRespaldo(
+        f"No encuentro {nombre}. Instalá MongoDB Database Tools (winget install MongoDB.DatabaseTools) "
+        "o indicá su carpeta en la variable AGROSENSE_HERRAMIENTAS."
+    )
 
 
 def directorio_de_respaldos(destino: str | Path | None = None) -> Path:
@@ -59,8 +61,10 @@ def directorio_de_respaldos(destino: str | Path | None = None) -> Path:
     carpeta = Path(destino or os.environ.get("AGROSENSE_BACKUP_DIR") or Path.home() / "agrosense-backups")
     carpeta = carpeta.expanduser().resolve()
     if carpeta == RAIZ or RAIZ in carpeta.parents:
-        raise ErrorDeRespaldo(f"{carpeta} está dentro del repositorio, que es público. Elegí una carpeta afuera "
-                              "(opción --destino o variable AGROSENSE_BACKUP_DIR).")
+        raise ErrorDeRespaldo(
+            f"{carpeta} está dentro del repositorio, que es público. Elegí una carpeta afuera "
+            "(opción --destino o variable AGROSENSE_BACKUP_DIR)."
+        )
     carpeta.mkdir(parents=True, exist_ok=True)
     return carpeta
 
@@ -74,6 +78,7 @@ def ejecutar(comando: list[str]) -> None:
 
 
 # --- Archivos de respaldo
+
 
 def listar_respaldos(carpeta: Path, bd: str) -> list[tuple[Path, datetime]]:
     """Los backups de `bd` en la carpeta, del más viejo al más nuevo, con la fecha que dice su nombre."""
@@ -117,6 +122,7 @@ def leer_manifiesto(archivo: Path) -> dict | None:
 
 # --- Resumen y comparación de bases
 
+
 def resumen_de_base(bd) -> dict:
     """Por colección: tipo, documentos, nombres de índices y huella del validador."""
     resumen = {}
@@ -125,8 +131,11 @@ def resumen_de_base(bd) -> dict:
         if nombre.startswith("system."):
             continue
         validador = info["options"].get("validator")
-        huella = hashlib.sha256(json.dumps(validador, sort_keys=True, default=str).encode()).hexdigest()[:12] \
-            if validador else None
+        huella = (
+            hashlib.sha256(json.dumps(validador, sort_keys=True, default=str).encode()).hexdigest()[:12]
+            if validador
+            else None
+        )
         resumen[nombre] = {
             "tipo": info["type"],
             "documentos": bd[nombre].count_documents({}),
@@ -147,8 +156,10 @@ def comparar_resumenes(esperado: dict, obtenido: dict) -> list[str]:
         else:
             for campo in ("tipo", "documentos", "indices", "validador"):
                 if esperado[nombre][campo] != obtenido[nombre][campo]:
-                    diferencias.append(f"{nombre}: {campo} esperado {esperado[nombre][campo]!r}, "
-                                       f"obtenido {obtenido[nombre][campo]!r}")
+                    diferencias.append(
+                        f"{nombre}: {campo} esperado {esperado[nombre][campo]!r}, "
+                        f"obtenido {obtenido[nombre][campo]!r}"
+                    )
     return diferencias
 
 
@@ -160,5 +171,6 @@ def normalizar(resultado) -> str:
 def comparar_consultas(bd_a, bd_b, ids=CONSULTAS_A_COMPARAR) -> list[tuple[str, bool]]:
     """Corre las consultas en las dos bases y dice si devuelven exactamente lo mismo."""
     from db.indexes.medir_indices import funciones
+
     fa, fb = funciones(bd_a), funciones(bd_b)
     return [(i, normalizar(fa[i]()) == normalizar(fb[i]())) for i in ids]

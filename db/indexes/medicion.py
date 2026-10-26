@@ -25,7 +25,7 @@ def perfilar(bd, funcion) -> dict:
     """Corre `funcion` una vez con el perfilador encendido y suma lo que MongoDB leyó."""
     bd.command("profile", 0)
     bd.system.profile.drop()
-    bd.command("profile", 2)                       # nivel 2: registra TODAS las operaciones
+    bd.command("profile", 2)  # nivel 2: registra TODAS las operaciones
     try:
         funcion()
     finally:
@@ -40,7 +40,7 @@ def perfilar(bd, funcion) -> dict:
 
 def tiempo_mediano(funcion, corridas: int = 10) -> float:
     """Mediana, en milisegundos, de `corridas` ejecuciones después de una de calentamiento."""
-    funcion()                                      # calentamiento: carga datos e índices en memoria
+    funcion()  # calentamiento: carga datos e índices en memoria
     tiempos = []
     for _ in range(corridas):
         inicio = time.perf_counter()

@@ -23,9 +23,9 @@ from db.seeds.geometria import punto, rectangulo
 
 # Superficie de cada parcela: 2 ha (supuesto, docs/investigacion/vid-malbec.md).
 SUPERFICIE_HA = 2
-LADO_PARCELA_M = math.sqrt(SUPERFICIE_HA * 10_000)   # ~141,42 m: un cuadrado de 2 ha
-SEPARACION_M = 20                                     # camino entre las dos parcelas
-MARGEN_FINCA_M = 30                                   # borde de la finca alrededor de sus parcelas
+LADO_PARCELA_M = math.sqrt(SUPERFICIE_HA * 10_000)  # ~141,42 m: un cuadrado de 2 ha
+SEPARACION_M = 20  # camino entre las dos parcelas
+MARGEN_FINCA_M = 30  # borde de la finca alrededor de sus parcelas
 
 # Los nodos se ubican a un cuarto del lado, desde el centro de su parcela: A al noreste
 # y B al suroeste. Dentro de la parcela, lejos del borde.
@@ -33,9 +33,9 @@ DESPLAZAMIENTO_NODO_M = LADO_PARCELA_M / 4
 
 # Centro (longitud, latitud) de cada finca, ficticio. Datos de la finca: ver fincas.py.
 CENTROS_FINCA = {
-    "F-SR": (-68.33, -34.61),    # San Rafael
-    "F-SM": (-68.47, -33.08),    # San Martín
-    "F-TU": (-69.17, -33.36),    # Tupungato
+    "F-SR": (-68.33, -34.61),  # San Rafael
+    "F-SM": (-68.47, -33.08),  # San Martín
+    "F-TU": (-69.17, -33.36),  # Tupungato
 }
 
 # Códigos de las parcelas de cada finca.
@@ -69,5 +69,8 @@ def ubicacion_nodo(nodo_id: str) -> dict:
     """Punto del nodo `N-SR-1-A` dentro de su parcela `P-SR-1`."""
     _, depto, numero, letra = nodo_id.split("-")
     signo = 1 if letra == "A" else -1
-    return punto(centro_parcela(f"P-{depto}-{numero}"),
-                 este_m=signo * DESPLAZAMIENTO_NODO_M, norte_m=signo * DESPLAZAMIENTO_NODO_M)
+    return punto(
+        centro_parcela(f"P-{depto}-{numero}"),
+        este_m=signo * DESPLAZAMIENTO_NODO_M,
+        norte_m=signo * DESPLAZAMIENTO_NODO_M,
+    )

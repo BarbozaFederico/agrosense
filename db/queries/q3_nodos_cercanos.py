@@ -16,19 +16,26 @@ from db.queries import comun
 from db.seeds.ubicaciones import centro_parcela
 
 COLECCION = "nodos"
-PUNTO = tuple(centro_parcela("P-SR-1"))                  # (longitud, latitud): el centro de la parcela P-SR-1
+PUNTO = tuple(centro_parcela("P-SR-1"))  # (longitud, latitud): el centro de la parcela P-SR-1
 
 
 def pipeline(punto: tuple[float, float] = PUNTO, cantidad: int = 4, maxima_m: float | None = None) -> list:
-    geo = {"near": {"type": "Point", "coordinates": list(punto)},
-           "distanceField": "distancia_m", "spherical": True}
+    geo = {"near": {"type": "Point", "coordinates": list(punto)}, "distanceField": "distancia_m", "spherical": True}
     if maxima_m is not None:
         geo["maxDistance"] = maxima_m
     return [
         {"$geoNear": geo},
         {"$limit": cantidad},
-        {"$project": {"_id": 0, "nodo_id": "$_id", "parcela_id": 1, "finca_id": 1, "estado": 1,
-                      "distancia_m": {"$round": ["$distancia_m", 1]}}},
+        {
+            "$project": {
+                "_id": 0,
+                "nodo_id": "$_id",
+                "parcela_id": 1,
+                "finca_id": 1,
+                "estado": 1,
+                "distancia_m": {"$round": ["$distancia_m", 1]},
+            }
+        },
     ]
 
 
@@ -48,8 +55,10 @@ def main() -> None:
     if a.mongosh:
         print(comun.texto_mongosh(COLECCION, pipeline((a.lon, a.lat), a.cantidad, a.maxima)))
         return
-    comun.imprimir_tabla(consultar(obtener_base(), (a.lon, a.lat), a.cantidad, a.maxima),
-                         ["nodo_id", "parcela_id", "finca_id", "distancia_m", "estado"])
+    comun.imprimir_tabla(
+        consultar(obtener_base(), (a.lon, a.lat), a.cantidad, a.maxima),
+        ["nodo_id", "parcela_id", "finca_id", "distancia_m", "estado"],
+    )
 
 
 if __name__ == "__main__":

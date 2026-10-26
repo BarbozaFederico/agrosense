@@ -31,20 +31,32 @@ def pipeline(fecha: date, etapas: dict[str, dict], delta_c: float) -> list:
     return [
         {"$match": {"ts": {"$gte": inicio, "$lt": fin}}},
         {"$group": {"_id": "$meta.parcela_id", "minima_c": {"$min": "$temperatura_c"}}},
-        {"$set": {
-            "minima_brote_c": {"$subtract": ["$minima_c", delta_c]},
-            "umbral_helada_c": {"$getField": {"field": "$_id", "input": {"$literal": umbrales}}},
-            "etapa": {"$getField": {"field": "$_id", "input": {"$literal": nombres}}}}},
+        {
+            "$set": {
+                "minima_brote_c": {"$subtract": ["$minima_c", delta_c]},
+                "umbral_helada_c": {"$getField": {"field": "$_id", "input": {"$literal": umbrales}}},
+                "etapa": {"$getField": {"field": "$_id", "input": {"$literal": nombres}}},
+            }
+        },
         # solo las que cruzaron el umbral (una etapa sin umbral no se evalúa)
         {"$match": {"umbral_helada_c": {"$ne": None}, "$expr": {"$lt": ["$minima_brote_c", "$umbral_helada_c"]}}},
         {"$lookup": {"from": "parcelas", "localField": "_id", "foreignField": "_id", "as": "parcela"}},
         {"$unwind": "$parcela"},
         {"$lookup": {"from": "fincas", "localField": "parcela.finca_id", "foreignField": "_id", "as": "finca"}},
         {"$unwind": "$finca"},
-        {"$project": {"_id": 0, "parcela_id": "$_id", "finca": "$finca.nombre", "departamento": "$finca.departamento",
-                      "etapa": 1, "umbral_helada_c": 1, "minima_c": 1,
-                      "minima_brote_c": {"$round": ["$minima_brote_c", 2]},
-                      "margen_c": {"$round": [{"$subtract": ["$minima_brote_c", "$umbral_helada_c"]}, 2]}}},
+        {
+            "$project": {
+                "_id": 0,
+                "parcela_id": "$_id",
+                "finca": "$finca.nombre",
+                "departamento": "$finca.departamento",
+                "etapa": 1,
+                "umbral_helada_c": 1,
+                "minima_c": 1,
+                "minima_brote_c": {"$round": ["$minima_brote_c", 2]},
+                "margen_c": {"$round": [{"$subtract": ["$minima_brote_c", "$umbral_helada_c"]}, 2]},
+            }
+        },
         {"$sort": {"parcela_id": 1}},
     ]
 
@@ -64,11 +76,16 @@ def main() -> None:
     bd = obtener_base()
     if a.mongosh:
         fecha = comun.a_fecha(a.fecha)
-        print(comun.texto_mongosh(COLECCION, pipeline(fecha, q9.etapas_estimadas(bd, fecha),
-                                                      comun.configuracion(bd)["delta_brote_c"])))
+        print(
+            comun.texto_mongosh(
+                COLECCION, pipeline(fecha, q9.etapas_estimadas(bd, fecha), comun.configuracion(bd)["delta_brote_c"])
+            )
+        )
         return
-    comun.imprimir_tabla(consultar(bd, a.fecha), ["parcela_id", "finca", "departamento", "etapa",
-                                                  "umbral_helada_c", "minima_c", "minima_brote_c", "margen_c"])
+    comun.imprimir_tabla(
+        consultar(bd, a.fecha),
+        ["parcela_id", "finca", "departamento", "etapa", "umbral_helada_c", "minima_c", "minima_brote_c", "margen_c"],
+    )
 
 
 if __name__ == "__main__":
