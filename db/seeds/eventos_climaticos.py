@@ -26,13 +26,15 @@ ID_NOCHE_EXTREMA = ObjectId("5eed00000000000000000001")
 def documentos() -> list[dict]:
     ancho = 2 * LADO_PARCELA_M + SEPARACION_M + 2 * MARGEN_FINCA_M + 2 * MARGEN_EVENTO_M
     alto = LADO_PARCELA_M + 2 * MARGEN_FINCA_M + 2 * MARGEN_EVENTO_M
-    return [{
-        "_id": ID_NOCHE_EXTREMA,
-        "tipo": "helada",
-        "inicio": NOCHE_EXTREMA["inicio"],
-        "fin": NOCHE_EXTREMA["fin"],
-        "area": rectangulo(CENTROS_FINCA[NOCHE_EXTREMA["finca_id"]], ancho, alto),
-        "temperatura_minima_c": NOCHE_EXTREMA["minimo_c"],   # supuesto adoptado (ADR-012)
-        "descripcion": "Noche de helada precargada (RF-13), San Rafael. Datos simulados.",
-        "fuente": "seed",
-    }]
+    return [
+        {
+            "_id": ID_NOCHE_EXTREMA,
+            "tipo": "helada",
+            "inicio": NOCHE_EXTREMA["inicio"],
+            "fin": NOCHE_EXTREMA["fin"],
+            "area": rectangulo(CENTROS_FINCA[NOCHE_EXTREMA["finca_id"]], ancho, alto),
+            "temperatura_minima_c": NOCHE_EXTREMA["minimo_c"],  # supuesto adoptado (ADR-012)
+            "descripcion": "Noche de helada precargada (RF-13), San Rafael. Datos simulados.",
+            "fuente": "seed",
+        }
+    ]

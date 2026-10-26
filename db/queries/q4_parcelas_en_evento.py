@@ -24,8 +24,16 @@ def pipeline(area: dict) -> list:
         {"$match": {"geometria": {"$geoIntersects": {"$geometry": area}}}},
         {"$lookup": {"from": "fincas", "localField": "finca_id", "foreignField": "_id", "as": "finca"}},
         {"$unwind": "$finca"},
-        {"$project": {"_id": 0, "parcela_id": "$_id", "nombre": 1, "finca": "$finca.nombre",
-                      "departamento": "$finca.departamento", "superficie_ha": 1}},
+        {
+            "$project": {
+                "_id": 0,
+                "parcela_id": "$_id",
+                "nombre": 1,
+                "finca": "$finca.nombre",
+                "departamento": "$finca.departamento",
+                "superficie_ha": 1,
+            }
+        },
         {"$sort": {"parcela_id": 1}},
     ]
 
@@ -56,10 +64,13 @@ def main() -> None:
     if a.mongosh:
         print(comun.texto_mongosh(COLECCION, pipeline(evento["area"])))
         return
-    print(f"Evento {evento['_id']} ({evento['tipo']}), del {comun.a_hora_local(evento['inicio']):%d/%m/%Y %H:%M} "
-          f"al {comun.a_hora_local(evento['fin']):%d/%m/%Y %H:%M} (hora de Argentina)")
-    comun.imprimir_tabla(consultar(bd, evento["_id"]),
-                         ["parcela_id", "nombre", "finca", "departamento", "superficie_ha"])
+    print(
+        f"Evento {evento['_id']} ({evento['tipo']}), del {comun.a_hora_local(evento['inicio']):%d/%m/%Y %H:%M} "
+        f"al {comun.a_hora_local(evento['fin']):%d/%m/%Y %H:%M} (hora de Argentina)"
+    )
+    comun.imprimir_tabla(
+        consultar(bd, evento["_id"]), ["parcela_id", "nombre", "finca", "departamento", "superficie_ha"]
+    )
 
 
 if __name__ == "__main__":

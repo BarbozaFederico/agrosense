@@ -140,6 +140,13 @@ Dashboard (con la base cargada; se abre en `http://localhost:8501`). Tiene las 4
 python -m streamlit run dashboard/app.py
 ```
 
+Formato del código (`black`, líneas de 120 caracteres, configurado en `pyproject.toml`; se instala con `bash install.sh`):
+
+```bash
+python -m black .            # aplica el formato a todo el código
+python -m black --check .    # solo comprueba: no cambia nada y termina con error si algo no está formateado
+```
+
 La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* roles.
 
 ## Equipo

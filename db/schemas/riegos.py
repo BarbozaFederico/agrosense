@@ -10,8 +10,7 @@ SERIE_TEMPORAL = False
 
 ESQUEMA = {
     "bsonType": "object",
-    "required": ["_id", "parcela_id", "inicio", "fin", "sistema", "origen",
-                 "lamina_mm", "litros", "fuente"],
+    "required": ["_id", "parcela_id", "inicio", "fin", "sistema", "origen", "lamina_mm", "litros", "fuente"],
     "additionalProperties": False,
     "properties": {
         "_id": c.OBJECT_ID,
@@ -20,9 +19,9 @@ ESQUEMA = {
         "fin": c.FECHA,
         "sistema": {"enum": ["surco", "goteo"]},
         "origen": {"enum": ["turno", "alerta"]},
-        "alerta_id": c.OBJECT_ID,                                # solo si origen es "alerta"
-        "lamina_mm": c.POSITIVO,                                 # lo que informan las fuentes
-        "litros": c.POSITIVO,                                    # lamina_mm × superficie_ha × 10.000 (Q7)
+        "alerta_id": c.OBJECT_ID,  # solo si origen es "alerta"
+        "lamina_mm": c.POSITIVO,  # lo que informan las fuentes
+        "litros": c.POSITIVO,  # lamina_mm × superficie_ha × 10.000 (Q7)
         "fuente": c.FUENTE_SIMULADA,
         "escenario_id": c.TEXTO,
     },

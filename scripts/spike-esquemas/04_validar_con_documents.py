@@ -59,12 +59,49 @@ meta = {"nodo_id": "N-SR-1-A", "parcela_id": "P-SR-1", "finca_id": "F-SR", "fuen
 # NO se manda a MongoDB: solo sirve para leer el resultado.
 casos = [
     ("1. Válido", {"ts": ts, "meta": meta, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81}),
-    ("2. Campo de más (viento_kmh)", {"ts": ts, "meta": meta, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81, "viento_kmh": 3}),
-    ("3. Error de tipeo (temperatua_c)", {"ts": ts, "meta": meta, "temperatua_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81}),
-    ("4. Campo de más dentro de meta (color)", {"ts": ts, "meta": {**meta, "color": "rojo"}, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81}),
-    ("5. Tipo equivocado (temperatura_c como texto)", {"ts": ts, "meta": meta, "temperatura_c": "-1.8", "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81}),
-    ("6. Falta un campo obligatorio (humedad_aire_pct)", {"ts": ts, "meta": meta, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4}),
-    ("7. Simulación en vivo con escenario_id en meta", {"ts": ts, "meta": {**meta, "fuente": "simulacion_en_vivo", "escenario_id": "demo-1"}, "temperatura_c": -3.0, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 85}),
+    (
+        "2. Campo de más (viento_kmh)",
+        {
+            "ts": ts,
+            "meta": meta,
+            "temperatura_c": -1.8,
+            "humedad_suelo_pct": 23.4,
+            "humedad_aire_pct": 81,
+            "viento_kmh": 3,
+        },
+    ),
+    (
+        "3. Error de tipeo (temperatua_c)",
+        {"ts": ts, "meta": meta, "temperatua_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81},
+    ),
+    (
+        "4. Campo de más dentro de meta (color)",
+        {
+            "ts": ts,
+            "meta": {**meta, "color": "rojo"},
+            "temperatura_c": -1.8,
+            "humedad_suelo_pct": 23.4,
+            "humedad_aire_pct": 81,
+        },
+    ),
+    (
+        "5. Tipo equivocado (temperatura_c como texto)",
+        {"ts": ts, "meta": meta, "temperatura_c": "-1.8", "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81},
+    ),
+    (
+        "6. Falta un campo obligatorio (humedad_aire_pct)",
+        {"ts": ts, "meta": meta, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4},
+    ),
+    (
+        "7. Simulación en vivo con escenario_id en meta",
+        {
+            "ts": ts,
+            "meta": {**meta, "fuente": "simulacion_en_vivo", "escenario_id": "demo-1"},
+            "temperatura_c": -3.0,
+            "humedad_suelo_pct": 23.4,
+            "humedad_aire_pct": 85,
+        },
+    ),
 ]
 
 colecciones_antes = set(bd.list_collection_names())
@@ -76,13 +113,15 @@ print("---")
 documentos = [{**doc, "_i": i} for i, (_, doc) in enumerate(casos)]
 
 try:
-    validos = bd.aggregate([
-        {"$documents": documentos},          # documentos "en el aire", no se guardan
-        {"$set": {"_tmp": "$_i"}},           # guardamos la etiqueta aparte
-        {"$unset": "_i"},                    # la sacamos para que no cuente como campo de más
-        {"$match": {"$jsonSchema": {**esquema, "properties": {**esquema["properties"], "_tmp": {}}}}},
-        {"$project": {"_tmp": 1}},
-    ])
+    validos = bd.aggregate(
+        [
+            {"$documents": documentos},  # documentos "en el aire", no se guardan
+            {"$set": {"_tmp": "$_i"}},  # guardamos la etiqueta aparte
+            {"$unset": "_i"},  # la sacamos para que no cuente como campo de más
+            {"$match": {"$jsonSchema": {**esquema, "properties": {**esquema["properties"], "_tmp": {}}}}},
+            {"$project": {"_tmp": 1}},
+        ]
+    )
     indices_validos = {d["_tmp"] for d in validos}
     for i, (descripcion, _) in enumerate(casos):
         print(("VÁLIDO   " if i in indices_validos else "INVÁLIDO ") + "| " + descripcion)
@@ -98,12 +137,16 @@ print("Colecciones nuevas creadas al validar:", sorted(nuevas) or "ninguna (no s
 
 lote = [{**casos[0][1], "_i": i} for i in range(5000)]
 inicio = time.perf_counter()
-resultado = list(bd.aggregate([
-    {"$documents": lote},
-    {"$unset": "_i"},
-    {"$match": {"$jsonSchema": esquema}},
-    {"$count": "validos"},
-]))
+resultado = list(
+    bd.aggregate(
+        [
+            {"$documents": lote},
+            {"$unset": "_i"},
+            {"$match": {"$jsonSchema": esquema}},
+            {"$count": "validos"},
+        ]
+    )
+)
 duracion = time.perf_counter() - inicio
 validas = resultado[0]["validos"] if resultado else 0
 print(f"Lote de 5000 lecturas validado en {duracion:.2f} s: {validas} válidas")

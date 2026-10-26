@@ -26,14 +26,25 @@ PARCELA = "P-SR-1"
 
 
 def pipeline(ahora: datetime, parcela_id: str = PARCELA, horas: int = 24) -> list:
-    fin = ahora.replace(minute=0, second=0, microsecond=0)               # la hora en curso, redondeada hacia abajo
+    fin = ahora.replace(minute=0, second=0, microsecond=0)  # la hora en curso, redondeada hacia abajo
     inicio = fin - timedelta(hours=horas)
     return [
         {"$match": {"meta.parcela_id": parcela_id, "ts": {"$gte": inicio, "$lt": fin}}},
-        {"$group": {"_id": {"$dateTrunc": {"date": "$ts", "unit": "hour", "timezone": comun.ZONA}},
-                    "humedad_suelo_pct": {"$avg": "$humedad_suelo_pct"}, "lecturas": {"$sum": 1}}},
-        {"$project": {"_id": 0, "hora": "$_id", "humedad_suelo_pct": {"$round": ["$humedad_suelo_pct", 2]},
-                      "lecturas": 1}},
+        {
+            "$group": {
+                "_id": {"$dateTrunc": {"date": "$ts", "unit": "hour", "timezone": comun.ZONA}},
+                "humedad_suelo_pct": {"$avg": "$humedad_suelo_pct"},
+                "lecturas": {"$sum": 1},
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "hora": "$_id",
+                "humedad_suelo_pct": {"$round": ["$humedad_suelo_pct", 2]},
+                "lecturas": 1,
+            }
+        },
         {"$sort": {"hora": 1}},
     ]
 
@@ -53,8 +64,9 @@ def main() -> None:
     if a.mongosh:
         print(comun.texto_mongosh(COLECCION, pipeline(comun.a_utc(a.ahora), a.parcela, a.horas)))
         return
-    comun.imprimir_tabla(consultar(obtener_base(), a.ahora, a.parcela, a.horas),
-                         ["hora", "humedad_suelo_pct", "lecturas"])
+    comun.imprimir_tabla(
+        consultar(obtener_base(), a.ahora, a.parcela, a.horas), ["hora", "humedad_suelo_pct", "lecturas"]
+    )
 
 
 if __name__ == "__main__":

@@ -18,17 +18,25 @@ fecha = st.session_state["fecha"]
 r = data.nodos(fecha)
 filas = filtrar(r["filas"], finca_id)
 
-st.markdown(f'<h1 class="titulo">Estado de nodos</h1>'
-            f'<p class="subtitulo">A las {hora(r["ahora"])} del {fecha_corta(r["ahora"])} de {r["ahora"]:%Y}, hora de Argentina '
-            f'· sin reportar = más de {r["limite_min"]} minutos sin lecturas</p>', unsafe_allow_html=True)
+st.markdown(
+    f'<h1 class="titulo">Estado de nodos</h1>'
+    f'<p class="subtitulo">A las {hora(r["ahora"])} del {fecha_corta(r["ahora"])} de {r["ahora"]:%Y}, hora de Argentina '
+    f'· sin reportar = más de {r["limite_min"]} minutos sin lecturas</p>',
+    unsafe_allow_html=True,
+)
 
 frase, detalle = frase_de_nodos(filas, r["limite_min"])
 ultima = r["ultima_de_la_red"]
-datos = ("<span class=\"aviso\"><b>Sin lecturas</b> en la red</span>" if ultima is None
-         else f'Último dato de la red: <b>{hora(ultima)}</b> del {fecha_corta(ultima)}')
-st.markdown(f'<div class="estado" role="status"><div><div class="frase">{escape(frase)}</div>'
-            f'<div class="detalle">{escape(detalle)}</div></div><div class="datos">{datos}</div></div>',
-            unsafe_allow_html=True)
+datos = (
+    '<span class="aviso"><b>Sin lecturas</b> en la red</span>'
+    if ultima is None
+    else f"Último dato de la red: <b>{hora(ultima)}</b> del {fecha_corta(ultima)}"
+)
+st.markdown(
+    f'<div class="estado" role="status"><div><div class="frase">{escape(frase)}</div>'
+    f'<div class="detalle">{escape(detalle)}</div></div><div class="datos">{datos}</div></div>',
+    unsafe_allow_html=True,
+)
 
 st.markdown('<h2 class="seccion">Los nodos, uno por uno</h2>', unsafe_allow_html=True)
 if filas:

@@ -21,17 +21,18 @@ from datetime import date, datetime, timedelta, timezone
 
 from bson import ObjectId
 
-ZONA = "-03:00"                                   # hora de Argentina, para $dateTrunc
-DESFASE_LOCAL = timedelta(hours=-3)               # UTC-3
-FECHA_NOCHE = date(2026, 10, 5)                   # la noche precargada (RF-13)
-FIN_TEMPORADA = date(2027, 3, 31)                 # último día de la temporada simulada
+ZONA = "-03:00"  # hora de Argentina, para $dateTrunc
+DESFASE_LOCAL = timedelta(hours=-3)  # UTC-3
+FECHA_NOCHE = date(2026, 10, 5)  # la noche precargada (RF-13)
+FIN_TEMPORADA = date(2027, 3, 31)  # último día de la temporada simulada
 
 # Mes -> período de `configuracion.umbrales_riego` (ADR-011)
 PERIODO_RIEGO = {9: "sep_oct", 10: "sep_oct", 11: "nov", 12: "dic_ene", 1: "dic_ene", 2: "feb_mar", 3: "feb_mar"}
-AHORA = datetime(2026, 10, 5, 9, 30, tzinfo=timezone.utc)   # 06:30 hora de Argentina (ADR-012)
+AHORA = datetime(2026, 10, 5, 9, 30, tzinfo=timezone.utc)  # 06:30 hora de Argentina (ADR-012)
 
 
 # --------------------------------------------------------------------------- fechas
+
 
 def a_utc(valor: datetime | str) -> datetime:
     """Texto ISO (con Z) o datetime a datetime UTC con zona."""
@@ -44,8 +45,11 @@ def a_utc(valor: datetime | str) -> datetime:
 
 def a_hora_local(valor: datetime) -> datetime:
     """Datetime (UTC, con o sin zona) a hora de Argentina, sin zona."""
-    return valor.replace(tzinfo=None) + DESFASE_LOCAL if valor.tzinfo is None else \
-        (valor.astimezone(timezone.utc) + DESFASE_LOCAL).replace(tzinfo=None)
+    return (
+        valor.replace(tzinfo=None) + DESFASE_LOCAL
+        if valor.tzinfo is None
+        else (valor.astimezone(timezone.utc) + DESFASE_LOCAL).replace(tzinfo=None)
+    )
 
 
 def a_fecha(valor: date | str) -> date:
@@ -67,6 +71,7 @@ def ventana_noche(fecha: date) -> tuple[datetime, datetime]:
 
 # --------------------------------------------------------------------------- configuración
 
+
 def configuracion(bd) -> dict:
     """El documento de `configuracion` (Δ, nodo inactivo, cortes del riesgo, umbrales de riego)."""
     doc = bd.configuracion.find_one({"_id": "general"})
@@ -77,11 +82,13 @@ def configuracion(bd) -> dict:
 
 # --------------------------------------------------------------------------- consola
 
+
 def parser(descripcion: str) -> argparse.ArgumentParser:
     """Parser de argumentos de la consola, con la opción de mostrar el texto de mongosh."""
     p = argparse.ArgumentParser(description=descripcion, formatter_class=argparse.RawTextHelpFormatter)
-    p.add_argument("--mongosh", action="store_true",
-                   help="muestra la misma consulta escrita para mongosh (sin ejecutarla)")
+    p.add_argument(
+        "--mongosh", action="store_true", help="muestra la misma consulta escrita para mongosh (sin ejecutarla)"
+    )
     return p
 
 
@@ -121,8 +128,10 @@ def a_js(valor, nivel: int = 0) -> str:
     if isinstance(valor, dict):
         if not valor:
             return "{}"
-        partes = [f"{sangria}{k if _IDENTIFICADOR.match(k) else json.dumps(k)}: {a_js(v, nivel + 1)}"
-                  for k, v in valor.items()]
+        partes = [
+            f"{sangria}{k if _IDENTIFICADOR.match(k) else json.dumps(k)}: {a_js(v, nivel + 1)}"
+            for k, v in valor.items()
+        ]
         return "{\n" + ",\n".join(partes) + f"\n{cierre}}}"
     if isinstance(valor, (list, tuple)):
         if not valor:

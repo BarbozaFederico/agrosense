@@ -33,9 +33,9 @@ INDICES_GEOESPACIALES = [
 # (colección, claves del índice, consulta que lo justifica). El orden de las claves importa: primero
 # las que se comparan con "igual" y después las de rango u orden.
 INDICES_RENDIMIENTO = [
-    ("lecturas", [("meta.nodo_id", ASCENDING), ("ts", DESCENDING)], "Q5"),      # última lectura de un nodo
-    ("riegos", [("parcela_id", ASCENDING), ("inicio", ASCENDING)], "Q7"),       # riegos de una parcela por fecha
-    ("alertas", [("tipo", ASCENDING), ("inicio", ASCENDING)], "Q8"),            # alertas de un tipo por fecha
+    ("lecturas", [("meta.nodo_id", ASCENDING), ("ts", DESCENDING)], "Q5"),  # última lectura de un nodo
+    ("riegos", [("parcela_id", ASCENDING), ("inicio", ASCENDING)], "Q7"),  # riegos de una parcela por fecha
+    ("alertas", [("tipo", ASCENDING), ("inicio", ASCENDING)], "Q8"),  # alertas de un tipo por fecha
     ("observaciones_fenologicas", [("parcela_id", ASCENDING), ("fecha", DESCENDING)], "Q9"),  # última observación
 ]
 

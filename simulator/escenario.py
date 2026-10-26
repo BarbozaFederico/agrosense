@@ -28,11 +28,11 @@ class NodoSim:
     id: str
     parcela_id: str
     finca_id: str
-    temperatura: np.ndarray         # °C, con NaN donde el nodo no reportó
-    humedad_aire: np.ndarray        # %, con NaN donde el nodo no reportó
-    desvio_suelo: float             # puntos de humedad de suelo respecto de su gemelo
-    ruido_suelo: np.ndarray         # puntos de humedad de suelo, ruido de cada lectura
-    sin_reporte: np.ndarray         # True donde el nodo no reportó
+    temperatura: np.ndarray  # °C, con NaN donde el nodo no reportó
+    humedad_aire: np.ndarray  # %, con NaN donde el nodo no reportó
+    desvio_suelo: float  # puntos de humedad de suelo respecto de su gemelo
+    ruido_suelo: np.ndarray  # puntos de humedad de suelo, ruido de cada lectura
+    sin_reporte: np.ndarray  # True donde el nodo no reportó
 
 
 @dataclass
@@ -42,20 +42,20 @@ class ParcelaSim:
     suelo: str
     sistema_riego: str
     nodos: list[str]
-    gd_diarios: np.ndarray          # grados-día de cada día
-    etapa: np.ndarray               # posición en variedad["etapas"] de cada día
-    exceso_calor: np.ndarray        # °C de máxima sobre la normal de cada día
+    gd_diarios: np.ndarray  # grados-día de cada día
+    etapa: np.ndarray  # posición en variedad["etapas"] de cada día
+    exceso_calor: np.ndarray  # °C de máxima sobre la normal de cada día
     rng_riego: np.random.Generator
 
 
 @dataclass
 class Noche:
     finca_id: str
-    fecha: object                   # día de la mañana en que se alcanza la mínima
+    fecha: object  # día de la mañana en que se alcanza la mínima
     dia: int
-    resultado: str                  # "alerta", "medio", "bajo" o "extrema"
-    minima_c: float                 # mínima del nodo más frío
-    umbral_c: float | None          # umbral de la etapa de ese día
+    resultado: str  # "alerta", "medio", "bajo" o "extrema"
+    minima_c: float  # mínima del nodo más frío
+    umbral_c: float | None  # umbral de la etapa de ese día
     etapa: str
     extrema: bool = False
 
@@ -67,10 +67,11 @@ class Escenario:
     noches: list[Noche] = field(default_factory=list)
     variedad: dict = field(default_factory=dict)
     config: dict = field(default_factory=dict)
-    vueltas: dict[str, int] = field(default_factory=dict)   # cuántas vueltas necesitó cada finca
+    vueltas: dict[str, int] = field(default_factory=dict)  # cuántas vueltas necesitó cada finca
 
 
 # --------------------------------------------------------------------------- utilidades
+
 
 def a_hora_local(momento_utc: datetime) -> datetime:
     """Instante UTC (con o sin zona) en hora de Argentina, sin zona."""
@@ -89,9 +90,9 @@ def _sin_reporte(nodo_id: str) -> np.ndarray:
     for nodo, inicio, horas in calendario.CORTES_NODOS:
         if nodo == nodo_id:
             desde = clima.indice_de_paso(inicio)
-            mascara[desde:desde + horas * 60 // P.PASO_MIN] = True
+            mascara[desde : desde + horas * 60 // P.PASO_MIN] = True
     if nodo_id == calendario.NODO_EN_MANTENIMIENTO:
-        mascara[clima.indice_de_paso(calendario.MANTENIMIENTO_DESDE):] = True
+        mascara[clima.indice_de_paso(calendario.MANTENIMIENTO_DESDE) :] = True
     return mascara
 
 
@@ -106,8 +107,15 @@ def _noches_de_la_finca(finca_id: str, config: dict, heladas: list) -> list[tupl
 
 # --------------------------------------------------------------------------- construcción
 
-def construir(config: dict, variedad: dict, fincas: list[dict], parcelas: list[dict],
-              nodos: list[dict], heladas: list | None = None) -> Escenario:
+
+def construir(
+    config: dict,
+    variedad: dict,
+    fincas: list[dict],
+    parcelas: list[dict],
+    nodos: list[dict],
+    heladas: list | None = None,
+) -> Escenario:
     """Arma el escenario completo. Determinista: la semilla es P.SEMILLA.
 
     `heladas` reemplaza a calendario.HELADAS (sirve para explorar el clima sin heladas)."""
@@ -125,14 +133,15 @@ def construir(config: dict, variedad: dict, fincas: list[dict], parcelas: list[d
         if limite is None:
             raise RuntimeError(
                 f"Falta el límite de temperatura sospechosa de {finca['departamento']} "
-                "(configuracion.sospechoso_minimo_c): el simulador no genera heladas sin él (ADR-009).")
+                "(configuracion.sospechoso_minimo_c): el simulador no genera heladas sin él (ADR-009)."
+            )
 
         parcelas_f = sorted((p for p in parcelas if p["finca_id"] == finca_id), key=lambda p: p["_id"])
         nodos_de = {p["_id"]: sorted(n["_id"] for n in nodos if n["parcela_id"] == p["_id"]) for p in parcelas_f}
         n_nodos = sum(len(v) for v in nodos_de.values())
         flujos = [np.random.default_rng(s) for s in hijo.spawn(2 + n_nodos + len(parcelas_f))]
         rng_clima, rng_rocio = flujos[0], flujos[1]
-        rngs_nodo, rngs_riego = iter(flujos[2:2 + n_nodos]), iter(flujos[2 + n_nodos:])
+        rngs_nodo, rngs_riego = iter(flujos[2 : 2 + n_nodos]), iter(flujos[2 + n_nodos :])
 
         # --- todo el azar, una sola vez ---
         tmax0, tmin0 = clima.temperaturas_diarias(rng_clima, finca_id)
@@ -144,13 +153,15 @@ def construir(config: dict, variedad: dict, fincas: list[dict], parcelas: list[d
         for p in parcelas_f:
             for nodo_id in nodos_de[p["_id"]]:
                 rng = next(rngs_nodo)
-                ruidos[nodo_id] = (rng.normal(0, P.RUIDO_TEMPERATURA_C, P.PASOS),
-                                   rng.normal(0, P.RUIDO_HUMEDAD_AIRE, P.PASOS),
-                                   rng.normal(0, P.RUIDO_HUMEDAD_SUELO, P.PASOS))
+                ruidos[nodo_id] = (
+                    rng.normal(0, P.RUIDO_TEMPERATURA_C, P.PASOS),
+                    rng.normal(0, P.RUIDO_HUMEDAD_AIRE, P.PASOS),
+                    rng.normal(0, P.RUIDO_HUMEDAD_SUELO, P.PASOS),
+                )
         huecos = {nodo_id: _sin_reporte(nodo_id) for ids in nodos_de.values() for nodo_id in ids}
         piso = np.full(P.PASOS, float(limite))
         if config["noche_extrema"]["finca_id"] == finca_id:
-            piso[primero:ultimo + 1] = config["noche_extrema"]["minimo_c"]
+            piso[primero : ultimo + 1] = config["noche_extrema"]["minimo_c"]
         lista_noches = _noches_de_la_finca(finca_id, config, heladas)
 
         def armar(etapa_dia: np.ndarray):
@@ -161,20 +172,26 @@ def construir(config: dict, variedad: dict, fincas: list[dict], parcelas: list[d
                 dia = clima.indice_dia(fecha)
                 etapa = etapas[etapa_dia[dia]]
                 extrema = resultado == "extrema"
-                minima = (config["noche_extrema"]["minimo_c"] if extrema
-                          else calendario.minima_objetivo(resultado, etapa["umbral_helada_c"], delta))
-                noches.append(Noche(finca_id, fecha, dia, resultado, minima, etapa["umbral_helada_c"],
-                                    etapa["nombre"], extrema))
-                descenso = (calendario.DESCENSO_MAXIMA_PREVIA_EXTREMA_C if extrema
-                            else calendario.DESCENSO_MAXIMA_PREVIA_C)
-                tmin[dia] = minima + P.DESVIO_TEMPERATURA_C          # el nodo más frío queda en `minima`
+                minima = (
+                    config["noche_extrema"]["minimo_c"]
+                    if extrema
+                    else calendario.minima_objetivo(resultado, etapa["umbral_helada_c"], delta)
+                )
+                noches.append(
+                    Noche(finca_id, fecha, dia, resultado, minima, etapa["umbral_helada_c"], etapa["nombre"], extrema)
+                )
+                descenso = (
+                    calendario.DESCENSO_MAXIMA_PREVIA_EXTREMA_C if extrema else calendario.DESCENSO_MAXIMA_PREVIA_C
+                )
+                tmin[dia] = minima + P.DESVIO_TEMPERATURA_C  # el nodo más frío queda en `minima`
                 tmax[dia - 1] = maxima_normal[dia - 1] - descenso
             base = clima.perfil_5min(tmax, tmin, amanecer, atardecer)
             for noche in noches:
                 d = noche.dia
                 t_puesta = float(clima.temperatura_en_puesta(tmax[d - 1], tmin[d - 1], amanecer[d], atardecer[d]))
-                base = clima.noche_de_helada(base, d, float(tmin[d]), t_puesta, amanecer, atardecer,
-                                             noche.extrema, P.DESVIO_TEMPERATURA_C)
+                base = clima.noche_de_helada(
+                    base, d, float(tmin[d]), t_puesta, amanecer, atardecer, noche.extrema, P.DESVIO_TEMPERATURA_C
+                )
             humedad_base = clima.humedad_aire(finca_id, base, anomalia)
 
             temperaturas, humedades = {}, {}
@@ -200,8 +217,10 @@ def construir(config: dict, variedad: dict, fincas: list[dict], parcelas: list[d
                 break
             etapa_dia = etapa_nueva
         else:
-            raise RuntimeError(f"Las etapas de las noches de {finca_id} no se estabilizan tras {MAX_VUELTAS} "
-                               "vueltas: hay que mover alguna fecha de calendario.HELADAS lejos de un cambio de etapa.")
+            raise RuntimeError(
+                f"Las etapas de las noches de {finca_id} no se estabilizan tras {MAX_VUELTAS} "
+                "vueltas: hay que mover alguna fecha de calendario.HELADAS lejos de un cambio de etapa."
+            )
         escenario.vueltas[finca_id] = vuelta
         escenario.noches += noches
 
@@ -210,10 +229,25 @@ def construir(config: dict, variedad: dict, fincas: list[dict], parcelas: list[d
             for j, nodo_id in enumerate(nodos_de[p["_id"]]):
                 s = signo[p["_id"]] * (1 if j == 0 else -1)
                 escenario.nodos[nodo_id] = NodoSim(
-                    nodo_id, p["_id"], finca_id, temperaturas[nodo_id], humedades[nodo_id],
-                    s * P.DESVIO_HUMEDAD_SUELO, ruidos[nodo_id][2], huecos[nodo_id])
+                    nodo_id,
+                    p["_id"],
+                    finca_id,
+                    temperaturas[nodo_id],
+                    humedades[nodo_id],
+                    s * P.DESVIO_HUMEDAD_SUELO,
+                    ruidos[nodo_id][2],
+                    huecos[nodo_id],
+                )
             gd, etapa = fenologia.etapas_de_parcela([temperaturas[n] for n in nodos_de[p["_id"]]], variedad)
             escenario.parcelas[p["_id"]] = ParcelaSim(
-                p["_id"], finca_id, finca["tipo_suelo"], finca["sistema_riego"], nodos_de[p["_id"]],
-                gd, etapa, tmax - maxima_normal, next(rngs_riego))
+                p["_id"],
+                finca_id,
+                finca["tipo_suelo"],
+                finca["sistema_riego"],
+                nodos_de[p["_id"]],
+                gd,
+                etapa,
+                tmax - maxima_normal,
+                next(rngs_riego),
+            )
     return escenario

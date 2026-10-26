@@ -33,7 +33,7 @@ from db.departamentos import clave_departamento
 from db.schemas import ESQUEMAS, configuracion as esquema_configuracion, lecturas
 from db.schemas.crear import crear_colecciones
 from db.schemas.validar import validar_documentos
-from db.seeds import (configuracion, eventos_climaticos, fincas, nodos, parcelas, variedades)
+from db.seeds import configuracion, eventos_climaticos, fincas, nodos, parcelas, variedades
 
 # Orden de carga: primero la configuración y los datos de los que dependen los demás.
 MODULOS = [configuracion, variedades, fincas, parcelas, nodos, eventos_climaticos]
@@ -45,8 +45,7 @@ def armar_documentos(umbrales=None) -> dict[str, list[dict]]:
     """Todos los documentos del seed, por colección. `umbrales` es solo para pruebas."""
     docs = {}
     for modulo in MODULOS:
-        docs[modulo.NOMBRE] = (modulo.documentos(umbrales) if modulo is configuracion
-                               else modulo.documentos())
+        docs[modulo.NOMBRE] = modulo.documentos(umbrales) if modulo is configuracion else modulo.documentos()
     return docs
 
 
@@ -54,9 +53,8 @@ def verificar_reglas(docs: dict[str, list[dict]]) -> list[str]:
     """Reglas que el esquema no puede expresar porque comparan campos o documentos."""
     errores = []
     departamento_de_finca = {f["_id"]: clave_departamento(f["departamento"]) for f in docs["fincas"]}
-    imposible = lecturas.ESQUEMA["properties"]["temperatura_c"]["minimum"]   # hoy -40, provisional
-    errores += esquema_configuracion.verificar_coherencia(docs["configuracion"][0],
-                                                          departamento_de_finca, imposible)
+    imposible = lecturas.ESQUEMA["properties"]["temperatura_c"]["minimum"]  # hoy -40, provisional
+    errores += esquema_configuracion.verificar_coherencia(docs["configuracion"][0], departamento_de_finca, imposible)
     for variedad in docs["variedades"]:
         errores += [f"variedad {variedad['_id']}: {e}" for e in variedades.verificar_etapas(variedad["etapas"])]
 
@@ -103,14 +101,18 @@ def verificar_geografia(bd: Database) -> list[str]:
     errores = []
     for nodo in bd.nodos.find():
         dentro = bd.parcelas.count_documents(
-            {"_id": nodo["parcela_id"], "geometria": {"$geoIntersects": {"$geometry": nodo["ubicacion"]}}})
+            {"_id": nodo["parcela_id"], "geometria": {"$geoIntersects": {"$geometry": nodo["ubicacion"]}}}
+        )
         if dentro != 1:
             errores.append(f"{nodo['_id']} no está dentro de {nodo['parcela_id']}")
     for finca in bd.fincas.find():
         # $geoWithin: parcelas cuyo polígono queda entero dentro del polígono de la finca.
-        dentro = {p["_id"] for p in bd.parcelas.find(
-            {"finca_id": finca["_id"], "geometria": {"$geoWithin": {"$geometry": finca["geometria"]}}},
-            {"_id": 1})}
+        dentro = {
+            p["_id"]
+            for p in bd.parcelas.find(
+                {"finca_id": finca["_id"], "geometria": {"$geoWithin": {"$geometry": finca["geometria"]}}}, {"_id": 1}
+            )
+        }
         todas = {p["_id"] for p in bd.parcelas.find({"finca_id": finca["_id"]}, {"_id": 1})}
         errores += [f"{p} no está dentro de {finca['_id']}" for p in sorted(todas - dentro)]
     return errores

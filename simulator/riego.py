@@ -27,11 +27,11 @@ from simulator.escenario import NodoSim, ParcelaSim
 
 @dataclass
 class RiegoSim:
-    inicio: int                      # paso de inicio
-    fin: int                         # paso de fin (exclusivo)
-    origen: str                      # "turno" o "alerta"
+    inicio: int  # paso de inicio
+    fin: int  # paso de fin (exclusivo)
+    origen: str  # "turno" o "alerta"
     lamina_mm: float
-    alerta: int | None = None        # posición de la alerta de riego que lo originó
+    alerta: int | None = None  # posición de la alerta de riego que lo originó
 
 
 @dataclass
@@ -44,7 +44,7 @@ class AlertaRiegoSim:
 
 @dataclass
 class ResultadoRiego:
-    humedad_suelo: np.ndarray                    # % volumétrico de la parcela, cada 5 minutos
+    humedad_suelo: np.ndarray  # % volumétrico de la parcela, cada 5 minutos
     riegos: list[RiegoSim] = field(default_factory=list)
     alertas: list[AlertaRiegoSim] = field(default_factory=list)
 
@@ -90,16 +90,16 @@ def simular_parcela(parcela: ParcelaSim, nodos: dict[str, NodoSim], config: dict
     ruido_medio = np.convolve(ruido_medio, np.ones(ventana) / ventana, mode="valid")
 
     programados = _programados(parcela)
-    ocupado = np.zeros(P.PASOS + 1, dtype=bool)                    # pasos cubiertos por un riego de turno
+    ocupado = np.zeros(P.PASOS + 1, dtype=bool)  # pasos cubiertos por un riego de turno
     for inicio, (fin, _) in programados.items():
         ocupado[inicio:fin] = True
     lamina_extra = P.LAMINA_EXTRA_SURCO_MM if parcela.sistema_riego == "surco" else P.LAMINA_EXTRA_GOTEO_MM
 
     resultado = ResultadoRiego(humedad_suelo=np.empty(P.PASOS))
     detector = Detector(P.CIERRE_RIEGO_LECTURAS)
-    extras: dict[int, tuple[int, int]] = {}                        # {inicio: (fin, posición de la alerta)}
-    activo = None                                                  # riego en curso
-    h = cc - 1.0                                                   # arranca un punto bajo la capacidad de campo
+    extras: dict[int, tuple[int, int]] = {}  # {inicio: (fin, posición de la alerta)}
+    activo = None  # riego en curso
+    h = cc - 1.0  # arranca un punto bajo la capacidad de campo
 
     for i in range(P.PASOS):
         d = i // P.PASOS_DIA
@@ -109,7 +109,7 @@ def simular_parcela(parcela: ParcelaSim, nodos: dict[str, NodoSim], config: dict
                 fin, lamina = programados[i]
                 if parcela.sistema_riego == "surco":
                     objetivo = cc
-                else:                                              # goteo: repone casi todo lo perdido ayer
+                else:  # goteo: repone casi todo lo perdido ayer
                     repone = perdida_dia[max(d - 1, 0)] * parcela.rng_riego.uniform(*P.RECARGA_GOTEO)
                     objetivo = min(cc, h + repone)
                 activo = (i, fin, h, objetivo, "turno", lamina, None)
@@ -138,10 +138,10 @@ def simular_parcela(parcela: ParcelaSim, nodos: dict[str, NodoSim], config: dict
             inicio_extra = i + P.DEMORA_EXTRA_H * 60 // P.PASO_MIN
             if parcela.sistema_riego == "goteo":
                 # el goteo riega todos los días: el extra espera al primer hueco libre
-                while inicio_extra + largo < P.PASOS and ocupado[inicio_extra:inicio_extra + largo].any():
+                while inicio_extra + largo < P.PASOS and ocupado[inicio_extra : inicio_extra + largo].any():
                     inicio_extra += 1
             # en surco, si un turno está por empezar ya resuelve la alerta: no se agrega otro riego
-            if inicio_extra + largo < P.PASOS and not ocupado[inicio_extra:inicio_extra + largo].any():
+            if inicio_extra + largo < P.PASOS and not ocupado[inicio_extra : inicio_extra + largo].any():
                 extras[inicio_extra] = (inicio_extra + largo, len(resultado.alertas) - 1)
         elif evento == "cierra":
             resultado.alertas[-1].fin = i

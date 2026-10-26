@@ -64,24 +64,36 @@ def probar(descripcion: str, accion) -> None:
 no_cumple = {"$nor": [{"$jsonSchema": esquema}]}
 
 # 1) ¿Qué lecturas CUMPLEN el esquema? (esperado: casos 1 y 7)
-probar("1. find({$jsonSchema}) → lecturas que cumplen",
-       lambda: casos_de(bd.lecturas.find({"$jsonSchema": esquema}).sort("ts", 1)))
+probar(
+    "1. find({$jsonSchema}) → lecturas que cumplen",
+    lambda: casos_de(bd.lecturas.find({"$jsonSchema": esquema}).sort("ts", 1)),
+)
 
 # 2) ¿Qué lecturas NO cumplen? Es la consulta de auditoría (esperado: casos 2 a 6)
-probar("2. find({$nor: [{$jsonSchema}]}) → lecturas mal formadas",
-       lambda: casos_de(bd.lecturas.find(no_cumple).sort("ts", 1)))
+probar(
+    "2. find({$nor: [{$jsonSchema}]}) → lecturas mal formadas",
+    lambda: casos_de(bd.lecturas.find(no_cumple).sort("ts", 1)),
+)
 
 # 3) Lo mismo dentro de una agregación ($match), contando cuántas fallan
-probar("3. aggregate $match + $count → cantidad de lecturas mal formadas",
-       lambda: list(bd.lecturas.aggregate([{"$match": no_cumple}, {"$count": "mal_formadas"}])))
+probar(
+    "3. aggregate $match + $count → cantidad de lecturas mal formadas",
+    lambda: list(bd.lecturas.aggregate([{"$match": no_cumple}, {"$count": "mal_formadas"}])),
+)
 
 # 4) Auditoría combinada con un filtro común (por nodo y rango de fechas)
-probar("4. Auditoría filtrando por nodo y rango de fechas",
-       lambda: bd.lecturas.count_documents({"meta.nodo_id": "N-SR-1-A",
-                                            "ts": {"$gte": hora(0), "$lt": hora(10)}, **no_cumple}))
+probar(
+    "4. Auditoría filtrando por nodo y rango de fechas",
+    lambda: bd.lecturas.count_documents(
+        {"meta.nodo_id": "N-SR-1-A", "ts": {"$gte": hora(0), "$lt": hora(10)}, **no_cumple}
+    ),
+)
 
 # 5) Borrar las lecturas mal formadas con el mismo filtro (posible "limpieza")
-probar("5. delete_many con $nor + $jsonSchema",
-       lambda: f"borrados {bd.lecturas.delete_many(no_cumple).deleted_count}")
-print("Lecturas que quedan después de limpiar:", bd.lecturas.count_documents({}), "→",
-      casos_de(bd.lecturas.find().sort("ts", 1)))
+probar("5. delete_many con $nor + $jsonSchema", lambda: f"borrados {bd.lecturas.delete_many(no_cumple).deleted_count}")
+print(
+    "Lecturas que quedan después de limpiar:",
+    bd.lecturas.count_documents({}),
+    "→",
+    casos_de(bd.lecturas.find().sort("ts", 1)),
+)

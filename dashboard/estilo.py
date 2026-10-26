@@ -5,9 +5,16 @@ tinta cálida. El estado nunca va solo en color: cada fila lleva además una for
 """
 
 COLORES = {
-    "fondo": "#14161a", "panel": "#1b1e23", "costura": "#2d3138", "pista": "#262a31",
-    "tinta": "#ece6d8", "tinta_2": "#a9a597",
-    "helada": "#ff7a6b", "atencion": "#f0b84a", "normal": "#6cc496", "neutro": "#8c8f95",
+    "fondo": "#14161a",
+    "panel": "#1b1e23",
+    "costura": "#2d3138",
+    "pista": "#262a31",
+    "tinta": "#ece6d8",
+    "tinta_2": "#a9a597",
+    "helada": "#ff7a6b",
+    "atencion": "#f0b84a",
+    "normal": "#6cc496",
+    "neutro": "#8c8f95",
 }
 
 CSS = """

@@ -46,14 +46,16 @@ def hora(h: int, m: int) -> datetime:
 meta_n01 = {"nodo_id": "N-01", "parcela_id": "P-1", "finca_id": "F-1"}
 meta_n02 = {"nodo_id": "N-02", "parcela_id": "P-1", "finca_id": "F-1"}
 
-resultado = bd.lecturas.insert_many([
-    {"ts": hora(3, 0), "meta": meta_n01, "temperatura": -0.4, "humedad_suelo": 31.0, "humedad_aire": 62.0},
-    {"ts": hora(3, 5), "meta": meta_n01, "temperatura": -0.8, "humedad_suelo": 31.0, "humedad_aire": 63.0},
-    {"ts": hora(3, 10), "meta": meta_n01, "temperatura": -1.1, "humedad_suelo": 30.9, "humedad_aire": 64.0},
-    {"ts": hora(3, 0), "meta": meta_n02, "temperatura": -0.2, "humedad_suelo": 33.0, "humedad_aire": 60.0},
-    {"ts": hora(3, 5), "meta": meta_n02, "temperatura": -0.5, "humedad_suelo": 33.1, "humedad_aire": 61.0},
-    {"ts": hora(3, 10), "meta": meta_n02, "temperatura": -0.9, "humedad_suelo": 33.0, "humedad_aire": 62.0},
-])
+resultado = bd.lecturas.insert_many(
+    [
+        {"ts": hora(3, 0), "meta": meta_n01, "temperatura": -0.4, "humedad_suelo": 31.0, "humedad_aire": 62.0},
+        {"ts": hora(3, 5), "meta": meta_n01, "temperatura": -0.8, "humedad_suelo": 31.0, "humedad_aire": 63.0},
+        {"ts": hora(3, 10), "meta": meta_n01, "temperatura": -1.1, "humedad_suelo": 30.9, "humedad_aire": 64.0},
+        {"ts": hora(3, 0), "meta": meta_n02, "temperatura": -0.2, "humedad_suelo": 33.0, "humedad_aire": 60.0},
+        {"ts": hora(3, 5), "meta": meta_n02, "temperatura": -0.5, "humedad_suelo": 33.1, "humedad_aire": 61.0},
+        {"ts": hora(3, 10), "meta": meta_n02, "temperatura": -0.9, "humedad_suelo": 33.0, "humedad_aire": 62.0},
+    ]
+)
 
 # 5) Verificar. Estas líneas son las que hay que mirar y anotar.
 print("Versión del servidor:", cliente.server_info()["version"])

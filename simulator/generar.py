@@ -45,6 +45,7 @@ TAMANO_LOTE = 5000
 @dataclass
 class Contexto:
     """Lo que el simulador lee de la base (o del seed, en las pruebas)."""
+
     config: dict
     variedad: dict
     fincas: list[dict]
@@ -55,8 +56,9 @@ class Contexto:
 @dataclass
 class Temporada:
     """La temporada simulada, lista para escribir."""
+
     escenario: E.Escenario
-    humedad_suelo: dict[str, np.ndarray]               # por parcela
+    humedad_suelo: dict[str, np.ndarray]  # por parcela
     alertas: list[dict] = field(default_factory=list)
     riegos: list[dict] = field(default_factory=list)
     observaciones: list[dict] = field(default_factory=list)
@@ -64,6 +66,7 @@ class Temporada:
 
 
 # --------------------------------------------------------------------------- lectura de la base
+
 
 def cargar_contexto(bd: Database) -> Contexto:
     """Lee de la base lo que hace falta; si falta el seed, lo dice."""
@@ -81,11 +84,18 @@ def cargar_contexto(bd: Database) -> Contexto:
 def contexto_desde_seed(umbrales=None) -> Contexto:
     """Lo mismo que cargar_contexto, pero armado con los módulos del seed, sin base de datos."""
     from db.seeds import configuracion, fincas, nodos, parcelas, variedades
-    return Contexto(configuracion.documentos(umbrales)[0], variedades.documentos()[0], fincas.documentos(),
-                    parcelas.documentos(), nodos.documentos())
+
+    return Contexto(
+        configuracion.documentos(umbrales)[0],
+        variedades.documentos()[0],
+        fincas.documentos(),
+        parcelas.documentos(),
+        nodos.documentos(),
+    )
 
 
 # --------------------------------------------------------------------------- identificadores
+
 
 def id_determinista(tipo: str, parcela_id: str, n: int, momento: datetime) -> ObjectId:
     """ObjectId que sale siempre igual: 4 bytes de fecha, 4 de (tipo, parcela) y 4 de número."""
@@ -95,6 +105,7 @@ def id_determinista(tipo: str, parcela_id: str, n: int, momento: datetime) -> Ob
 
 
 # --------------------------------------------------------------------------- la temporada
+
 
 def simular(contexto: Contexto) -> Temporada:
     """Arma la temporada completa en memoria. Determinista."""
@@ -115,44 +126,74 @@ def simular(contexto: Contexto) -> Temporada:
             dia = a.inicio // P.PASOS_DIA
             _id = id_determinista("alerta_riego", pid, n, ts[a.inicio])
             ids_alerta_riego.append(_id)
-            temporada.alertas.append({
-                "_id": _id, "tipo": "riego", "parcela_id": pid,
-                "estado": "cerrada" if a.fin is not None else "abierta",
-                "inicio": ts[a.inicio], "fin": ts[a.fin] if a.fin is not None else None,
-                "etapa_bbch": etapas[parcela.etapa[dia]]["bbch_desde"],
-                "umbral": round(a.umbral, 2), "valor_extremo": round(float(a.minimo), 2),
-                "riesgo": None, "fuente": P.FUENTE})
+            temporada.alertas.append(
+                {
+                    "_id": _id,
+                    "tipo": "riego",
+                    "parcela_id": pid,
+                    "estado": "cerrada" if a.fin is not None else "abierta",
+                    "inicio": ts[a.inicio],
+                    "fin": ts[a.fin] if a.fin is not None else None,
+                    "etapa_bbch": etapas[parcela.etapa[dia]]["bbch_desde"],
+                    "umbral": round(a.umbral, 2),
+                    "valor_extremo": round(float(a.minimo), 2),
+                    "riesgo": None,
+                    "fuente": P.FUENTE,
+                }
+            )
         for n, r in enumerate(agua.riegos):
-            doc = {"_id": id_determinista("riego", pid, n, ts[r.inicio]), "parcela_id": pid,
-                   "inicio": ts[r.inicio], "fin": ts[min(r.fin, P.PASOS - 1)], "sistema": parcela.sistema_riego,
-                   "origen": r.origen, "lamina_mm": r.lamina_mm,
-                   "litros": round(r.lamina_mm * superficie[pid] * 10_000, 1), "fuente": P.FUENTE}
+            doc = {
+                "_id": id_determinista("riego", pid, n, ts[r.inicio]),
+                "parcela_id": pid,
+                "inicio": ts[r.inicio],
+                "fin": ts[min(r.fin, P.PASOS - 1)],
+                "sistema": parcela.sistema_riego,
+                "origen": r.origen,
+                "lamina_mm": r.lamina_mm,
+                "litros": round(r.lamina_mm * superficie[pid] * 10_000, 1),
+                "fuente": P.FUENTE,
+            }
             if r.origen == "alerta":
                 doc["alerta_id"] = ids_alerta_riego[r.alerta]
             temporada.riegos.append(doc)
 
         # --- alertas de helada ---
-        for n, a in enumerate(alertas.detectar_heladas(parcela, esc.nodos, agua.humedad_suelo,
-                                                       contexto.config, contexto.variedad)):
-            temporada.alertas.append({
-                "_id": id_determinista("alerta_helada", pid, n, ts[a.inicio]), "tipo": "helada",
-                "parcela_id": pid, "estado": "cerrada" if a.fin is not None else "abierta",
-                "inicio": ts[a.inicio], "fin": ts[a.fin] if a.fin is not None else None,
-                "etapa_bbch": etapas[a.posicion_etapa]["bbch_desde"],
-                "umbral": a.umbral_c, "valor_extremo": round(a.valor_extremo_c, 2),
-                "riesgo": a.riesgo, "fuente": P.FUENTE})
+        for n, a in enumerate(
+            alertas.detectar_heladas(parcela, esc.nodos, agua.humedad_suelo, contexto.config, contexto.variedad)
+        ):
+            temporada.alertas.append(
+                {
+                    "_id": id_determinista("alerta_helada", pid, n, ts[a.inicio]),
+                    "tipo": "helada",
+                    "parcela_id": pid,
+                    "estado": "cerrada" if a.fin is not None else "abierta",
+                    "inicio": ts[a.inicio],
+                    "fin": ts[a.fin] if a.fin is not None else None,
+                    "etapa_bbch": etapas[a.posicion_etapa]["bbch_desde"],
+                    "umbral": a.umbral_c,
+                    "valor_extremo": round(a.valor_extremo_c, 2),
+                    "riesgo": a.riesgo,
+                    "fuente": P.FUENTE,
+                }
+            )
 
         # --- observaciones fenológicas: una por mes, el día 15 ---
         for k, mes in enumerate(P.MESES_TEMPORADA):
             anio = P.INICIO.year if mes >= P.INICIO.month else P.FIN.year
-            fecha = datetime(anio, mes, calendario.DIA_OBSERVACION, 15, 0, tzinfo=timezone.utc)   # 12:00 en Argentina
+            fecha = datetime(anio, mes, calendario.DIA_OBSERVACION, 15, 0, tzinfo=timezone.utc)  # 12:00 en Argentina
             dia = clima.indice_dia(fecha.date())
             posicion = int(parcela.etapa[dia]) + calendario.OBSERVACIONES_QUE_CORRIGEN.get((pid, fecha.date()), 0)
             posicion = min(max(posicion, 0), len(etapas) - 1)
-            temporada.observaciones.append({
-                "_id": id_determinista("observacion", pid, k, fecha), "parcela_id": pid, "fecha": fecha,
-                "etapa_bbch": etapas[posicion]["bbch_desde"],
-                "observador": "tecnico" if (k + int(pid[-1])) % 2 == 0 else "encargado", "fuente": "seed"})
+            temporada.observaciones.append(
+                {
+                    "_id": id_determinista("observacion", pid, k, fecha),
+                    "parcela_id": pid,
+                    "fecha": fecha,
+                    "etapa_bbch": etapas[posicion]["bbch_desde"],
+                    "observador": "tecnico" if (k + int(pid[-1])) % 2 == 0 else "encargado",
+                    "fuente": "seed",
+                }
+            )
 
     temporada.resumen = {
         "lecturas": int(sum((~n.sin_reporte).sum() for n in esc.nodos.values())),
@@ -175,20 +216,26 @@ def lecturas_de_nodo(temporada: Temporada, nodo_id: str, ts: list[datetime]):
     meta = {"nodo_id": nodo.id, "parcela_id": nodo.parcela_id, "finca_id": nodo.finca_id, "fuente": P.FUENTE}
     posiciones = np.nonzero(~nodo.sin_reporte)[0]
     for inicio in range(0, len(posiciones), TAMANO_LOTE):
-        parte = posiciones[inicio:inicio + TAMANO_LOTE]
-        yield [{"ts": ts[i], "meta": meta, "temperatura_c": t, "humedad_suelo_pct": s, "humedad_aire_pct": a}
-               for i, t, s, a in zip(parte.tolist(), temperatura[parte].tolist(),
-                                     suelo[parte].tolist(), aire[parte].tolist())]
+        parte = posiciones[inicio : inicio + TAMANO_LOTE]
+        yield [
+            {"ts": ts[i], "meta": meta, "temperatura_c": t, "humedad_suelo_pct": s, "humedad_aire_pct": a}
+            for i, t, s, a in zip(
+                parte.tolist(), temperatura[parte].tolist(), suelo[parte].tolist(), aire[parte].tolist()
+            )
+        ]
 
 
 # --------------------------------------------------------------------------- escritura
 
+
 def escribir(bd: Database, temporada: Temporada) -> dict:
     """Valida, borra lo simulado anterior y carga la temporada. Devuelve el resultado de la auditoría."""
     print("3) Validación (sin guardar)")
-    for nombre, modulo, docs in (("alertas", esquema_alertas, temporada.alertas),
-                                 ("riegos", esquema_riegos, temporada.riegos),
-                                 ("observaciones_fenologicas", esquema_observaciones, temporada.observaciones)):
+    for nombre, modulo, docs in (
+        ("alertas", esquema_alertas, temporada.alertas),
+        ("riegos", esquema_riegos, temporada.riegos),
+        ("observaciones_fenologicas", esquema_observaciones, temporada.observaciones),
+    ):
         validos, invalidos = validar_documentos(bd, modulo.ESQUEMA, docs)
         print(f"  {nombre}: {len(validos)} válidos, {len(invalidos)} inválidos")
         if invalidos:
@@ -206,8 +253,10 @@ def escribir(bd: Database, temporada: Temporada) -> dict:
     bd.riegos.insert_many(temporada.riegos)
     bd.observaciones_fenologicas.insert_many(temporada.observaciones)
     bd.nodos.update_one({"_id": calendario.NODO_EN_MANTENIMIENTO}, {"$set": {"estado": "mantenimiento"}})
-    print(f"  alertas {len(temporada.alertas)}, riegos {len(temporada.riegos)}, "
-          f"observaciones {len(temporada.observaciones)}; nodo {calendario.NODO_EN_MANTENIMIENTO} en mantenimiento")
+    print(
+        f"  alertas {len(temporada.alertas)}, riegos {len(temporada.riegos)}, "
+        f"observaciones {len(temporada.observaciones)}; nodo {calendario.NODO_EN_MANTENIMIENTO} en mantenimiento"
+    )
 
     print("5) Lecturas (validadas por lote antes de insertar)")
     ts = clima.marcas_de_tiempo_utc()
@@ -230,6 +279,7 @@ def escribir(bd: Database, temporada: Temporada) -> dict:
 
 # --------------------------------------------------------------------------- script
 
+
 def main() -> None:
     preparar_consola()
     bd = obtener_base()
@@ -243,8 +293,10 @@ def main() -> None:
     print("  " + ", ".join(f"{k} {v}" for k, v in temporada.resumen.items()))
 
     auditoria = escribir(bd, temporada)
-    print(f"  lecturas totales: {auditoria['total']} | mal formadas: {auditoria['mal_formadas']} (esperado 0) | "
-          f"sospechosas esperadas: {auditoria['esperadas']} | inesperadas: {auditoria['inesperadas']} (esperado 0)")
+    print(
+        f"  lecturas totales: {auditoria['total']} | mal formadas: {auditoria['mal_formadas']} (esperado 0) | "
+        f"sospechosas esperadas: {auditoria['esperadas']} | inesperadas: {auditoria['inesperadas']} (esperado 0)"
+    )
     print(f"\nTiempo total: {time.time() - inicio:.0f} s")
     if not auditoria["aprobada"]:
         print("RESULTADO: FALLA la auditoría")

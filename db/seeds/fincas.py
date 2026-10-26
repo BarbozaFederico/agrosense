@@ -20,8 +20,16 @@ DATOS = [
 
 def documentos() -> list[dict]:
     return [
-        {"_id": id_, "nombre": nombre, "departamento": departamento, "oasis": oasis,
-         "altitud_m": altitud, "geometria": geometria_finca(id_),
-         "sistema_riego": riego, "tipo_suelo": suelo, "ficticia": True}
+        {
+            "_id": id_,
+            "nombre": nombre,
+            "departamento": departamento,
+            "oasis": oasis,
+            "altitud_m": altitud,
+            "geometria": geometria_finca(id_),
+            "sistema_riego": riego,
+            "tipo_suelo": suelo,
+            "ficticia": True,
+        }
         for id_, nombre, departamento, oasis, altitud, riego, suelo in DATOS
     ]

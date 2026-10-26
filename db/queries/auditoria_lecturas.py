@@ -49,9 +49,9 @@ def auditar(bd) -> dict:
         "mal_formadas": contar_mal_formadas(bd),
         "config_faltante": False,
         "esperadas": 0,
-        "minima_esperada": None,     # la lectura más fría de la noche extrema
+        "minima_esperada": None,  # la lectura más fría de la noche extrema
         "inesperadas": 0,
-        "sin_limite": [],            # fincas cuyas lecturas no se pudieron auditar como sospechosas
+        "sin_limite": [],  # fincas cuyas lecturas no se pudieron auditar como sospechosas
     }
 
     config = bd.configuracion.find_one({"_id": "general"})
@@ -60,8 +60,9 @@ def auditar(bd) -> dict:
     else:
         limites = config["sospechoso_minimo_c"]
         noche = config["noche_extrema"]
-        departamento_de_finca = {f["_id"]: clave_departamento(f["departamento"])
-                                 for f in bd.fincas.find({}, {"departamento": 1})}
+        departamento_de_finca = {
+            f["_id"]: clave_departamento(f["departamento"]) for f in bd.fincas.find({}, {"departamento": 1})
+        }
 
         for finca_id in sorted(bd.lecturas.distinct("meta.finca_id")):
             limite = limites.get(departamento_de_finca.get(finca_id))
@@ -75,8 +76,8 @@ def auditar(bd) -> dict:
             if finca_id == noche["finca_id"]:
                 filtro_esperadas = {
                     **filtro_finca,
-                    "temperatura_c": {"$lt": limite, "$gte": noche["minimo_c"]},   # sin pasar su piso
-                    "ts": {"$gte": noche["inicio"], "$lte": noche["fin"]},         # dentro de la ventana
+                    "temperatura_c": {"$lt": limite, "$gte": noche["minimo_c"]},  # sin pasar su piso
+                    "ts": {"$gte": noche["inicio"], "$lte": noche["fin"]},  # dentro de la ventana
                 }
                 esperadas = bd.lecturas.count_documents(filtro_esperadas)
                 if esperadas:
@@ -99,12 +100,13 @@ def main() -> None:
     if r["config_faltante"]:
         print("AVISO: no hay documento de configuración: las lecturas sospechosas NO se auditaron.")
     else:
-        print(f"Sospechosas esperadas (noche extrema): {r['esperadas']}"
-              + (f"  (la más fría: {r['minima_esperada']} °C)" if r["esperadas"] else ""))
+        print(
+            f"Sospechosas esperadas (noche extrema): {r['esperadas']}"
+            + (f"  (la más fría: {r['minima_esperada']} °C)" if r["esperadas"] else "")
+        )
         print(f"Sospechosas inesperadas: {r['inesperadas']}  (esperado: 0)")
         if r["sin_limite"]:
-            print("AVISO: sin límite de sospechoso, NO auditadas como sospechosas: "
-                  + ", ".join(r["sin_limite"]))
+            print("AVISO: sin límite de sospechoso, NO auditadas como sospechosas: " + ", ".join(r["sin_limite"]))
     if r["mal_formadas"]:
         print("Ejemplos de mal formadas (hasta 5):")
         for doc in bd.lecturas.find(FILTRO_MAL_FORMADAS).limit(5):

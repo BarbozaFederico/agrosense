@@ -27,8 +27,10 @@ def crear_coleccion(bd: Database, modulo) -> str:
         if info["type"] != "timeseries":
             raise RuntimeError(f"{modulo.NOMBRE} existe pero no es serie temporal (tipo: {info['type']})")
         estado = "ya existía" if existe else "creada"
-        return (f"{modulo.NOMBRE} | serie temporal {estado} | sin validador: "
-                "se valida con db/schemas/validar.py y se audita (ADR-007)")
+        return (
+            f"{modulo.NOMBRE} | serie temporal {estado} | sin validador: "
+            "se valida con db/schemas/validar.py y se audita (ADR-007)"
+        )
 
     opciones = {
         "validator": {"$jsonSchema": modulo.ESQUEMA},

@@ -16,18 +16,27 @@ SERIE_TEMPORAL = False
 
 ESQUEMA = {
     "bsonType": "object",
-    "required": ["_id", "nombre", "departamento", "oasis", "altitud_m", "geometria",
-                 "sistema_riego", "tipo_suelo", "ficticia"],
+    "required": [
+        "_id",
+        "nombre",
+        "departamento",
+        "oasis",
+        "altitud_m",
+        "geometria",
+        "sistema_riego",
+        "tipo_suelo",
+        "ficticia",
+    ],
     "additionalProperties": False,
     "properties": {
-        "_id": c.CODIGO_FINCA,                                   # "F-SR", "F-TU", "F-SM"
+        "_id": c.CODIGO_FINCA,  # "F-SR", "F-TU", "F-SM"
         "nombre": c.TEXTO,
         "departamento": {"enum": ["San Rafael", "Tupungato", "San Martín"]},
         "oasis": {"enum": ["Sur", "Valle de Uco", "Este"]},
         "altitud_m": {"bsonType": ["double", "int", "long"], "minimum": 0},
         "geometria": c.POLIGONO,
-        "sistema_riego": {"enum": ["surco", "goteo"]},           # ADR-005
+        "sistema_riego": {"enum": ["surco", "goteo"]},  # ADR-005
         "tipo_suelo": {"enum": ["franco", "franco_arenoso", "pedregoso"]},  # ADR-005
-        "ficticia": {"enum": [True]},                            # todas las fincas son ficticias
+        "ficticia": {"enum": [True]},  # todas las fincas son ficticias
     },
 }

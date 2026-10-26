@@ -23,9 +23,20 @@ from datetime import datetime
 from pathlib import Path
 
 from db.conexion import BASE_POR_DEFECTO, obtener_base, preparar_consola
-from scripts.backup_restore.comun import (DIARIOS, SEMANALES, SUFIJO, ErrorDeRespaldo, buscar_herramienta,
-                                          directorio_de_respaldos, ejecutar, listar_respaldos, resumen_de_base,
-                                          ruta_manifiesto, sha256_de, uri)
+from scripts.backup_restore.comun import (
+    DIARIOS,
+    SEMANALES,
+    SUFIJO,
+    ErrorDeRespaldo,
+    buscar_herramienta,
+    directorio_de_respaldos,
+    ejecutar,
+    listar_respaldos,
+    resumen_de_base,
+    ruta_manifiesto,
+    sha256_de,
+    uri,
+)
 
 DOMINGO = 6
 
@@ -38,8 +49,9 @@ def hacer_backup(nombre_bd: str, carpeta: Path, ahora: datetime | None = None) -
         raise ErrorDeRespaldo(f"La base {nombre_bd} no existe o está vacía: no hay nada que respaldar.")
     archivo = carpeta / f"{nombre_bd}_{ahora:%Y%m%d_%H%M%S}{SUFIJO}"
     try:
-        ejecutar([buscar_herramienta("mongodump"), f"--uri={uri()}", f"--db={nombre_bd}",
-                  f"--archive={archivo}", "--gzip"])
+        ejecutar(
+            [buscar_herramienta("mongodump"), f"--uri={uri()}", f"--db={nombre_bd}", f"--archive={archivo}", "--gzip"]
+        )
     except ErrorDeRespaldo:
         archivo.unlink(missing_ok=True)
         raise
@@ -55,12 +67,13 @@ def hacer_backup(nombre_bd: str, carpeta: Path, ahora: datetime | None = None) -
     return archivo, manifiesto
 
 
-def seleccionar_a_borrar(respaldos: list[tuple[Path, datetime]], diarios: int = DIARIOS,
-                         semanales: int = SEMANALES) -> list[Path]:
+def seleccionar_a_borrar(
+    respaldos: list[tuple[Path, datetime]], diarios: int = DIARIOS, semanales: int = SEMANALES
+) -> list[Path]:
     """Qué copias sobran según la política. No borra nada: solo decide (por eso se puede probar con fechas inventadas)."""
     ultima_del_dia = {}
     for ruta, cuando in sorted(respaldos, key=lambda par: par[1]):
-        ultima_del_dia[cuando.date()] = ruta          # la más nueva de cada día pisa a las anteriores
+        ultima_del_dia[cuando.date()] = ruta  # la más nueva de cada día pisa a las anteriores
     dias = sorted(ultima_del_dia, reverse=True)
     conservar = set(dias[:diarios]) | set([d for d in dias if d.weekday() == DOMINGO][:semanales])
     conservadas = {ultima_del_dia[d] for d in conservar}
@@ -80,15 +93,19 @@ def main() -> None:
     preparar_consola()
     parser = argparse.ArgumentParser(description="Backup de la base con mongodump y rotación de copias viejas.")
     parser.add_argument("--bd", default=os.environ.get("AGROSENSE_BD", BASE_POR_DEFECTO), help="base a respaldar")
-    parser.add_argument("--destino", help="carpeta de los respaldos (por defecto AGROSENSE_BACKUP_DIR o ~/agrosense-backups)")
+    parser.add_argument(
+        "--destino", help="carpeta de los respaldos (por defecto AGROSENSE_BACKUP_DIR o ~/agrosense-backups)"
+    )
     parser.add_argument("--sin-rotar", action="store_true", help="no borrar las copias viejas")
     args = parser.parse_args()
     try:
         carpeta = directorio_de_respaldos(args.destino)
         archivo, manifiesto = hacer_backup(args.bd, carpeta)
         print(f"Backup de {args.bd}: {archivo}")
-        print(f"  {manifiesto['tamano_bytes'] / 1024:.0f} KB, sha256 {manifiesto['sha256'][:16]}…, "
-              f"MongoDB {manifiesto['servidor']}")
+        print(
+            f"  {manifiesto['tamano_bytes'] / 1024:.0f} KB, sha256 {manifiesto['sha256'][:16]}…, "
+            f"MongoDB {manifiesto['servidor']}"
+        )
         for nombre, c in manifiesto["colecciones"].items():
             print(f"  {nombre.ljust(27)} {c['documentos']:>8} documentos  {c['tipo']}")
         if not args.sin_rotar:

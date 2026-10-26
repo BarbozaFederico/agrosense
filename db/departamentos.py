@@ -10,6 +10,5 @@ import unicodedata
 
 def clave_departamento(nombre: str) -> str:
     """Quita tildes, pasa a minúsculas y reemplaza los espacios por guiones bajos."""
-    sin_tildes = "".join(c for c in unicodedata.normalize("NFD", nombre)
-                         if unicodedata.category(c) != "Mn")
+    sin_tildes = "".join(c for c in unicodedata.normalize("NFD", nombre) if unicodedata.category(c) != "Mn")
     return sin_tildes.lower().replace(" ", "_")

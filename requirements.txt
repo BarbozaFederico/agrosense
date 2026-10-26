@@ -10,3 +10,6 @@ numpy==2.5.4
 # Dashboard
 streamlit==1.65.0
 plotly==7.1.0
+
+# Formato del código (la configuración está en pyproject.toml)
+black==26.10.1

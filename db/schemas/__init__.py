@@ -23,6 +23,14 @@ from db.schemas import (
 )
 
 ESQUEMAS = [
-    configuracion, variedades, fincas, parcelas, nodos,
-    lecturas, alertas, riegos, eventos_climaticos, observaciones_fenologicas,
+    configuracion,
+    variedades,
+    fincas,
+    parcelas,
+    nodos,
+    lecturas,
+    alertas,
+    riegos,
+    eventos_climaticos,
+    observaciones_fenologicas,
 ]

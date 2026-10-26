@@ -16,17 +16,17 @@ ESQUEMA = {
     "required": ["_id", "nombre", "ficticia", "grados_dia", "etapas"],
     "additionalProperties": False,
     "properties": {
-        "_id": c.TEXTO,                                          # "malbec"
+        "_id": c.TEXTO,  # "malbec"
         "nombre": c.TEXTO,
-        "ficticia": {"bsonType": "bool"},                        # True solo en la variedad simulada X
+        "ficticia": {"bsonType": "bool"},  # True solo en la variedad simulada X
         "grados_dia": {
             "bsonType": "object",
             "required": ["base_c", "tope_c", "inicio", "hasta_brotacion"],
             "additionalProperties": False,
             "properties": {
-                "base_c": c.NUMERO,                              # 10 °C
-                "tope_c": c.NUMERO,                              # 32 °C
-                "inicio": {                                      # desde cuándo se cuenta (1/9)
+                "base_c": c.NUMERO,  # 10 °C
+                "tope_c": c.NUMERO,  # 32 °C
+                "inicio": {  # desde cuándo se cuenta (1/9)
                     "bsonType": "object",
                     "required": ["mes", "dia"],
                     "additionalProperties": False,
@@ -43,15 +43,21 @@ ESQUEMA = {
             "minItems": 1,
             "items": {
                 "bsonType": "object",
-                "required": ["bbch_desde", "bbch_hasta", "nombre", "baggiolini",
-                             "umbral_helada_c", "gd_desde_brotacion"],
+                "required": [
+                    "bbch_desde",
+                    "bbch_hasta",
+                    "nombre",
+                    "baggiolini",
+                    "umbral_helada_c",
+                    "gd_desde_brotacion",
+                ],
                 "additionalProperties": False,
                 "properties": {
                     "bbch_desde": c.ETAPA_BBCH,
                     "bbch_hasta": c.ETAPA_BBCH,
                     "nombre": c.TEXTO,
-                    "baggiolini": c.TEXTO,                       # solo para mostrar
-                    "umbral_helada_c": NUMERO_O_NULL,            # None: la etapa no se evalúa
+                    "baggiolini": c.TEXTO,  # solo para mostrar
+                    "umbral_helada_c": NUMERO_O_NULL,  # None: la etapa no se evalúa
                     "gd_desde_brotacion": NUMERO_O_NULL,
                 },
             },

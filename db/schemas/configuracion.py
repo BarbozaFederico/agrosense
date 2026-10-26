@@ -48,9 +48,9 @@ SOSPECHOSO_MINIMO_C = {
     "required": ["san_rafael", "san_martin", "tupungato"],
     "additionalProperties": False,
     "properties": {
-        "san_rafael": LIMITE_FRIO_O_NULL,                        # -4,5 °C (SMN, San Rafael Aero)
-        "san_martin": LIMITE_FRIO_O_NULL,                        # -2,8 °C (SMN, San Martín)
-        "tupungato": LIMITE_FRIO_O_NULL,                         # -5,6 °C (supuesto adoptado, ADR-012)
+        "san_rafael": LIMITE_FRIO_O_NULL,  # -4,5 °C (SMN, San Rafael Aero)
+        "san_martin": LIMITE_FRIO_O_NULL,  # -2,8 °C (SMN, San Martín)
+        "tupungato": LIMITE_FRIO_O_NULL,  # -5,6 °C (supuesto adoptado, ADR-012)
     },
 }
 
@@ -79,19 +79,25 @@ NOCHE_EXTREMA = {
 
 ESQUEMA = {
     "bsonType": "object",
-    "required": ["_id", "delta_brote_c", "nodo_inactivo_min", "sospechoso_minimo_c",
-                 "noche_extrema", "riesgo", "umbrales_riego"],
+    "required": [
+        "_id",
+        "delta_brote_c",
+        "nodo_inactivo_min",
+        "sospechoso_minimo_c",
+        "noche_extrema",
+        "riesgo",
+        "umbrales_riego",
+    ],
     "additionalProperties": False,
     "properties": {
-        "_id": {"enum": ["general"]},                            # un solo documento
+        "_id": {"enum": ["general"]},  # un solo documento
         "delta_brote_c": {"bsonType": ["double", "int", "long"], "minimum": 0},  # 2 °C (ADR-005)
-        "nodo_inactivo_min": {"bsonType": ["int", "long"], "minimum": 1},        # 30 min
-        "sospechoso_minimo_c": SOSPECHOSO_MINIMO_C,              # límite de "sospechoso" por departamento
-        "noche_extrema": NOCHE_EXTREMA,                          # la noche precargada que puede superarlo
-        "riesgo": {                                              # cortes del índice (ADR-005)
+        "nodo_inactivo_min": {"bsonType": ["int", "long"], "minimum": 1},  # 30 min
+        "sospechoso_minimo_c": SOSPECHOSO_MINIMO_C,  # límite de "sospechoso" por departamento
+        "noche_extrema": NOCHE_EXTREMA,  # la noche precargada que puede superarlo
+        "riesgo": {  # cortes del índice (ADR-005)
             "bsonType": "object",
-            "required": ["margen_bajo_c", "margen_alto_c", "horas_duracion",
-                         "margen_duracion_c", "aire_seco_pct"],
+            "required": ["margen_bajo_c", "margen_alto_c", "horas_duracion", "margen_duracion_c", "aire_seco_pct"],
             "additionalProperties": False,
             "properties": {
                 "margen_bajo_c": c.NUMERO,
@@ -101,7 +107,7 @@ ESQUEMA = {
                 "aire_seco_pct": c.PORCENTAJE,
             },
         },
-        "umbrales_riego": {                                      # por tipo de suelo (ADR-005)
+        "umbrales_riego": {  # por tipo de suelo (ADR-005)
             "bsonType": "object",
             "required": ["franco", "franco_arenoso", "pedregoso"],
             "additionalProperties": False,
@@ -115,8 +121,9 @@ ESQUEMA = {
 }
 
 
-def verificar_coherencia(config: dict, departamento_de_finca: dict[str, str],
-                         temperatura_minima_imposible_c: float) -> list[str]:
+def verificar_coherencia(
+    config: dict, departamento_de_finca: dict[str, str], temperatura_minima_imposible_c: float
+) -> list[str]:
     """Reglas que el esquema no puede expresar porque comparan dos campos.
 
     Devuelve una lista de errores en texto (vacía si todo es coherente).
@@ -131,8 +138,10 @@ def verificar_coherencia(config: dict, departamento_de_finca: dict[str, str],
     # 1) Cada límite tiene que ser más cálido que lo "imposible".
     for departamento, limite in limites.items():
         if limite is not None and limite <= temperatura_minima_imposible_c:
-            errores.append(f"sospechoso_minimo_c.{departamento} ({limite}) tiene que ser más cálido "
-                           f"que el mínimo imposible ({temperatura_minima_imposible_c})")
+            errores.append(
+                f"sospechoso_minimo_c.{departamento} ({limite}) tiene que ser más cálido "
+                f"que el mínimo imposible ({temperatura_minima_imposible_c})"
+            )
 
     noche = config["noche_extrema"]
 
@@ -148,6 +157,8 @@ def verificar_coherencia(config: dict, departamento_de_finca: dict[str, str],
     elif limites.get(departamento) is None:
         errores.append(f"noche_extrema: el departamento {departamento} no tiene límite de sospechoso")
     elif noche["minimo_c"] >= limites[departamento]:
-        errores.append(f"noche_extrema.minimo_c ({noche['minimo_c']}) tiene que ser más frío que "
-                       f"sospechoso_minimo_c.{departamento} ({limites[departamento]})")
+        errores.append(
+            f"noche_extrema.minimo_c ({noche['minimo_c']}) tiene que ser más frío que "
+            f"sospechoso_minimo_c.{departamento} ({limites[departamento]})"
+        )
     return errores

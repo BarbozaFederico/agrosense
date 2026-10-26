@@ -17,7 +17,7 @@ def esquema_lectura(incluir_id: bool) -> dict:
         "meta": {
             "bsonType": "object",
             "required": ["nodo_id", "parcela_id", "finca_id", "fuente"],
-            "additionalProperties": False,          # meta también cerrado
+            "additionalProperties": False,  # meta también cerrado
             "properties": {
                 "nodo_id": {"bsonType": "string"},
                 "parcela_id": {"bsonType": "string"},
@@ -46,21 +46,53 @@ META = {"nodo_id": "N-SR-1-A", "parcela_id": "P-SR-1", "finca_id": "F-SR", "fuen
 def casos(ts: datetime) -> list[tuple[str, dict]]:
     """Los siete documentos de prueba, con la fecha indicada."""
     return [
-        ("1. Documento válido",
-         {"ts": ts, "meta": META, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81}),
-        ("2. Campo de más (viento_kmh)",
-         {"ts": ts, "meta": META, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81, "viento_kmh": 3}),
-        ("3. Error de tipeo (temperatua_c)",
-         {"ts": ts, "meta": META, "temperatua_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81}),
-        ("4. Campo de más dentro de meta (color)",
-         {"ts": ts, "meta": {**META, "color": "rojo"}, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81}),
-        ("5. Tipo equivocado (temperatura_c como texto)",
-         {"ts": ts, "meta": META, "temperatura_c": "-1.8", "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81}),
-        ("6. Falta un campo obligatorio (humedad_aire_pct)",
-         {"ts": ts, "meta": META, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4}),
-        ("7. Simulación en vivo con escenario_id en meta",
-         {"ts": ts, "meta": {**META, "fuente": "simulacion_en_vivo", "escenario_id": "demo-1"},
-          "temperatura_c": -3.0, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 85}),
+        (
+            "1. Documento válido",
+            {"ts": ts, "meta": META, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81},
+        ),
+        (
+            "2. Campo de más (viento_kmh)",
+            {
+                "ts": ts,
+                "meta": META,
+                "temperatura_c": -1.8,
+                "humedad_suelo_pct": 23.4,
+                "humedad_aire_pct": 81,
+                "viento_kmh": 3,
+            },
+        ),
+        (
+            "3. Error de tipeo (temperatua_c)",
+            {"ts": ts, "meta": META, "temperatua_c": -1.8, "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81},
+        ),
+        (
+            "4. Campo de más dentro de meta (color)",
+            {
+                "ts": ts,
+                "meta": {**META, "color": "rojo"},
+                "temperatura_c": -1.8,
+                "humedad_suelo_pct": 23.4,
+                "humedad_aire_pct": 81,
+            },
+        ),
+        (
+            "5. Tipo equivocado (temperatura_c como texto)",
+            {"ts": ts, "meta": META, "temperatura_c": "-1.8", "humedad_suelo_pct": 23.4, "humedad_aire_pct": 81},
+        ),
+        (
+            "6. Falta un campo obligatorio (humedad_aire_pct)",
+            {"ts": ts, "meta": META, "temperatura_c": -1.8, "humedad_suelo_pct": 23.4},
+        ),
+        (
+            "7. Simulación en vivo con escenario_id en meta",
+            {
+                "ts": ts,
+                "meta": {**META, "fuente": "simulacion_en_vivo", "escenario_id": "demo-1"},
+                "temperatura_c": -3.0,
+                "humedad_suelo_pct": 23.4,
+                "humedad_aire_pct": 85,
+            },
+        ),
     ]
 
 

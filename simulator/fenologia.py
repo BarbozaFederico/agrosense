@@ -24,7 +24,7 @@ def extremos_diarios(temperaturas_nodos: list[np.ndarray]) -> tuple[np.ndarray, 
     Los huecos (NaN, nodo sin reportar) no cuentan."""
     por_dia = [t.reshape(P.DIAS, P.PASOS_DIA) for t in temperaturas_nodos]
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore", RuntimeWarning)       # un día sin lecturas de un nodo da NaN
+        warnings.simplefilter("ignore", RuntimeWarning)  # un día sin lecturas de un nodo da NaN
         maximos = np.nanmean([np.nanmax(t, axis=1) for t in por_dia], axis=0)
         minimos = np.nanmean([np.nanmin(t, axis=1) for t in por_dia], axis=0)
     return maximos, minimos

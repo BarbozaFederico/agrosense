@@ -19,9 +19,21 @@ import sys
 from pathlib import Path
 
 from db.conexion import BASE_POR_DEFECTO, obtener_base, preparar_consola
-from scripts.backup_restore.comun import (CONSULTAS_A_COMPARAR, ErrorDeRespaldo, base_de_origen, buscar_herramienta,
-                                          comparar_consultas, comparar_resumenes, directorio_de_respaldos, ejecutar,
-                                          integro, leer_manifiesto, listar_respaldos, resumen_de_base, uri)
+from scripts.backup_restore.comun import (
+    CONSULTAS_A_COMPARAR,
+    ErrorDeRespaldo,
+    base_de_origen,
+    buscar_herramienta,
+    comparar_consultas,
+    comparar_resumenes,
+    directorio_de_respaldos,
+    ejecutar,
+    integro,
+    leer_manifiesto,
+    listar_respaldos,
+    resumen_de_base,
+    uri,
+)
 
 
 def restaurar(archivo: Path, destino: str | None = None, reemplazar: bool = False) -> list[str]:
@@ -30,17 +42,24 @@ def restaurar(archivo: Path, destino: str | None = None, reemplazar: bool = Fals
     destino = destino or f"{origen}_restaurada"
     manifiesto = leer_manifiesto(archivo)
     if manifiesto and not integro(archivo, manifiesto):
-        raise ErrorDeRespaldo(f"{archivo.name} está dañado o cambió desde que se hizo: la huella no coincide. No se restaura.")
+        raise ErrorDeRespaldo(
+            f"{archivo.name} está dañado o cambió desde que se hizo: la huella no coincide. No se restaura."
+        )
     bd = obtener_base(destino)
     if bd.list_collection_names() and not reemplazar:
         raise ErrorDeRespaldo(f"La base {destino} ya existe. Usá otro --destino, o --reemplazar para sobrescribirla.")
 
-    comando = [buscar_herramienta("mongorestore"), f"--uri={uri()}", f"--archive={archivo}", "--gzip",
-               f"--nsInclude={origen}.*"]
+    comando = [
+        buscar_herramienta("mongorestore"),
+        f"--uri={uri()}",
+        f"--archive={archivo}",
+        "--gzip",
+        f"--nsInclude={origen}.*",
+    ]
     if destino != origen:
         comando += [f"--nsFrom={origen}.*", f"--nsTo={destino}.*"]
     if reemplazar:
-        comando.append("--drop")                   # borra cada colección antes de restaurarla
+        comando.append("--drop")  # borra cada colección antes de restaurarla
     ejecutar(comando)
 
     if manifiesto is None:
@@ -52,12 +71,17 @@ def main() -> None:
     preparar_consola()
     parser = argparse.ArgumentParser(description="Restaura un backup en una base aparte y verifica el resultado.")
     parser.add_argument("archivo", nargs="?", help="archivo .archive.gz (por defecto, el último de --bd)")
-    parser.add_argument("--bd", default=os.environ.get("AGROSENSE_BD", BASE_POR_DEFECTO),
-                        help="base cuyo último backup se restaura, si no se da el archivo")
+    parser.add_argument(
+        "--bd",
+        default=os.environ.get("AGROSENSE_BD", BASE_POR_DEFECTO),
+        help="base cuyo último backup se restaura, si no se da el archivo",
+    )
     parser.add_argument("--destino", help="base donde restaurar (por defecto <base>_restaurada)")
     parser.add_argument("--reemplazar", action="store_true", help="sobrescribir la base destino si existe")
     parser.add_argument("--comparar-con", metavar="BASE", help="base contra la que comparar Q1, Q5, Q9 y Q10")
-    parser.add_argument("--carpeta", help="carpeta de los respaldos (por defecto AGROSENSE_BACKUP_DIR o ~/agrosense-backups)")
+    parser.add_argument(
+        "--carpeta", help="carpeta de los respaldos (por defecto AGROSENSE_BACKUP_DIR o ~/agrosense-backups)"
+    )
     args = parser.parse_args()
     try:
         if args.archivo:
@@ -65,7 +89,9 @@ def main() -> None:
         else:
             respaldos = listar_respaldos(directorio_de_respaldos(args.carpeta), args.bd)
             if not respaldos:
-                raise ErrorDeRespaldo(f"No hay backups de {args.bd}. Hacé uno con: python -m scripts.backup_restore.backup")
+                raise ErrorDeRespaldo(
+                    f"No hay backups de {args.bd}. Hacé uno con: python -m scripts.backup_restore.backup"
+                )
             archivo = respaldos[-1][0]
         if not archivo.exists():
             raise ErrorDeRespaldo(f"No existe {archivo}")
@@ -86,8 +112,10 @@ def main() -> None:
             for f in fallas:
                 print(f"  - {f}")
             sys.exit(1)
-        print("RESULTADO: la base restaurada coincide con el manifiesto"
-              + (f" y con {args.comparar_con} en {', '.join(CONSULTAS_A_COMPARAR)}" if args.comparar_con else ""))
+        print(
+            "RESULTADO: la base restaurada coincide con el manifiesto"
+            + (f" y con {args.comparar_con} en {', '.join(CONSULTAS_A_COMPARAR)}" if args.comparar_con else "")
+        )
     except ErrorDeRespaldo as error:
         print(f"ERROR: {error}")
         sys.exit(1)

@@ -42,15 +42,15 @@ sería mejor medir θFC y θWP de cada parcela. Pendiente: el sensor del MVP es 
 
 from decimal import ROUND_HALF_UP, Decimal
 
-P_VID_DE_VINO = Decimal("0.45")      # FAO-56, Tabla 22
+P_VID_DE_VINO = Decimal("0.45")  # FAO-56, Tabla 22
 
 # Fracción del volumen del suelo pedregoso ocupada por gravas. SUPUESTO inventado, a medir.
 RV_PEDREGOSO = Decimal("0.30")
 
 # Suelo del proyecto → (θFC, θWP) en m³/m³, punto medio del rango de la Tabla 19.
 SUELOS = {
-    "franco": (Decimal("0.25"), Decimal("0.12")),             # Loam
-    "franco_arenoso": (Decimal("0.23"), Decimal("0.11")),     # Sandy loam
+    "franco": (Decimal("0.25"), Decimal("0.12")),  # Loam
+    "franco_arenoso": (Decimal("0.23"), Decimal("0.11")),  # Sandy loam
     # Loamy sand (punto medio 0,15 / 0,065) menos las gravas: supuesto adoptado.
     "pedregoso": (Decimal("0.15") * (1 - RV_PEDREGOSO), Decimal("0.065") * (1 - RV_PEDREGOSO)),
 }
@@ -68,7 +68,4 @@ def umbral_pct(theta_fc: Decimal, theta_wp: Decimal, p: Decimal = P_VID_DE_VINO)
 
 # Mismo valor en los 4 períodos (p fijo). Se mantiene la estructura por período del esquema
 # para poder ajustar p más adelante sin cambiar `configuracion` ni las consultas.
-UMBRALES_RIEGO = {
-    suelo: {periodo: umbral_pct(fc, wp) for periodo in PERIODOS}
-    for suelo, (fc, wp) in SUELOS.items()
-}
+UMBRALES_RIEGO = {suelo: {periodo: umbral_pct(fc, wp) for periodo in PERIODOS} for suelo, (fc, wp) in SUELOS.items()}

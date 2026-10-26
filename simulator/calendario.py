@@ -24,20 +24,20 @@ from datetime import date, datetime
 #   "bajo":   no cruza y queda a más de 2 °C del umbral (Q10: riesgo bajo).
 # (finca, día de la mañana en que se alcanza la mínima, resultado)
 HELADAS = [
-    ("F-SR", date(2026, 9, 21), "medio"),     # yema hinchada
-    ("F-SR", date(2026, 10, 2), "alerta"),    # brotación
+    ("F-SR", date(2026, 9, 21), "medio"),  # yema hinchada
+    ("F-SR", date(2026, 10, 2), "alerta"),  # brotación
     # San Rafael, 5/10: la noche extrema se toma de `configuracion.noche_extrema` (ADR-009)
-    ("F-SM", date(2026, 9, 15), "medio"),     # yema hinchada
-    ("F-SM", date(2026, 9, 29), "alerta"),    # 2 a 5 hojas
-    ("F-TU", date(2026, 9, 8), "bajo"),       # yema dormida
-    ("F-TU", date(2026, 9, 22), "alerta"),    # yema hinchada
-    ("F-TU", date(2026, 10, 10), "alerta"),   # 2 a 5 hojas
+    ("F-SM", date(2026, 9, 15), "medio"),  # yema hinchada
+    ("F-SM", date(2026, 9, 29), "alerta"),  # 2 a 5 hojas
+    ("F-TU", date(2026, 9, 8), "bajo"),  # yema dormida
+    ("F-TU", date(2026, 9, 22), "alerta"),  # yema hinchada
+    ("F-TU", date(2026, 10, 10), "alerta"),  # 2 a 5 hojas
 ]
 
-MARGEN_ALERTA_C = -0.4         # la mínima del brote queda 0,4 °C bajo el umbral
-MARGEN_MEDIO_C = 1.3           # ... 1,3 °C sobre el umbral (entre 0 y 2: riesgo medio)
-MINIMA_BAJO_C = -1.5           # noche "bajo": mínima fija del sensor
-DESCENSO_MAXIMA_PREVIA_C = 3.0      # el día anterior a una helada es más fresco que lo normal
+MARGEN_ALERTA_C = -0.4  # la mínima del brote queda 0,4 °C bajo el umbral
+MARGEN_MEDIO_C = 1.3  # ... 1,3 °C sobre el umbral (entre 0 y 2: riesgo medio)
+MINIMA_BAJO_C = -1.5  # noche "bajo": mínima fija del sensor
+DESCENSO_MAXIMA_PREVIA_C = 3.0  # el día anterior a una helada es más fresco que lo normal
 DESCENSO_MAXIMA_PREVIA_EXTREMA_C = 6.0
 
 
@@ -64,7 +64,7 @@ CORTES_NODOS = [
 # Un nodo en mantenimiento: sin lecturas durante dos semanas a fin de temporada, y su estado
 # en `nodos` queda en "mantenimiento" (el estado actual al cierre de la temporada).
 NODO_EN_MANTENIMIENTO = "N-TU-2-B"
-MANTENIMIENTO_DESDE = datetime(2027, 3, 17, 0, 0)      # hasta el final de la temporada
+MANTENIMIENTO_DESDE = datetime(2027, 3, 17, 0, 0)  # hasta el final de la temporada
 
 # Observaciones fenológicas (ADR-012, decisión 14): una por parcela el día 15 de cada mes.
 # Estas dos difieren de la etapa que da el modelo, en +1 o -1 etapa, para mostrar que cuando
