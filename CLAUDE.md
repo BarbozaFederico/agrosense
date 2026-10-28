@@ -27,7 +27,7 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 Ver `README.md` para el índice. Los más importantes: `docs/vision.md`, `docs/requisitos.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/ux/pantallas.md`, `docs/equipo.md`.
 
-Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-016 y ADR-018 a ADR-021; el ADR-017, roles y autenticación, está reservado). Consultas explicadas en `docs/consultas.md`, mediciones de índices en `docs/performance.md` y backup en `docs/backup-restore.md`.
+Investigación en `docs/investigacion/`: contexto, fuentes de datos, dos informes del Malbec y `verificacion-fuentes.md` (prevalece sobre los informes). Decisiones en `docs/decisions/` (ADR-001 a ADR-016 y ADR-018 a ADR-021; el ADR-017, roles y autenticación, está reservado). Guía de defensa oral en `docs/defensa/guia-defensa.html`. Consultas explicadas en `docs/consultas.md`, mediciones de índices en `docs/performance.md` y backup en `docs/backup-restore.md`.
 
 ## 4. Alcance del MVP
 
@@ -153,6 +153,7 @@ agrosense/
 │   ├── investigacion/
 │   ├── ux/                    # pantallas.md, usuarios-y-flujos.md, wireframes/
 │   ├── decisions/             # ADR-001 a ADR-016
+│   ├── defensa/               # guia-defensa.html (guía para la defensa oral)
 │   └── sprints/
 ├── db/                        # paquete de Python (python -m db.…)
 │   ├── conexion.py            # AGROSENSE_URI y AGROSENSE_BD

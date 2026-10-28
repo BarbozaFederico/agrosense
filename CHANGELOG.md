@@ -5,6 +5,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 ## [Sin publicar]
 
 ### Agregado
+- `docs/defensa/guia-defensa.html`: guía de defensa oral en HTML (mapa de archivos, comandos de terminal, guion de la demo y preguntas probables).
 - Estructura inicial del repositorio y documentación base.
 - Informes de investigación en `docs/investigacion/`: contexto del problema, fuentes de datos, dos informes de parámetros del Malbec y `verificacion-fuentes.md`, con los datos confirmados en las fuentes originales (SMN, INV, WSU, FAUBA, FDF, Morábito, Zapata 2017).
 - ADR-003: decisiones iniciales de modelado (alertas con referencias, contenido de `lecturas.meta`, alerta de riego por humedad de suelo).
