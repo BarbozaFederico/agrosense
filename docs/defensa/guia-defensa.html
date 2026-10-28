@@ -1,0 +1,574 @@
+<title>Guía de defensa agrosense</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+/* Boletín de campo: lectura de apoyo para la defensa. Grafito + ámbar, igual que el dashboard. Índice lateral fijo, contenido en una columna de lectura. */
+:root {
+  --bg: #14161a;
+  --surface: #1b1e23;
+  --code: #0e1013;
+  --line: #2b2f36;
+  --fg: #ece6d8;
+  --muted: #a8a294;
+  --accent: #f0b84a;
+  --on-accent: #1a1405;
+  --ok: #7cc89a;
+  --warn: #f0b84a;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, "Courier New", monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f6f3ec; --surface: #fffdf8; --code: #ece7da; --line: #dcd6c8; --fg: #1f2024; --muted: #5b574d;
+    --accent: #8a5a00; --on-accent: #fffdf8; --ok: #1f6b3f; --warn: #8a5a00; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f6f3ec; --surface: #fffdf8; --code: #ece7da; --line: #dcd6c8; --fg: #1f2024; --muted: #5b574d;
+  --accent: #8a5a00; --on-accent: #fffdf8; --ok: #1f6b3f; --warn: #8a5a00; color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 80px;
+}
+::selection { background: var(--accent); color: var(--on-accent); }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+code, pre, kbd { font-family: var(--font-mono); }
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; }
+
+/* navegación */
+nav.toc { position: sticky; top: 0; align-self: start; padding-top: 36px; max-height: 100vh; overflow-y: auto; }
+nav.toc .brand { font-family: var(--font-display); font-weight: 600; font-size: 20px; margin: 0 0 4px; }
+nav.toc .sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+nav.toc a { display: block; padding: 5px 10px; color: var(--muted); text-decoration: none; font-size: 14px; border-radius: 4px; }
+nav.toc a:hover { color: var(--fg); background: var(--surface); }
+nav.toc a.on { color: var(--fg); background: var(--surface); box-shadow: inset 2px 0 0 var(--accent); }
+.themebtn { margin-top: 18px; }
+
+/* tipografía */
+main { padding-top: 36px; min-width: 0; }
+header.top { padding-bottom: 28px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 4.5vw, 3.1rem); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 14px; text-wrap: balance; }
+.lede { font-size: 18px; color: var(--fg); max-width: 62ch; margin: 0 0 18px; }
+section { padding-top: 52px; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15; margin: 0 0 8px; text-wrap: balance; }
+h3 { font-size: 15px; font-weight: 600; margin: 28px 0 8px; }
+p { margin: 0 0 12px; max-width: 70ch; }
+.intro { color: var(--muted); max-width: 66ch; margin-bottom: 20px; }
+ul.plain { margin: 0 0 12px; padding-left: 20px; max-width: 70ch; }
+ul.plain li { margin-bottom: 5px; }
+.muted { color: var(--muted); }
+.tag { display: inline-block; font-family: var(--font-mono); font-size: 12px; padding: 1px 7px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); white-space: nowrap; }
+.tag.fuente { color: var(--ok); border-color: var(--ok); }
+.tag.sup { color: var(--warn); border-color: var(--warn); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 22px 0 0; }
+.facts div { padding: 14px 16px 14px 0; }
+.facts dt { color: var(--muted); font-size: 13px; }
+.facts dd { margin: 2px 0 0; font-family: var(--font-display); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* botones */
+button { font: inherit; cursor: pointer; }
+.btn { background: transparent; color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 14px; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* comandos */
+.cmd { margin: 0 0 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--code); overflow: hidden; }
+.cmd .why { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 8px 8px 14px; background: var(--surface); border-bottom: 1px solid var(--line); font-size: 14px; }
+.cmd .why span { min-width: 0; }
+.cmd .copy { flex: none; font-size: 13px; padding: 3px 10px; }
+.cmd pre { margin: 0; padding: 12px 14px; overflow-x: auto; font-size: 13.5px; line-height: 1.65; }
+.cmd pre .c { color: var(--muted); }
+.cmd .out { padding: 0 14px 12px; color: var(--muted); font-size: 13px; }
+
+/* tablas */
+.tablewrap { overflow-x: auto; margin: 0 0 16px; border-top: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+th { text-align: left; font-weight: 600; font-size: 13px; color: var(--muted); padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+td code { font-size: 13px; color: var(--accent); overflow-wrap: anywhere; }
+td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.filter { width: 100%; max-width: 360px; padding: 8px 12px; margin-bottom: 12px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; font: inherit; font-size: 14px; }
+.filter::placeholder { color: var(--muted); }
+
+/* lista de pasos (secuencia real) */
+ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+ol.steps > li::before { content: counter(s); font-family: var(--font-display); font-size: 34px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+ol.steps h3 { margin: 0 0 4px; font-size: 16px; }
+ol.steps .time { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-left: 8px; font-weight: 400; }
+ol.steps p { margin-bottom: 8px; }
+ol.steps .cmd { margin-bottom: 8px; }
+
+/* checklist */
+.check { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.check li { border-bottom: 1px solid var(--line); }
+.check label { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; cursor: pointer; }
+.check input { margin-top: 5px; accent-color: var(--accent); width: 16px; height: 16px; flex: none; }
+.check input:checked + span { color: var(--muted); text-decoration: line-through; }
+
+/* preguntas */
+.qhead { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+details { border-top: 1px solid var(--line); }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; padding: 14px 28px 14px 0; font-weight: 500; list-style: none; position: relative; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; position: absolute; right: 4px; top: 12px; color: var(--accent); font-family: var(--font-mono); font-size: 18px; }
+details[open] summary::after { content: "\2212"; }
+details .ans { padding: 0 0 16px; color: var(--fg); }
+details .ans p { color: var(--fg); }
+.where { font-size: 13px; color: var(--muted); }
+
+/* aviso */
+.note { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 14px 16px; margin: 0 0 16px; max-width: 74ch; }
+.note strong { color: var(--accent); font-weight: 600; }
+
+footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+
+@media (max-width: 900px) {
+  .shell { display: block; }
+  nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; max-height: none; padding: 10px 0; margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); background: var(--bg); border-bottom: 1px solid var(--line); }
+  nav.toc .brand, nav.toc .sub, .themebtn { display: none; }
+  nav.toc ul { flex-direction: row; overflow-x: auto; padding: 0 16px; gap: 4px; }
+  nav.toc a { white-space: nowrap; }
+  nav.toc a.on { box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0; }
+  main { padding-top: 24px; }
+  ol.steps > li { grid-template-columns: 40px minmax(0, 1fr); gap: 10px; }
+  ol.steps > li::before { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+
+<div class="shell">
+<nav class="toc" aria-label="Secciones">
+  <p class="brand">agrosense</p>
+  <p class="sub">Guía de defensa oral</p>
+  <ul id="toc">
+    <li><a href="#resumen">Qué decir primero</a></li>
+    <li><a href="#antes">Antes de entrar</a></li>
+    <li><a href="#archivos">Dónde está cada cosa</a></li>
+    <li><a href="#comandos">Comandos</a></li>
+    <li><a href="#modelo">Modelo de datos</a></li>
+    <li><a href="#consultas">Consultas Q1 a Q10</a></li>
+    <li><a href="#indices">Índices</a></li>
+    <li><a href="#backup">Backup</a></li>
+    <li><a href="#demo">Guion de la demo</a></li>
+    <li><a href="#preguntas">Preguntas probables</a></li>
+    <li><a href="#fallas">Si algo falla</a></li>
+  </ul>
+  <button class="btn themebtn" id="theme" type="button">Cambiar tema</button>
+</nav>
+
+<main>
+<header class="top">
+  <h1>Defender agrosense en 15 minutos</h1>
+  <p class="lede">Base de datos MongoDB que monitorea sensores en viñedos de Mendoza: temperatura, humedad de suelo y de aire, con alertas de helada y de riego. Esta guía junta lo que hay que decir, dónde está cada cosa y qué escribir en la terminal.</p>
+  <dl class="facts">
+    <div><dt>Lecturas simuladas</dt><dd>727.980</dd></div>
+    <div><dt>Fincas / parcelas / nodos</dt><dd>3 / 6 / 12</dd></div>
+    <div><dt>Colecciones</dt><dd>10</dd></div>
+    <div><dt>Consultas / índices</dt><dd>10 / 7</dd></div>
+    <div><dt>Entrega</dt><dd>28/10/2026</dd></div>
+  </dl>
+</header>
+
+<section id="resumen">
+  <h2>Qué decir primero</h2>
+  <p class="intro">Una introducción de 30 segundos. Después mostrá el dashboard y bajá a la base cuando te pregunten.</p>
+  <p>agrosense guarda lo que miden los sensores de tres fincas ficticias (San Rafael, San Martín y Tupungato) durante una temporada de Malbec, del 1/9/2026 al 31/3/2027. Cada nodo manda una lectura cada 5 minutos. Con eso, la base responde a las preguntas de un encargado de finca después de una noche fría: qué parcelas se helaron, desde cuándo, cuánto bajó y si ya se regó.</p>
+  <p>Lo central es que el riesgo de helada no se compara contra un valor único. Se compara contra el umbral de la etapa fenológica del Malbec en esa fecha, usando la temperatura estimada en el brote (sensor menos 2 °C).</p>
+  <h3>Decisiones que conviene nombrar solas</h3>
+  <ul class="plain">
+    <li><strong>Lecturas como serie temporal</strong> (<code>timeField: ts</code>, <code>metaField: meta</code>), por volumen y por el patrón de acceso. ADR-001.</li>
+    <li><strong>Colecciones comunes con validación <code>$jsonSchema</code> cerrada</strong> para todo lo demás. Las series temporales no admiten validador. ADR-007 y ADR-008.</li>
+    <li><strong>Geoespacial con GeoJSON y <code>2dsphere</code></strong>, en colecciones comunes porque en series temporales el índice solo acepta puntos.</li>
+    <li><strong>Datos sintéticos, con marca</strong>: cada dato es <span class="tag fuente">con fuente</span> o <span class="tag sup">supuesto adoptado</span> (ADR-012).</li>
+  </ul>
+</section>
+
+<section id="antes">
+  <h2>Antes de entrar</h2>
+  <p class="intro">Hacelo en la notebook que vas a llevar, con el wifi apagado. El mapa no usa mapa base, así que no debería necesitar internet.</p>
+  <ul class="check" id="checklist">
+    <li><label><input type="checkbox"><span>El servicio de MongoDB está corriendo.</span></label></li>
+    <li><label><input type="checkbox"><span><code>mongosh</code> y las Database Tools están en el PATH (la guía de backup los necesita).</span></label></li>
+    <li><label><input type="checkbox"><span>La base <code>agrosense</code> tiene datos: 727.980 lecturas.</span></label></li>
+    <li><label><input type="checkbox"><span>El dashboard abre en <code>http://localhost:8501</code> y muestra la noche del 5/10/2026.</span></label></li>
+    <li><label><input type="checkbox"><span>Hay al menos un backup hecho y probado fuera del repo.</span></label></li>
+    <li><label><input type="checkbox"><span>Abrí <code>docs/consultas.md</code>, <code>docs/performance.md</code> y <code>docs/modelo-datos.md</code> en pestañas.</span></label></li>
+    <li><label><input type="checkbox"><span>MongoDB Compass abierto sobre <code>agrosense</code> (por si piden ver un documento).</span></label></li>
+    <li><label><input type="checkbox"><span>Wifi apagado y probado el recorrido completo una vez.</span></label></li>
+  </ul>
+  <h3>Verificación rápida</h3>
+  <div class="cmd"><div class="why"><span>Servicio y versión de MongoDB (el proyecto se verificó en 9.0.2)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>Get-Service *mongo*
+mongosh --version
+mongosh --eval "db.version()"</code></pre></div>
+  <div class="cmd"><div class="why"><span>Contar lecturas y colecciones de la base real</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>mongosh agrosense --eval "db.getCollectionNames()"
+mongosh agrosense --eval "db.lecturas.countDocuments()"</code></pre><div class="out">Tiene que dar 727980.</div></div>
+</section>
+
+<section id="archivos">
+  <h2>Dónde está cada cosa</h2>
+  <p class="intro">Todo se corre desde la raíz del repo, <code>C:\Users\g3d3g\dev\agrosense</code>. Buscá por tema.</p>
+  <input class="filter" id="f-arch" type="search" placeholder="Filtrar: lecturas, índice, backup, Q5…" aria-label="Filtrar archivos">
+  <div class="tablewrap"><table id="t-arch">
+    <thead><tr><th>Tema</th><th>Archivo o carpeta</th><th>Qué hay</th></tr></thead>
+    <tbody>
+      <tr><td>Visión y alcance</td><td><code>docs/vision.md</code>, <code>docs/requisitos.md</code></td><td>Qué problema resuelve y qué entra en el MVP.</td></tr>
+      <tr><td>Modelo de datos</td><td><code>docs/modelo-datos.md</code></td><td>Campos, tipos y relaciones de las 10 colecciones.</td></tr>
+      <tr><td>Esquemas de validación</td><td><code>db/schemas/</code> (un archivo por colección), <code>docs/esquemas-validacion.md</code></td><td>Los <code>$jsonSchema</code>; <code>crear_colecciones.py</code> crea todo; <code>validar.py</code> valida antes de insertar.</td></tr>
+      <tr><td>Serie temporal de lecturas</td><td><code>db/schemas/lecturas.py</code>, <code>docs/spikes/spike-adr001-series-temporales.md</code></td><td>Cómo se crea <code>lecturas</code> y qué se verificó en el spike del 14/10.</td></tr>
+      <tr><td>Auditoría de lecturas</td><td><code>db/queries/auditoria_lecturas.py</code></td><td>Reemplaza al validador que la serie temporal no admite.</td></tr>
+      <tr><td>Seed (datos base)</td><td><code>db/seeds/</code> (<code>cargar.py</code>), <code>docs/seed.md</code></td><td>Fincas, parcelas, nodos, variedades y configuración. Geometrías ficticias de 2 ha.</td></tr>
+      <tr><td>Simulador de la temporada</td><td><code>simulator/</code> (<code>generar.py</code>), <code>docs/simulador.md</code></td><td>Clima, calendario de heladas, fenología, alertas y riego. Reglas exactas en el doc.</td></tr>
+      <tr><td>Consultas Q1 a Q10</td><td><code>db/queries/qN_nombre.py</code>, <code>docs/consultas.md</code></td><td>Cada una con <code>pipeline()</code>, <code>consultar()</code> y <code>main()</code>. El doc explica cada etapa.</td></tr>
+      <tr><td>Índices</td><td><code>db/indexes/crear_indices.py</code>, <code>medir_indices.py</code>, <code>docs/performance.md</code></td><td>3 geoespaciales y 4 de rendimiento, con medición antes y después.</td></tr>
+      <tr><td>Backup y restauración</td><td><code>scripts/backup_restore/</code>, <code>docs/backup-restore.md</code></td><td><code>backup.py</code>, <code>restaurar.py</code>, <code>probar_respaldo.py</code>.</td></tr>
+      <tr><td>Dashboard</td><td><code>dashboard/app.py</code>, <code>dashboard/paginas/</code>, <code>dashboard/data.py</code></td><td>Menú, una pantalla por archivo y el puente a las consultas con caché.</td></tr>
+      <tr><td>Estilo del dashboard</td><td><code>.streamlit/config.toml</code>, <code>dashboard/estilo.py</code></td><td>Tema oscuro y colores de estado.</td></tr>
+      <tr><td>Decisiones de diseño</td><td><code>docs/decisions/ADR-001…ADR-021</code></td><td>Una decisión por archivo. El ADR-017 (roles) está reservado.</td></tr>
+      <tr><td>Conexión a la base</td><td><code>db/conexion.py</code></td><td>Variables <code>AGROSENSE_URI</code> y <code>AGROSENSE_BD</code>.</td></tr>
+      <tr><td>Pantallas y flujos</td><td><code>docs/ux/pantallas.md</code>, <code>docs/ux/usuarios-y-flujos.md</code></td><td>Qué muestra cada pantalla y para quién.</td></tr>
+      <tr><td>Fuentes de los datos</td><td><code>docs/investigacion/verificacion-fuentes.md</code></td><td>Prevalece sobre los informes del Malbec.</td></tr>
+      <tr><td>Equipo y reparto</td><td><code>docs/equipo.md</code></td><td>Quién hizo qué; igual la evaluación es individual.</td></tr>
+      <tr><td>Historial</td><td><code>CHANGELOG.md</code>, <code>docs/roadmap.md</code></td><td>Qué se hizo en cada sprint.</td></tr>
+    </tbody></table></div>
+</section>
+
+<section id="comandos">
+  <h2>Comandos de la terminal</h2>
+  <p class="intro">PowerShell, desde la raíz del repo. Los scripts de <code>db/</code> se corren con <code>python -m</code>, no con la ruta del archivo.</p>
+
+  <h3>Reconstruir todo desde cero</h3>
+  <div class="cmd"><div class="why"><span>Instalar dependencias (crea <code>.venv</code>; en PowerShell se usa <code>bash</code>)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>bash install.sh</code></pre></div>
+  <div class="cmd"><div class="why"><span>Crear las colecciones con su validación</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m db.schemas.crear_colecciones</code></pre></div>
+  <div class="cmd"><div class="why"><span>Cargar el seed: fincas, parcelas, nodos y configuración</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m db.seeds.cargar</code></pre></div>
+  <div class="cmd"><div class="why"><span>Generar la temporada: 727.980 lecturas, alertas, riegos y observaciones (unos 25 s)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m simulator.generar</code></pre></div>
+  <div class="cmd"><div class="why"><span>Crear los índices (después del simulador; Q3 no funciona sin los geoespaciales)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m db.indexes.crear_indices</code></pre></div>
+
+  <h3>Consultas</h3>
+  <div class="cmd"><div class="why"><span>Q9 sobre la noche precargada (todas siguen esta forma)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05</code></pre></div>
+  <div class="cmd"><div class="why"><span>Ver las opciones de cualquier consulta, o su versión en <code>mongosh</code></span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m db.queries.q1_horas_bajo_cero --help
+python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code></pre></div>
+  <div class="cmd"><div class="why"><span>Auditar las lecturas (reemplaza al validador de la serie temporal)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m db.queries.auditoria_lecturas</code></pre></div>
+
+  <h3>Índices y medición</h3>
+  <div class="cmd"><div class="why"><span>Medir las 10 consultas antes y después de los índices (usa <code>agrosense_tests</code>)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m db.indexes.medir_indices</code></pre></div>
+
+  <h3>Backup y restauración</h3>
+  <div class="cmd"><div class="why"><span>Hacer un backup (queda fuera del repo, en <code>~/agrosense-backups</code>, y rota)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m scripts.backup_restore.backup</code></pre></div>
+  <div class="cmd"><div class="why"><span>Restaurar el último backup en <code>agrosense_restaurada</code> y compararlo con la base real</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m scripts.backup_restore.restaurar --comparar-con agrosense</code></pre></div>
+  <div class="cmd"><div class="why"><span>Pruebas del backup (19 casos, sobre <code>agrosense_tests</code>)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m scripts.backup_restore.probar_respaldo</code></pre></div>
+
+  <h3>Dashboard</h3>
+  <div class="cmd"><div class="why"><span>Abrir el dashboard (<code>http://localhost:8501</code>)</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m streamlit run dashboard/app.py</code></pre></div>
+
+  <h3>Pruebas y formato</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Qué prueba</th><th>Comando</th><th>Casos</th></tr></thead>
+    <tbody>
+      <tr><td>Esquemas</td><td><code>python -m db.schemas.probar_esquemas</code></td><td class="n">62</td></tr>
+      <tr><td>Simulador</td><td><code>python -m simulator.probar_simulador</code></td><td class="n">51</td></tr>
+      <tr><td>Consultas Q1 a Q10</td><td><code>python -m db.queries.probar_consultas</code></td><td class="n">43</td></tr>
+      <tr><td>Índices</td><td><code>python -m db.indexes.probar_indices</code></td><td class="n">19</td></tr>
+      <tr><td>Backup</td><td><code>python -m scripts.backup_restore.probar_respaldo</code></td><td class="n">19</td></tr>
+      <tr><td>Dashboard: datos</td><td><code>python -m dashboard.probar_datos</code></td><td class="n">37</td></tr>
+      <tr><td>Dashboard: detalle</td><td><code>python -m dashboard.probar_detalle</code></td><td class="n">53</td></tr>
+      <tr><td>Dashboard: alertas</td><td><code>python -m dashboard.probar_alertas</code></td><td class="n">44</td></tr>
+      <tr><td>Dashboard: nodos</td><td><code>python -m dashboard.probar_nodos</code></td><td class="n">31</td></tr>
+      <tr><td>Dashboard: pantallas de punta a punta</td><td><code>python -m dashboard.probar_pantallas</code></td><td class="n">50</td></tr>
+      <tr><td>Formato (black, 120 columnas)</td><td><code>python -m black --check .</code></td><td class="n">—</td></tr>
+    </tbody></table></div>
+  <p class="muted">Las pruebas usan <code>agrosense_tests</code>, nunca la base real. La base se elige con la variable <code>AGROSENSE_BD</code>.</p>
+</section>
+
+<section id="modelo">
+  <h2>Modelo de datos</h2>
+  <p class="intro">Diez colecciones. Lo que importa en la defensa es por qué cada decisión de embeber o referenciar.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Colección</th><th>Contiene</th><th>Notas de diseño</th></tr></thead>
+    <tbody>
+      <tr><td><code>fincas</code></td><td>3 fincas, una por departamento</td><td>ID legible: <code>F-SR</code>. Riego y suelo por finca.</td></tr>
+      <tr><td><code>parcelas</code></td><td>6 parcelas, polígono GeoJSON</td><td><code>P-SR-1</code>. Índice <code>2dsphere</code>.</td></tr>
+      <tr><td><code>nodos</code></td><td>12 nodos, punto GeoJSON</td><td><code>N-SR-1-A</code>. Índice <code>2dsphere</code> (Q3).</td></tr>
+      <tr><td><code>lecturas</code></td><td>Serie temporal, 727.980 documentos</td><td><code>meta</code> lleva <code>nodo_id</code>, <code>parcela_id</code>, <code>finca_id</code> y, si aplica, <code>escenario_id</code>.</td></tr>
+      <tr><td><code>alertas</code></td><td>Helada y riego</td><td>Solo referencias (<code>parcela_id</code>). Abierta = <code>fin: null</code>. El riesgo se guarda al cerrar.</td></tr>
+      <tr><td><code>riegos</code></td><td>Eventos de riego</td><td>En mm y en litros.</td></tr>
+      <tr><td><code>eventos_climaticos</code></td><td>Polígonos de eventos</td><td>Colección común porque en series temporales el <code>2dsphere</code> solo acepta puntos (Q4).</td></tr>
+      <tr><td><code>observaciones_fenologicas</code></td><td>Observaciones manuales de etapa</td><td>Si hay observación, manda sobre la estimada.</td></tr>
+      <tr><td><code>variedades</code></td><td>Malbec con sus etapas BBCH</td><td>Etapas <em>embebidas</em>: se leen siempre juntas. Umbral de helada por etapa.</td></tr>
+      <tr><td><code>configuracion</code></td><td>Parámetros</td><td>Límite de temperatura sospechosa por departamento, noche extrema, umbrales.</td></tr>
+    </tbody></table></div>
+  <h3>Qué verificó el spike en MongoDB 9.0.2</h3>
+  <ul class="plain">
+    <li>En series temporales se puede borrar con cualquier filtro, pero solo se actualizan campos de <code>meta</code>. Una lectura mal cargada se borra y se vuelve a insertar.</li>
+    <li>No admiten validador, ni al crearlas ni con <code>collMod</code>. El mismo esquema sí sirve como filtro de búsqueda, y de ahí sale la auditoría.</li>
+    <li>El <code>2dsphere</code> solo acepta puntos. Por eso la ubicación vive en <code>nodos</code> y <code>parcelas</code>, no en cada lectura.</li>
+  </ul>
+  <p class="where">Detalle en <code>docs/spikes/</code>, <code>ADR-001</code>, <code>ADR-006</code> y <code>ADR-007</code>.</p>
+</section>
+
+<section id="consultas">
+  <h2>Consultas Q1 a Q10</h2>
+  <p class="intro">Todas están en Python con <code>pymongo</code> (ADR-014) y se pueden mostrar como <code>mongosh</code> con <code>--mongosh</code>. Una noche va de las 18:00 a las 12:00, hora de Argentina.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ID</th><th>Pregunta</th><th>Técnica</th><th>Archivo</th></tr></thead>
+    <tbody>
+      <tr><td>Q1</td><td>Horas bajo 0 °C por parcela en una noche</td><td><code>$group</code>, <code>$setWindowFields</code></td><td><code>q1_horas_bajo_cero.py</code></td></tr>
+      <tr><td>Q2</td><td>Parcelas con mínima bajo el umbral de su etapa</td><td><code>$lookup</code></td><td><code>q2_minima_bajo_umbral.py</code></td></tr>
+      <tr><td>Q3</td><td>Nodos más cercanos a un punto</td><td><code>$geoNear</code></td><td><code>q3_nodos_cercanos.py</code></td></tr>
+      <tr><td>Q4</td><td>Parcelas dentro del polígono de un evento climático</td><td><code>$geoIntersects</code></td><td><code>q4_parcelas_en_evento.py</code></td></tr>
+      <tr><td>Q5</td><td>Nodos sin reportar en los últimos 30 minutos</td><td><code>$group</code> + <code>$match</code></td><td><code>q5_nodos_sin_reportar.py</code></td></tr>
+      <tr><td>Q6</td><td>Humedad de suelo promedio por hora, últimas 24 h</td><td>agregación</td><td><code>q6_humedad_suelo_horaria.py</code></td></tr>
+      <tr><td>Q7</td><td>Litros regados por parcela y semana</td><td><code>$group</code></td><td><code>q7_litros_por_semana.py</code></td></tr>
+      <tr><td>Q8</td><td>Eventos de helada por departamento y semana</td><td><code>$group</code> + <code>$lookup</code></td><td><code>q8_heladas_por_departamento.py</code></td></tr>
+      <tr><td>Q9</td><td>Etapa fenológica estimada por grados-día</td><td><code>$setWindowFields</code> (suma acumulada)</td><td><code>q9_etapa_por_grados_dia.py</code></td></tr>
+      <tr><td>Q10</td><td>Índice de riesgo de helada por parcela y noche</td><td><code>$group</code> + <code>$lookup</code></td><td><code>q10_riesgo_de_helada.py</code></td></tr>
+    </tbody></table></div>
+  <h3>Las dos que más piden explicar</h3>
+  <ul class="plain">
+    <li><strong>Q9.</strong> Grados-día con base 10 °C, <code>(Tmáx + Tmín)/2</code>, tope de 32 °C, acumulados desde el 1/9. 260 grados-día de brotación a floración y 712 de floración a envero (Zapata 2017). Se promedian los 2 nodos de la parcela y se usan los días hasta el anterior.</li>
+    <li><strong>Q10.</strong> Nivel base por el margen entre la mínima del brote y el umbral: bajo si es mayor a 2 °C, medio de 0 a 2 °C, alto si es 0 °C o menos. Sube un nivel por 2 h o más cerca del umbral, por aire seco (menos de 60 %) o por suelo seco. No es un porcentaje de daño.</li>
+  </ul>
+  <p class="where">Explicación etapa por etapa y resultados reales: <code>docs/consultas.md</code>.</p>
+</section>
+
+<section id="indices">
+  <h2>Índices</h2>
+  <p class="intro">Se mide con el perfilador de MongoDB. La mejora se ve en documentos examinados, no en tiempo, porque la base es chica.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Índice</th><th>Colección</th><th>Para qué</th></tr></thead>
+    <tbody>
+      <tr><td><code>2dsphere</code></td><td><code>nodos</code>, <code>parcelas</code>, <code>eventos_climaticos</code></td><td>Q3 y Q4</td></tr>
+      <tr><td><code>{meta.nodo_id, ts}</code></td><td><code>lecturas</code></td><td>Q5: de 5.053 a 433 documentos examinados</td></tr>
+      <tr><td><code>{parcela_id, inicio}</code></td><td><code>riegos</code></td><td>Q7</td></tr>
+      <tr><td><code>{tipo, inicio}</code></td><td><code>alertas</code></td><td>Q8</td></tr>
+      <tr><td><code>{parcela_id, fecha}</code></td><td><code>observaciones_fenologicas</code></td><td>Q9</td></tr>
+    </tbody></table></div>
+  <p><code>lecturas</code> conserva el índice automático de la serie temporal sobre <code>meta</code> y <code>ts</code> (<code>meta_1_ts_1</code>), y se dejó. Todo en <code>docs/performance.md</code> y ADR-015.</p>
+  <div class="cmd"><div class="why"><span>Mostrar el plan de ejecución de una consulta en vivo</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>mongosh agrosense --eval "db.riegos.find({parcela_id:'P-SR-1'}).sort({inicio:1}).explain('executionStats').executionStats"</code></pre>
+  <div class="out">Mirá <code>totalDocsExamined</code> y la etapa <code>IXSCAN</code>. Ajustá el campo si te piden otra parcela.</div></div>
+</section>
+
+<section id="backup">
+  <h2>Backup y restauración</h2>
+  <ul class="plain">
+    <li><code>mongodump --archive --gzip</code> de la base <code>agrosense</code>: un archivo <code>.archive.gz</code> por backup, siempre fuera del repo.</li>
+    <li>Cada backup lleva un manifiesto con sha256 y un resumen de cada colección.</li>
+    <li>Política: 7 diarios y 4 semanales <span class="tag sup">supuesto adoptado</span>. El script rota solo.</li>
+    <li>Se restaura con <code>mongorestore</code> en una base aparte (<code>agrosense_restaurada</code>), así no se pisa la real.</li>
+    <li>Verificado: la serie temporal se restaura bien, con las mismas 727.980 lecturas.</li>
+  </ul>
+  <p class="where">Requiere MongoDB Database Tools (<code>winget install MongoDB.DatabaseTools</code>). Los scripts las encuentran solos o con <code>AGROSENSE_HERRAMIENTAS</code>. Ver ADR-016 y <code>docs/backup-restore.md</code>.</p>
+</section>
+
+<section id="demo">
+  <h2>Guion de la demo</h2>
+  <p class="intro">Un orden que va de lo que ve el usuario a lo que hay debajo. Los tiempos son una guía.</p>
+  <ol class="steps">
+    <li><div>
+      <h3>Abrí el dashboard <span class="time">1 min</span></h3>
+      <p>Mostrá que corre sin internet y que tiene la etiqueta "datos simulados".</p>
+      <div class="cmd"><div class="why"><span>Levantar la app</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m streamlit run dashboard/app.py</code></pre></div>
+    </div></li>
+    <li><div>
+      <h3>Resumen de la mañana <span class="time">3 min</span></h3>
+      <p>Elegí la fecha 5/10/2026 y la finca San Rafael. Mostrá la frase de estado y la tabla de la noche con la barra de tiempo de 18:00 a 12:00. La noche de helada va de 03:00 a 08:00 con una mínima de −6,3 °C en el sensor.</p>
+      <p class="where">Abrí "Ver consulta" para mostrar el pipeline real. Código: <code>dashboard/paginas/resumen.py</code>, <code>db/queries/resumen_manana.py</code>.</p>
+    </div></li>
+    <li><div>
+      <h3>Detalle de parcela <span class="time">2 min</span></h3>
+      <p>Temperatura del sensor contra la del brote y contra el umbral de la etapa. Explicá por qué el umbral cambia con la etapa BBCH.</p>
+    </div></li>
+    <li><div>
+      <h3>Alertas <span class="time">2 min</span></h3>
+      <p>Una alerta por evento, con inicio, fin y mínima. Mostrá una abierta (<code>fin: null</code>) y una cerrada con su riesgo.</p>
+    </div></li>
+    <li><div>
+      <h3>Estado de nodos <span class="time">1 min</span></h3>
+      <p>Nodo inactivo si no reporta hace más de 30 min (configurable). Es Q5.</p>
+    </div></li>
+    <li><div>
+      <h3>Bajá a la base <span class="time">3 min</span></h3>
+      <p>Mostrá un documento de <code>lecturas</code> en Compass (con su <code>meta</code>) y corré una consulta en la terminal con <code>--mongosh</code> para ver el pipeline.</p>
+      <div class="cmd"><div class="why"><span>La misma consulta, vista como mongosh</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code></pre></div>
+    </div></li>
+    <li><div>
+      <h3>Índices y backup <span class="time">3 min</span></h3>
+      <p>Mostrá <code>docs/performance.md</code> (Q5: 5.053 a 433) y corré la restauración comparando con la base real.</p>
+      <div class="cmd"><div class="why"><span>Restaurar y verificar</span><button class="btn copy" type="button">Copiar</button></div>
+<pre><code>python -m scripts.backup_restore.restaurar --comparar-con agrosense</code></pre></div>
+    </div></li>
+  </ol>
+</section>
+
+<section id="preguntas">
+  <h2>Preguntas probables</h2>
+  <div class="qhead">
+    <p class="intro" style="margin:0">Respondé con tus palabras; esto es el hilo.</p>
+    <button class="btn" id="toggle-q" type="button">Abrir todas</button>
+  </div>
+
+  <details><summary>¿Por qué <code>lecturas</code> es una serie temporal?</summary><div class="ans">
+    <p>Son 727.980 lecturas con marca de tiempo, una cada 5 minutos por nodo, que se insertan y se consultan por rango de fechas y por nodo. La serie temporal las agrupa en buckets y comprime. Se creó con <code>timeField: ts</code> y <code>metaField: meta</code>.</p>
+    <p>El costo: no admite validador y solo se actualiza <code>meta</code>. Lo verificamos en el spike del 14/10 y lo compensamos con validación en el simulador y una consulta de auditoría.</p>
+    <p class="where">ADR-001, ADR-007, <code>docs/spikes/spike-adr001-series-temporales.md</code></p></div></details>
+
+  <details><summary>¿Cómo validan las lecturas si no hay <code>$jsonSchema</code>?</summary><div class="ans">
+    <p>El simulador valida antes de insertar (<code>$documents</code> más <code>$jsonSchema</code>), y hay una consulta de auditoría con <code>$nor</code> + <code>$jsonSchema</code> que busca lecturas mal formadas o inesperadas. Dos ceros es lo esperado.</p>
+    <p class="where">ADR-007, ADR-008, ADR-009, <code>db/queries/auditoria_lecturas.py</code></p></div></details>
+
+  <details><summary>¿Por qué <code>eventos_climaticos</code> no es una serie temporal?</summary><div class="ans">
+    <p>Guarda polígonos y el índice <code>2dsphere</code> en series temporales solo acepta puntos. Es una colección común y Q4 usa <code>$geoIntersects</code> para ver qué parcelas caen dentro.</p></div></details>
+
+  <details><summary>¿Qué embebieron y qué referenciaron, y por qué?</summary><div class="ans">
+    <p>Embebido: las etapas BBCH dentro de <code>variedades</code>, porque siempre se leen junto con la variedad. Referenciado: <code>alertas</code> guarda solo <code>parcela_id</code> y el departamento se obtiene con <code>$lookup</code> alertas, parcelas, fincas (Q8), para no duplicar datos que podrían cambiar.</p>
+    <p><code>lecturas.meta</code> lleva <code>nodo_id</code>, <code>parcela_id</code> y <code>finca_id</code> para filtrar sin hacer joins sobre 727.980 documentos.</p>
+    <p class="where">ADR-003, ADR-006</p></div></details>
+
+  <details><summary>¿Cómo decide si hay helada?</summary><div class="ans">
+    <p>Compara la temperatura estimada en el brote (sensor menos 2 °C, supuesto configurable) con el umbral de la etapa fenológica. Para el Malbec va de −10,6 °C en yema dormida a 0 °C en floración y cuaje. La alerta se abre al superar el umbral y se cierra al recuperarse, con 1 hora de histéresis en el simulador, y guarda inicio, fin y mínima.</p>
+    <p>Los valores de IDR y DACC de −1,1 y −0,6 °C son de frutales y no se usan.</p>
+    <p class="where">ADR-005, ADR-013</p></div></details>
+
+  <details><summary>¿Cómo se estima la etapa fenológica?</summary><div class="ans">
+    <p>Por grados-día acumulados desde el 1/9 (Q9, base 10 °C, tope 32 °C) y se corrige con observaciones manuales. Si hay observación, manda la observación. Se guarda en escala BBCH, numérica, para poder consultar por rango. Baggiolini es solo una equivalencia en pantalla.</p>
+    <p class="where">ADR-004, ADR-010, <code>docs/simulador.md</code></p></div></details>
+
+  <details><summary>¿De dónde salen los datos?</summary><div class="ans">
+    <p>Nodos y lecturas son simulados y los documentos llevan <code>fuente</code>. Los parámetros agronómicos son <span class="tag fuente">con fuente</span> (umbrales, FAO-56, Zapata 2017) o <span class="tag sup">supuesto adoptado</span> (por ejemplo, el piso de −6,3 °C de la noche extrema y el suelo pedregoso), registrados en el ADR-012.</p>
+    <p class="where"><code>docs/investigacion/verificacion-fuentes.md</code></p></div></details>
+
+  <details><summary>¿Qué índices crearon y cómo demuestran que sirven?</summary><div class="ans">
+    <p>Tres <code>2dsphere</code> (Q3 y Q4) y cuatro de rendimiento (Q5, Q7, Q8 y Q9). Se midió cada una de las 10 consultas con el perfilador antes y después. El caso más claro es Q5: de 5.053 a 433 documentos examinados. La diferencia está en documentos examinados y no en milisegundos porque el volumen es chico.</p>
+    <p class="where">ADR-015, <code>docs/performance.md</code></p></div></details>
+
+  <details><summary>¿Cómo es la política de backup?</summary><div class="ans">
+    <p><code>mongodump --archive --gzip</code>, manifiesto con sha256, fuera del repo, 7 diarios y 4 semanales (supuesto adoptado). Se restaura en una base aparte y se compara con la real; la serie temporal vuelve con las mismas 727.980 lecturas.</p>
+    <p class="where">ADR-016, <code>docs/backup-restore.md</code></p></div></details>
+
+  <details><summary>¿Por qué las consultas están en Python y no en mongosh?</summary><div class="ans">
+    <p>Porque el dashboard las importa y las cachea; así hay una sola versión de cada consulta. Cada una puede imprimir su versión de <code>mongosh</code> con <code>--mongosh</code>, y el panel "Ver consulta" del dashboard la muestra.</p>
+    <p class="where">ADR-014</p></div></details>
+
+  <details><summary>¿Cómo detectan un nodo caído?</summary><div class="ans">
+    <p>Un nodo está inactivo si no tiene lecturas en un tiempo configurable, inicialmente 30 minutos. Q5 agrupa por nodo la última lectura y filtra con <code>$match</code>. El "ahora" es la fecha de referencia del selector de la barra lateral.</p></div></details>
+
+  <details><summary>¿Y la seguridad: usuarios y roles?</summary><div class="ans">
+    <p>El repo es público, así que no hay credenciales ni backups en él. Los roles y la autenticación (ADR-017) quedaron planteados: <code>admin</code> con <code>root</code>, <code>dashboard</code> con <code>read</code>, <code>simulador</code> con <code>readWrite</code> y <code>dbAdmin</code>, y <code>respaldo</code> con <code>backup</code> y <code>restore</code>. El ADR-017 está reservado.</p>
+    <p class="where">Antes de la defensa confirmá en el repo si esto ya se implementó o sigue pendiente, y decilo como está.</p></div></details>
+
+  <details><summary>¿Qué le falta o qué haría distinto?</summary><div class="ans">
+    <p>Los datos son simulados, así que no resuelve el problema real del viñatero. Quedaron afuera el pronóstico, la alerta temprana, el mapa base, la versión móvil y la simulación en vivo de la noche. Falta probar el dashboard en pantallas angostas y con el wifi apagado (probalo vos antes).</p></div></details>
+</section>
+
+<section id="fallas">
+  <h2>Si algo falla</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Síntoma</th><th>Qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>El dashboard no conecta o sale vacío</td><td>Revisá el servicio con <code>Get-Service *mongo*</code>. Si la base está vacía, <code>python -m db.seeds.cargar</code>, <code>python -m simulator.generar</code> y <code>python -m db.indexes.crear_indices</code>.</td></tr>
+      <tr><td>Q3 da error o no devuelve nada</td><td>Faltan los índices geoespaciales: <code>python -m db.indexes.crear_indices</code>.</td></tr>
+      <tr><td><code>mongodump</code> no se encuentra</td><td>Instalá las Database Tools con <code>winget install MongoDB.DatabaseTools</code> o definí <code>AGROSENSE_HERRAMIENTAS</code>.</td></tr>
+      <tr><td>El puerto 8501 está ocupado</td><td><code>python -m streamlit run dashboard/app.py --server.port 8502</code></td></tr>
+      <tr><td>Otra base en vez de la real</td><td>Revisá la variable <code>AGROSENSE_BD</code>; por defecto es <code>agrosense</code>.</td></tr>
+      <tr><td>No sabés una respuesta</td><td>Decí dónde está: el ADR o el doc de este mapa. Defender una decisión es poder mostrar de dónde sale.</td></tr>
+    </tbody></table></div>
+  <p class="muted">Cifras y comandos tomados de <code>CLAUDE.md</code> (estado al 21/10/2026). Si algo cambió después, ese archivo y el <code>CHANGELOG.md</code> mandan.</p>
+</section>
+
+<footer>agrosense · Diseño de Bases de Datos II · Universidad de Mendoza, 2026</footer>
+</main>
+</div>
+
+<script>
+(function () {
+  // copiar comandos
+  document.querySelectorAll('.cmd .copy').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var pre = b.closest('.cmd').querySelector('pre');
+      var text = pre.innerText.trim();
+      var done = function (ok) { b.textContent = ok ? 'Copiado' : 'Seleccioná y copiá'; setTimeout(function () { b.textContent = 'Copiar'; }, 1600); };
+      try {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { sel(pre); done(false); });
+      } catch (e) { sel(pre); done(false); }
+    });
+  });
+  function sel(el) { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+  // filtro de archivos
+  var f = document.getElementById('f-arch');
+  f.addEventListener('input', function () {
+    var q = f.value.toLowerCase();
+    document.querySelectorAll('#t-arch tbody tr').forEach(function (tr) { tr.hidden = q && tr.textContent.toLowerCase().indexOf(q) === -1; });
+  });
+
+  // abrir/cerrar preguntas
+  var tq = document.getElementById('toggle-q'), open = false;
+  tq.addEventListener('click', function () {
+    open = !open;
+    document.querySelectorAll('#preguntas details').forEach(function (d) { d.open = open; });
+    tq.textContent = open ? 'Cerrar todas' : 'Abrir todas';
+  });
+
+  // checklist recordada en este navegador
+  var boxes = document.querySelectorAll('#checklist input');
+  try {
+    var saved = JSON.parse(localStorage.getItem('agrosense-check') || '[]');
+    boxes.forEach(function (b, i) { b.checked = !!saved[i]; });
+  } catch (e) {}
+  boxes.forEach(function (b) {
+    b.addEventListener('change', function () {
+      try { localStorage.setItem('agrosense-check', JSON.stringify(Array.prototype.map.call(boxes, function (x) { return x.checked; }))); } catch (e) {}
+    });
+  });
+
+  // tema manual
+  document.getElementById('theme').addEventListener('click', function () {
+    var root = document.documentElement;
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : !window.matchMedia('(prefers-color-scheme: light)').matches;
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+  });
+
+  // sección activa en el índice
+  var links = {};
+  document.querySelectorAll('#toc a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) {
+          Object.keys(links).forEach(function (k) { links[k].classList.remove('on'); });
+          links[e.target.id].classList.add('on');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    Object.keys(links).forEach(function (k) { var s = document.getElementById(k); if (s) io.observe(s); });
+  }
+})();
+</script>

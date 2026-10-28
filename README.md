@@ -69,6 +69,7 @@ agrosense/
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo, procedimiento y prueba de restauración |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
+| [`docs/defensa/guia-defensa.html`](docs/defensa/guia-defensa.html) | Guía de defensa oral (se abre en el navegador): qué decir, dónde está cada cosa, comandos, guion de demo y preguntas probables |
 | [`docs/seed.md`](docs/seed.md) | Seed base: qué carga, cómo se usa y qué supuestos tiene |
 | [`docs/consultas.md`](docs/consultas.md) | Consultas Q1 a Q10: qué responden, cómo se calculan etapa por etapa y su resultado real |
 | [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-016 y ADR-018 a ADR-021) |
