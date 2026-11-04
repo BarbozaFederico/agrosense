@@ -271,7 +271,7 @@ python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code>
 <pre><code>python -m db.queries.auditoria_lecturas</code></pre></div>
 
   <h3>Índices y medición</h3>
-  <div class="cmd"><div class="why"><span>Medir las 10 consultas antes y después de los índices (usa <code>agrosense_tests</code>)</span><button class="btn copy" type="button">Copiar</button></div>
+  <div class="cmd"><div class="why"><span>Medir los documentos examinados con y sin cada índice, y ver los comandos de <code>mongosh</code> (usa <code>agrosense_tests</code>)</span><button class="btn copy" type="button">Copiar</button></div>
 <pre><code>python -m db.indexes.medir_indices</code></pre></div>
 
   <h3>Backup y restauración</h3>
@@ -358,13 +358,13 @@ python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code>
 
 <section id="indices">
   <h2>Índices</h2>
-  <p class="intro">Se mide con el perfilador de MongoDB. La mejora se ve en documentos examinados, no en tiempo, porque la base es chica.</p>
+  <p class="intro">Se mide con <code>explain("executionStats")</code>, campo <code>totalDocsExamined</code>. La mejora se ve en documentos examinados, no en tiempo, porque la base es chica.</p>
   <div class="tablewrap"><table>
     <thead><tr><th>Índice</th><th>Colección</th><th>Para qué</th></tr></thead>
     <tbody>
       <tr><td><code>2dsphere</code></td><td><code>nodos</code></td><td>Q3: sin él <code>$geoNear</code> falla (el único obligatorio)</td></tr>
       <tr><td><code>2dsphere</code></td><td><code>parcelas</code></td><td>Q4: anda igual sin él; se deja como par geoespacial de Q3</td></tr>
-      <tr><td><code>{meta.nodo_id, ts}</code></td><td><code>lecturas</code></td><td>Q5: de 5.053 a 433 documentos examinados</td></tr>
+      <tr><td><code>{meta.nodo_id, ts}</code></td><td><code>lecturas</code></td><td>Q5: de 365 a 32 documentos examinados</td></tr>
       <tr><td><code>{parcela_id, inicio}</code></td><td><code>riegos</code></td><td>Q7: de 563 a 33 documentos examinados</td></tr>
     </tbody></table></div>
   <p><code>lecturas</code> conserva el índice automático de la serie temporal sobre <code>meta</code> y <code>ts</code> (<code>meta_1_ts_1</code>), y se dejó. También se midieron y se <strong>descartaron</strong> tres índices más (<code>alertas</code>, <code>observaciones_fenologicas</code> y un <code>2dsphere</code> en <code>eventos_climaticos</code>) porque no justificaban su costo. Todo en <code>docs/performance.md</code>, ADR-015 y ADR-022.</p>
@@ -420,7 +420,7 @@ python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code>
     </div></li>
     <li><div>
       <h3>Índices y backup <span class="time">3 min</span></h3>
-      <p>Mostrá <code>docs/performance.md</code> (Q5: 5.053 a 433) y corré la restauración comparando con la base real.</p>
+      <p>Mostrá <code>docs/performance.md</code> (Q5: 365 a 32) y corré la restauración comparando con la base real.</p>
       <div class="cmd"><div class="why"><span>Restaurar y verificar</span><button class="btn copy" type="button">Copiar</button></div>
 <pre><code>python -m scripts.backup_restore.restaurar --comparar-con agrosense</code></pre></div>
     </div></li>
@@ -465,11 +465,11 @@ python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code>
     <p class="where"><code>docs/investigacion/verificacion-fuentes.md</code></p></div></details>
 
   <details><summary>¿Qué índices crearon y cómo demuestran que sirven?</summary><div class="ans">
-    <p>Cuatro: dos <code>2dsphere</code> (<code>nodos</code> para Q3, que sin él falla, y <code>parcelas</code> para Q4) y dos de rendimiento (<code>lecturas</code> para Q5 y <code>riegos</code> para Q7). Se midió cada una de las 10 consultas con el perfilador antes y después. El caso más claro es Q5: de 5.053 a 433 documentos examinados. La diferencia está en documentos examinados y no en milisegundos porque el volumen es chico.</p>
+    <p>Cuatro: dos <code>2dsphere</code> (<code>nodos</code> para Q3, que sin él falla, y <code>parcelas</code> para Q4) y dos de rendimiento (<code>lecturas</code> para Q5 y <code>riegos</code> para Q7). Se midieron los documentos examinados con y sin cada índice (<code>explain</code>). El caso más claro es Q5: de 365 a 32 documentos examinados. La diferencia está en documentos examinados y no en milisegundos porque el volumen es chico.</p>
     <p class="where">ADR-015 y ADR-022, <code>docs/performance.md</code></p></div></details>
   <details><summary>¿Por qué no indexaron <code>alertas</code> u <code>observaciones_fenologicas</code>?</summary><div class="ans">
-    <p>Los creamos y los medimos: <code>alertas</code> tiene 35 documentos y <code>tipo</code> solo 2 valores (Q8 pasa de 57 a 32 documentos y el tiempo no cambia), y el de <code>observaciones_fenologicas</code> ahorra un 22 % de documentos en Q9 sin cambiar el tiempo. No justificaban su costo ni la complejidad de explicarlos, así que los descartamos y dejamos la medición como evidencia. Si esas colecciones crecieran mucho, se vuelve a medir con <code>medir_indices.py</code>.</p>
-    <p class="where">ADR-022, <code>docs/performance.md</code></p></div></details>
+    <p>Los creamos y los medimos: <code>alertas</code> tiene 35 documentos y <code>tipo</code> solo 2 valores (Q8 pasa de 57 a 32 documentos y el tiempo no cambia), y el de <code>observaciones_fenologicas</code> ahorra un 22 % de documentos en Q9 sin cambiar el tiempo. No justificaban su costo ni la complejidad de explicarlos, así que los descartamos (la medición está en el ADR-022). Si esas colecciones crecieran mucho, se vuelve a medir.</p>
+    <p class="where">ADR-022</p></div></details>
 
   <details><summary>¿Cómo es la política de backup?</summary><div class="ans">
     <p><code>mongodump --archive --gzip</code>, manifiesto con sha256, fuera del repo, 7 diarios y 4 semanales (supuesto adoptado). Se restaura en una base aparte y se compara con la real; la serie temporal vuelve con las mismas 727.980 lecturas.</p>
