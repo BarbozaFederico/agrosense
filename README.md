@@ -65,7 +65,7 @@ agrosense/
 | [`docs/esquemas-validacion.md`](docs/esquemas-validacion.md) | Esquemas `$jsonSchema`: cómo se crean, se prueban y se auditan |
 | [`docs/simulador.md`](docs/simulador.md) | Simulador: qué genera, parámetros, calendario de heladas y pruebas |
 | [`docs/ux/pantallas.md`](docs/ux/pantallas.md) | Pantallas y comportamiento del dashboard |
-| [`docs/performance.md`](docs/performance.md) | Índices: los 4 que se mantienen, los 3 descartados con su evidencia, mediciones antes y después de las 10 consultas, costo y experimentos |
+| [`docs/performance.md`](docs/performance.md) | Índices: los 4 que se mantienen, con una tabla de documentos examinados con y sin cada uno y los comandos de `mongosh` para repetirla |
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo, procedimiento y prueba de restauración |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
@@ -98,7 +98,7 @@ python -m db.schemas.crear_colecciones   # crea las 10 colecciones con sus valid
 python -m db.seeds.cargar                # fincas, parcelas, nodos, variedad y configuración
 python -m simulator.generar              # la temporada simulada (~25 s) y su auditoría
 python -m db.indexes.crear_indices       # 4 índices: 2 geoespaciales (Q3 no funciona sin el de nodos) y 2 de rendimiento
-python -m db.indexes.medir_indices       # opcional: mediciones antes y después y de los candidatos descartados (usa agrosense_tests)
+python -m db.indexes.medir_indices       # opcional: documentos examinados con y sin cada índice (usa agrosense_tests)
 ```
 
 Consultas (cada una acepta `--help` y `--mongosh`, que muestra la misma consulta para `mongosh`):
