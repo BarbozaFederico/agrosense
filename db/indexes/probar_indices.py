@@ -15,16 +15,20 @@ import json
 import sys
 
 from bson import json_util
+from pymongo.errors import OperationFailure
 
 from db.conexion import obtener_base, preparar_consola
 from db.indexes import medicion
 from db.indexes.crear_indices import (
+    INDICES_DESCARTADOS,
     INDICES_GEOESPACIALES,
     INDICES_RENDIMIENTO,
     crear_indices,
     crear_indices_rendimiento,
+    nombre_de_indice,
+    quitar_indices_descartados,
 )
-from db.indexes.medir_indices import INDICE_AUTOMATICO, BASE_DE_PRUEBA, funciones, nombre_de_indice, quitar_indices
+from db.indexes.medir_indices import INDICE_AUTOMATICO, BASE_DE_PRUEBA, funciones, quitar_indices
 from db.schemas.probar_esquemas import Resumen
 
 
@@ -51,10 +55,18 @@ def main() -> None:
     print(f"Base de prueba: {bd.name} (los índices se borran y se crean acá; la base real no se toca)")
     fns = funciones(bd)
 
-    print("--- Sin índices de rendimiento: resultados y mediciones de referencia")
+    print("--- Sin índices: resultados y mediciones de referencia")
     quitar_indices(bd)
-    sin_indices = {i: normalizar(fns[i]()) for i in ("Q2", "Q5", "Q7", "Q8", "Q9", "Q10")}
-    antes = {i: medicion.perfilar(bd, fns[i]) for i in ("Q5", "Q7", "Q8", "Q9")}
+    try:
+        fns["Q3"]()
+        q3_falla = False
+    except OperationFailure:
+        q3_falla = True
+    r.chequear(
+        q3_falla, "antes | Q3 FALLA sin el índice 2dsphere de nodos ($geoNear lo exige: es el único obligatorio)"
+    )
+    sin_indices = {i: normalizar(fns[i]()) for i in ("Q2", "Q4", "Q5", "Q7", "Q8", "Q9", "Q10")}
+    antes = {i: medicion.perfilar(bd, fns[i]) for i in ("Q5", "Q7")}
     r.chequear(
         antes["Q7"]["docs"] >= 500 and "COLLSCAN" in antes["Q7"]["planes"][0],
         f"antes | Q7 lee la colección entera: {antes['Q7']['docs']} documentos, plan {antes['Q7']['planes']}",
@@ -78,33 +90,39 @@ def main() -> None:
     )
 
     print("--- MongoDB los usa")
-    planes = {
-        "riegos": bd.riegos.find({"parcela_id": "P-SR-1"}).explain()["queryPlanner"]["winningPlan"],
-        "alertas": bd.alertas.find({"tipo": "helada"}).explain()["queryPlanner"]["winningPlan"],
-        "observaciones_fenologicas": bd.observaciones_fenologicas.find({"parcela_id": "P-SR-1"})
-        .sort("fecha", -1)
-        .limit(1)
-        .explain()["queryPlanner"]["winningPlan"],
-    }
+    plan_riegos = bd.riegos.find({"parcela_id": "P-SR-1"}).explain()["queryPlanner"]["winningPlan"]
     for coleccion, claves, consulta in INDICES_RENDIMIENTO[1:]:
         r.chequear(
-            usa_indice(planes[coleccion], nombre_de_indice(claves)),
+            usa_indice(plan_riegos, nombre_de_indice(claves)),
             f"plan | {consulta}: la búsqueda en {coleccion} usa el índice {nombre_de_indice(claves)} (IXSCAN)",
         )
 
     print("--- Mejoran lo que dicen mejorar")
-    despues = {i: medicion.perfilar(bd, fns[i]) for i in ("Q5", "Q7", "Q8", "Q9")}
+    despues = {i: medicion.perfilar(bd, fns[i]) for i in ("Q5", "Q7")}
     for i, minimo in (("Q5", 5), ("Q7", 5)):
         r.chequear(
             despues[i]["docs"] * minimo <= antes[i]["docs"] and despues[i]["claves"] > 0,
             f"mejora | {i}: documentos examinados {antes[i]['docs']} → {despues[i]['docs']} "
             f"(al menos {minimo} veces menos), claves {antes[i]['claves']} → {despues[i]['claves']}",
         )
-    for i in ("Q8", "Q9"):
-        r.chequear(
-            despues[i]["docs"] < antes[i]["docs"],
-            f"mejora | {i}: documentos examinados {antes[i]['docs']} → {despues[i]['docs']}",
-        )
+    r.chequear(len(fns["Q3"]()) > 0, "mejora | Q3 funciona con el índice de nodos")
+
+    print("--- Los índices descartados no se crean (ADR-022)")
+    colecciones = {c for c, *_ in INDICES_DESCARTADOS}
+    nombres_descartados = {(c, nombre_de_indice(k)) for c, k, _ in INDICES_DESCARTADOS}
+    existentes = {(c, i["name"]) for c in colecciones for i in bd[c].list_indexes()}
+    r.chequear(
+        not (nombres_descartados & existentes),
+        f"descartados | crear los índices no crea ninguno de los {len(nombres_descartados)} descartados",
+    )
+    for coleccion, claves, _ in INDICES_DESCARTADOS:
+        bd[coleccion].create_index(claves)
+    borrados = quitar_indices_descartados(bd)
+    existentes = {(c, i["name"]) for c in colecciones for i in bd[c].list_indexes()}
+    r.chequear(
+        len(borrados) == len(nombres_descartados) and not (nombres_descartados & existentes),
+        f"descartados | si una base los tiene (hecha antes del ADR-022), se borran: {', '.join(borrados)}",
+    )
 
     print("--- No cambian ninguna respuesta")
     for i, texto in sin_indices.items():
@@ -112,9 +130,7 @@ def main() -> None:
 
     print("--- Costo")
     tamanos = {
-        nombre: tam
-        for c in ("lecturas", "riegos", "alertas", "observaciones_fenologicas")
-        for nombre, tam in medicion.tamanos_de_indices(bd, c).items()
+        nombre: tam for c in ("lecturas", "riegos") for nombre, tam in medicion.tamanos_de_indices(bd, c).items()
     }
     r.chequear(
         all(tamanos[nombre_de_indice(claves)] > 0 for _, claves, _ in INDICES_RENDIMIENTO),

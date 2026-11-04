@@ -65,14 +65,14 @@ agrosense/
 | [`docs/esquemas-validacion.md`](docs/esquemas-validacion.md) | Esquemas `$jsonSchema`: cómo se crean, se prueban y se auditan |
 | [`docs/simulador.md`](docs/simulador.md) | Simulador: qué genera, parámetros, calendario de heladas y pruebas |
 | [`docs/ux/pantallas.md`](docs/ux/pantallas.md) | Pantallas y comportamiento del dashboard |
-| [`docs/performance.md`](docs/performance.md) | Índices: mediciones antes y después de las 10 consultas, costo y experimentos |
+| [`docs/performance.md`](docs/performance.md) | Índices: los 4 que se mantienen, los 3 descartados con su evidencia, mediciones antes y después de las 10 consultas, costo y experimentos |
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo, procedimiento y prueba de restauración |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
 | [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
 | [`docs/defensa/guia-defensa.html`](docs/defensa/guia-defensa.html) | Guía de defensa oral (se abre en el navegador): qué decir, dónde está cada cosa, comandos, guion de demo y preguntas probables |
 | [`docs/seed.md`](docs/seed.md) | Seed base: qué carga, cómo se usa y qué supuestos tiene |
 | [`docs/consultas.md`](docs/consultas.md) | Consultas Q1 a Q10: qué responden, cómo se calculan etapa por etapa y su resultado real |
-| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-016 y ADR-018 a ADR-021) |
+| [`docs/decisions/`](docs/decisions/) | Decisiones de diseño (ADR-001 a ADR-016 y ADR-018 a ADR-022) |
 | [`docs/investigacion/`](docs/investigacion/) | Investigación de contexto y fuentes de datos |
 
 ## Hoja de ruta
@@ -97,8 +97,8 @@ source .venv/Scripts/activate            # Git Bash en Windows (en Linux y macOS
 python -m db.schemas.crear_colecciones   # crea las 10 colecciones con sus validadores
 python -m db.seeds.cargar                # fincas, parcelas, nodos, variedad y configuración
 python -m simulator.generar              # la temporada simulada (~25 s) y su auditoría
-python -m db.indexes.crear_indices       # 3 índices geoespaciales (Q3 no funciona sin ellos) y 4 de rendimiento
-python -m db.indexes.medir_indices       # opcional: mediciones antes y después (usa agrosense_tests)
+python -m db.indexes.crear_indices       # 4 índices: 2 geoespaciales (Q3 no funciona sin el de nodos) y 2 de rendimiento
+python -m db.indexes.medir_indices       # opcional: mediciones antes y después y de los candidatos descartados (usa agrosense_tests)
 ```
 
 Consultas (cada una acepta `--help` y `--mongosh`, que muestra la misma consulta para `mongosh`):
@@ -126,7 +126,7 @@ Pruebas (usan la base `agrosense_tests`, no tocan `agrosense`):
 python -m db.schemas.probar_esquemas     # 62 casos de los esquemas
 python -m simulator.probar_simulador     # 51 casos del simulador (~1 min)
 python -m db.queries.probar_consultas    # 43 casos de las consultas contra cálculos independientes (~30 s)
-python -m db.indexes.probar_indices      # 19 casos: los índices existen, se usan y no cambian ninguna respuesta
+python -m db.indexes.probar_indices      # 20 casos: los índices existen, se usan y no cambian ninguna respuesta
 python -m scripts.backup_restore.probar_respaldo        # 19 casos: backup, rotación, restauración y protecciones (unos segundos)
 python -m dashboard.probar_datos         # 37 casos de los datos y del mapa de "Resumen de la mañana" (unos segundos)
 python -m dashboard.probar_detalle       # 53 casos de "Detalle de parcela": datos, textos, gráficos y consultas de apoyo

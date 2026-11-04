@@ -1,6 +1,6 @@
 # ADR-015: Índices de rendimiento y cómo se miden
 
-**Estado:** Aceptado (20/10/2026). Completa [ADR-014](ADR-014-consultas-en-python.md) (índices geoespaciales). Resultados en [`performance.md`](../performance.md). Requisito RNF-01.
+**Estado:** Aceptado (20/10/2026). **La decisión 2 (qué índices se crean) fue reemplazada por [ADR-022](ADR-022-simplificar-indices.md) (4/11/2026): de los 4 índices de rendimiento solo se mantienen `lecturas` y `riegos`; `alertas` y `observaciones_fenologicas` se descartaron.** El resto (qué se mide y cómo, el perfilador, `agrosense_tests`, el índice automático) sigue vigente. Completa [ADR-014](ADR-014-consultas-en-python.md) (índices geoespaciales). Resultados en [`performance.md`](../performance.md). Requisito RNF-01.
 
 ## Contexto
 

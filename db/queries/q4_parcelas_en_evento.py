@@ -1,6 +1,6 @@
 """Q4 - ¿Qué parcelas quedan dentro del polígono de un evento climático?
 
-Requisito: RF-07 y RF-08.   Técnica: $geoIntersects (índice 2dsphere en parcelas.geometria).
+Requisito: RF-07 y RF-08.   Técnica: $geoIntersects (con el índice 2dsphere de parcelas.geometria; funciona igual sin él, ADR-022).
 
 Primero se lee el evento (su polígono, en `eventos_climaticos.area`) y después se buscan las parcelas
 cuyo polígono se cruza con el del evento. "Dentro" se interpreta como "toca o está dentro": una

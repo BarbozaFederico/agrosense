@@ -229,18 +229,15 @@ Un archivo por colección en `db/schemas/` con su `$jsonSchema` (`validationActi
 
 ## 8. Índices (creados y medidos)
 
-Todos se crean con `python -m db.indexes.crear_indices` ([ADR-014](decisions/ADR-014-consultas-en-python.md) y [ADR-015](decisions/ADR-015-indices-de-rendimiento.md)). Cada uno tiene una medición antes y después en [`performance.md`](performance.md); la propuesta inicial se corrigió con esas mediciones (`alertas` ahora es `{ tipo, inicio }` y se agregó el de `lecturas` para Q5).
+Son 4 y se crean con `python -m db.indexes.crear_indices` ([ADR-014](decisions/ADR-014-consultas-en-python.md), [ADR-015](decisions/ADR-015-indices-de-rendimiento.md) y [ADR-022](decisions/ADR-022-simplificar-indices.md)). Cada uno tiene una medición antes y después en [`performance.md`](performance.md). La propuesta inicial tenía más (`alertas`, `observaciones_fenologicas` y un `2dsphere` en `eventos_climaticos`); se midieron y se descartaron porque no justificaban su costo.
 
 | Colección | Índice | Consulta que lo justifica | Documentos examinados |
 |---|---|---|---|
 | `lecturas` | `{ meta: 1, ts: 1 }` (lo crea MongoDB solo) | Ninguna lo usa; se deja (experimento en `performance.md`) | - |
 | `lecturas` | `{ "meta.nodo_id": 1, ts: -1 }` | Q5 | 5.053 → 433 |
-| `nodos` | `{ ubicacion: "2dsphere" }` | Q3 (sin él falla) | falla → 12 |
-| `parcelas` | `{ geometria: "2dsphere" }` | Q4 | 9 → 5 |
-| `eventos_climaticos` | `{ area: "2dsphere" }` | Q4 | - |
-| `alertas` | `{ tipo: 1, inicio: 1 }` | Q8 | 57 → 32 |
+| `nodos` | `{ ubicacion: "2dsphere" }` | Q3 (sin él falla: es el único obligatorio) | falla → 12 |
+| `parcelas` | `{ geometria: "2dsphere" }` | Q4 (anda igual sin él; se deja como par de Q3) | 9 → 5 |
 | `riegos` | `{ parcela_id: 1, inicio: 1 }` | Q7 | 563 → 33 |
-| `observaciones_fenologicas` | `{ parcela_id: 1, fecha: -1 }` | Q9 (y Q2 y Q10, que la llaman) | 1.092 → 846 |
 
 ## 9. Ejemplos de documentos
 

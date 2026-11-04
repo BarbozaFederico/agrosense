@@ -1,6 +1,6 @@
 # ADR-014: Consultas Q1 a Q10 en Python y reglas comunes
 
-**Estado:** Aceptado (20/10/2026). Reemplaza la frase de [ADR-008](ADR-008-esquemas-en-python.md) "Las consultas Q1 a Q10 siguen en `mongosh`". Detalle de cada consulta en [`consultas.md`](../consultas.md).
+**Estado:** Aceptado (20/10/2026). La decisión 11 (índices) se ajustó por [ADR-022](ADR-022-simplificar-indices.md): el `2dsphere` de `eventos_climaticos` se descartó porque ninguna consulta lo usa. Reemplaza la frase de [ADR-008](ADR-008-esquemas-en-python.md) "Las consultas Q1 a Q10 siguen en `mongosh`". Detalle de cada consulta en [`consultas.md`](../consultas.md).
 
 ## Contexto
 

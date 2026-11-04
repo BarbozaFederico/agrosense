@@ -8,14 +8,16 @@ Usa la base de PRUEBA `agrosense_tests` (si está vacía, carga el seed y la tem
 real `agrosense`: este script BORRA y CREA índices, y no corresponde hacerlo sobre la base real.
 
 Qué hace, en este orden:
-    1. Borra los índices de este proyecto (los geoespaciales y los de rendimiento).
+    1. Borra los índices de este proyecto (los 4 elegidos y los 3 descartados).
     2. ANTES: mide las 10 consultas.
-    3. Crea los índices (db/indexes/crear_indices.py).
+    3. Crea los 4 índices elegidos (db/indexes/crear_indices.py).
     4. DESPUÉS: vuelve a medir las 10 consultas.
-    5. Experimento: borra el índice automático de `lecturas` (meta_1_ts_1), mide Q1, Q5, Q6 y Q9 sin él y lo
+    5. Candidatos descartados (ADR-022): crea cada uno por separado, mide las consultas que podría mejorar y lo
+       borra. Sirve de evidencia de por qué no se crean.
+    6. Experimento: borra el índice automático de `lecturas` (meta_1_ts_1), mide Q1, Q5, Q6 y Q9 sin él y lo
        vuelve a crear. En la base real ese índice nunca se borra.
-    6. Mide cuánto ocupa cada índice.
-Imprime las tablas en Markdown, listas para docs/performance.md. Al terminar deja los índices creados.
+    7. Mide cuánto ocupa cada índice.
+Imprime las tablas en Markdown, listas para docs/performance.md. Al terminar deja los 4 índices elegidos.
 """
 
 import argparse
@@ -30,10 +32,12 @@ from pymongo import ASCENDING, DESCENDING
 from db.conexion import obtener_base, preparar_consola
 from db.indexes import medicion
 from db.indexes.crear_indices import (
+    INDICES_DESCARTADOS,
     INDICES_GEOESPACIALES,
     INDICES_RENDIMIENTO,
     crear_indices,
     crear_indices_rendimiento,
+    nombre_de_indice,
 )
 from db.queries import (
     comun,
@@ -56,15 +60,15 @@ FECHA = date(2026, 10, 5)
 # id, qué mide, colección del índice que le sirve (o "-" si no necesita uno nuevo)
 CONSULTAS = [
     ("Q1", "horas bajo cero de una noche", "-"),
-    ("Q2", "parcelas bajo el umbral", "observaciones (por Q9)"),
+    ("Q2", "parcelas bajo el umbral", "-"),
     ("Q3", "nodos más cercanos", "nodos 2dsphere"),
-    ("Q4", "parcelas dentro de un evento", "parcelas 2dsphere"),
+    ("Q4", "parcelas dentro de un evento", "parcelas 2dsphere (opcional)"),
     ("Q5", "nodos sin reportar", "lecturas"),
     ("Q6", "humedad de suelo por hora", "-"),
     ("Q7", "litros por parcela y semana", "riegos"),
-    ("Q8", "heladas por departamento", "alertas"),
-    ("Q9", "etapa por grados-día", "observaciones"),
-    ("Q10", "índice de riesgo de helada", "observaciones (por Q9)"),
+    ("Q8", "heladas por departamento", "-"),
+    ("Q9", "etapa por grados-día", "-"),
+    ("Q10", "índice de riesgo de helada", "-"),
 ]
 
 
@@ -84,30 +88,40 @@ def funciones(bd) -> dict:
     }
 
 
-def nombre_de_indice(claves) -> str:
-    """El nombre que MongoDB le da a un índice: campo_orden por cada clave."""
-    return "_".join(f"{campo}_{orden}" for campo, orden in claves)
-
-
 def quitar_indices(bd) -> None:
-    """Borra los índices de este proyecto (no toca el automático de las series temporales)."""
-    existentes = {
-        coleccion: {i["name"] for i in bd[coleccion].list_indexes()}
-        for coleccion in {c for c, *_ in INDICES_GEOESPACIALES + INDICES_RENDIMIENTO}
-    }
-    for coleccion, campo in INDICES_GEOESPACIALES:
-        nombre = f"{campo}_2dsphere"
-        if nombre in existentes[coleccion]:
-            bd[coleccion].drop_index(nombre)
-    for coleccion, claves, _ in INDICES_RENDIMIENTO:
-        nombre = nombre_de_indice(claves)
-        if nombre in existentes[coleccion]:
+    """Borra los índices de este proyecto, elegidos y descartados (no toca el automático de las series temporales)."""
+    todos = (
+        [(c, f"{campo}_2dsphere") for c, campo in INDICES_GEOESPACIALES]
+        + [(c, nombre_de_indice(claves)) for c, claves, _ in INDICES_RENDIMIENTO]
+        + [(c, nombre_de_indice(claves)) for c, claves, _ in INDICES_DESCARTADOS]
+    )
+    for coleccion, nombre in todos:
+        if nombre in {i["name"] for i in bd[coleccion].list_indexes()}:
             bd[coleccion].drop_index(nombre)
 
 
 def medir_todas(bd, ids: list[str] | None, corridas: int) -> dict:
     fns = funciones(bd)
     return {i: medicion.medir(bd, fns[i], corridas) for i in (ids or list(fns))}
+
+
+def medir_descartados(bd, corridas: int) -> list[dict]:
+    """Por cada candidato descartado: lo crea, mide las consultas que podría mejorar y lo borra."""
+    filas = []
+    for coleccion, claves, ids in INDICES_DESCARTADOS:
+        nombre = bd[coleccion].create_index(claves)
+        try:
+            filas.append(
+                {
+                    "coleccion": coleccion,
+                    "nombre": nombre,
+                    "con": medir_todas(bd, ids, corridas),
+                    "tamano": medicion.tamanos_de_indices(bd, coleccion)[nombre],
+                }
+            )
+        finally:
+            bd[coleccion].drop_index(nombre)
+    return filas
 
 
 # --------------------------------------------------------------------------- tablas
@@ -146,6 +160,23 @@ def tabla_resultados(antes: dict, despues: dict) -> str:
         plan = _plan(a) if _plan(a) == _plan(d) else f"{_plan(a)} → {_plan(d)}"
         filas.append(f"| {i} | {que} | {indice} | {docs} | {claves} | {ms} | {plan} |")
     return "\n".join(filas)
+
+
+def tabla_descartados(base: dict, filas: list[dict]) -> str:
+    """Cada candidato descartado: la consulta que podría mejorar, sin él (con los 4 elegidos) y con él."""
+    cabecera = [
+        "| Candidato | Consulta | Documentos examinados sin / con | Tiempo (ms) sin / con | Tamaño |",
+        "|---|---|---|---|---|",
+    ]
+    entero = lambda v: f"{v:,}".replace(",", ".")
+    for fila in filas:
+        for i, con in fila["con"].items():
+            sin = base[i]
+            cabecera.append(
+                f"| {fila['coleccion']} `{fila['nombre']}` | {i} | {entero(sin['docs'])} / {entero(con['docs'])} "
+                f"| {sin['ms']:.1f} / {con['ms']:.1f} | {fila['tamano'] / 1024:.1f} KB |"
+            )
+    return "\n".join(cabecera)
 
 
 def tabla_experimento(con: dict, sin: dict) -> str:
@@ -207,6 +238,9 @@ def main() -> None:
     despues = medir_todas(bd, None, a.corridas)
     print("### Antes y después de crear los índices\n")
     print(tabla_resultados(antes, despues))
+
+    print("\n### Candidatos descartados: qué aportarían (ADR-022)\n")
+    print(tabla_descartados(despues, medir_descartados(bd, a.corridas)))
 
     ids_lecturas = ["Q1", "Q5", "Q6", "Q9"]
     con = {i: despues[i] for i in ids_lecturas}

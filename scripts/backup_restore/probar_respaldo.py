@@ -155,8 +155,8 @@ def main() -> None:
         )
         indices_restaurados = {nombre for c in restauradas.values() for nombre in c["indices"]}
         r.chequear(
-            len(indices) == 7 and set(indices) <= indices_restaurados and "meta_1_ts_1" in indices_restaurados,
-            f"restaurar | volvieron los {len(indices)} índices del proyecto (3 2dsphere y 4 de rendimiento) "
+            len(indices) == 4 and set(indices) <= indices_restaurados and "meta_1_ts_1" in indices_restaurados,
+            f"restaurar | volvieron los {len(indices)} índices del proyecto (2 2dsphere y 2 de rendimiento) "
             "y el automático de la serie temporal",
         )
         comparacion = comparar_consultas(bd, cliente[COPIA])
