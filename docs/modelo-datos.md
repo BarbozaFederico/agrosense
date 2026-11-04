@@ -233,7 +233,7 @@ Son 4 y se crean con `python -m db.indexes.crear_indices` ([ADR-014](decisions/A
 
 | Colección | Índice | Consulta que lo justifica | Documentos examinados |
 |---|---|---|---|
-| `lecturas` | `{ meta: 1, ts: 1 }` (lo crea MongoDB solo) | Ninguna lo usa; se deja (experimento en `performance.md`) | - |
+| `lecturas` | `{ meta: 1, ts: 1 }` (lo crea MongoDB solo) | Ninguna consulta de este proyecto lo usa; se deja porque lo crea MongoDB (ADR-015) | - |
 | `lecturas` | `{ "meta.nodo_id": 1, ts: -1 }` | Q5 | 5.053 → 433 |
 | `nodos` | `{ ubicacion: "2dsphere" }` | Q3 (sin él falla: es el único obligatorio) | falla → 12 |
 | `parcelas` | `{ geometria: "2dsphere" }` | Q4 (anda igual sin él; se deja como par de Q3) | 9 → 5 |

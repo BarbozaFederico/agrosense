@@ -180,7 +180,7 @@ Las alertas guardan solo la parcela (ADR-003); el departamento sale de dos `$loo
 | Q5 | `lecturas {meta.nodo_id, ts}` | 5.053 → 433 |
 | Q7 | `riegos {parcela_id, inicio}` | 563 → 33 |
 
-Se crean con `python -m db.indexes.crear_indices`. Mediciones completas, costo en espacio y experimentos en [`performance.md`](performance.md), [ADR-015](decisions/ADR-015-indices-de-rendimiento.md) y [ADR-022](decisions/ADR-022-simplificar-indices.md).
+Se crean con `python -m db.indexes.crear_indices`. Medición con y sin cada índice en [`performance.md`](performance.md), [ADR-015](decisions/ADR-015-indices-de-rendimiento.md) y [ADR-022](decisions/ADR-022-simplificar-indices.md).
 
 ## Cómo se probó
 
