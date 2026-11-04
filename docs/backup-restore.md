@@ -110,7 +110,7 @@ RESULTADO: la base restaurada coincide con el manifiesto y con agrosense en Q1, 
 | Rotación | Con 52 copias inventadas (1/9 al 21/10) se conservan 10: los días 15 a 21/10 y los domingos 11/10, 4/10 y 27/9; entre dos copias del mismo día queda la más nueva; con pocas copias no se borra nada. Resultados esperados escritos a mano |
 | Ubicación y herramientas | Se niega a guardar dentro del repo; encuentra `mongodump` y `mongorestore` |
 | Backup real | Archivo y manifiesto; el manifiesto coincide con la base (10 colecciones, 727.980 lecturas en una serie temporal); la huella coincide |
-| Restauración | Coincide con el manifiesto; `lecturas` vuelve como serie temporal; vuelven los 7 índices del proyecto y el automático; Q1, Q5, Q9 y Q10 iguales |
+| Restauración | Coincide con el manifiesto; `lecturas` vuelve como serie temporal; vuelven los 4 índices del proyecto y el automático; Q1, Q5, Q9 y Q10 iguales |
 | Protecciones | No pisa una base existente ni la original sin `--reemplazar` (y sus datos siguen intactos); un archivo con un byte cambiado se detecta y no se restaura nada |
 | Desastre | Se borra `riegos` y se vacía `alertas` en la copia, la comparación lo detecta, y con `--reemplazar` vuelven 563 riegos y 35 alertas |
 | Rotación real | De 10 archivos reales se borran los 3 más viejos con sus manifiestos |

@@ -175,13 +175,12 @@ Las alertas guardan solo la parcela (ADR-003); el departamento sale de dos `$loo
 | Consulta | Índice | Mejora |
 |---|---|---|
 | Q1, Q6 | Ninguno propio: la serie temporal se lee por tiempo (CLUSTERED_IXSCAN) | - |
-| Q2, Q9, Q10 | `observaciones_fenologicas {parcela_id, fecha}` | 1.092 → 846 documentos examinados (Q9) |
-| Q3, Q4 | `2dsphere` en `nodos` y `parcelas` | Q3 no funciona sin el índice |
+| Q2, Q8, Q9, Q10 | Ninguno propio: se midió un índice en `alertas` y otro en `observaciones_fenologicas` y no justificaban su costo (ADR-022) | - |
+| Q3, Q4 | `2dsphere` en `nodos` y `parcelas` | Q3 no funciona sin el de `nodos`; Q4 anda igual sin el de `parcelas` |
 | Q5 | `lecturas {meta.nodo_id, ts}` | 5.053 → 433 |
 | Q7 | `riegos {parcela_id, inicio}` | 563 → 33 |
-| Q8 | `alertas {tipo, inicio}` | 57 → 32 |
 
-Se crean con `python -m db.indexes.crear_indices`. Mediciones completas, costo en espacio y experimentos en [`performance.md`](performance.md) y [ADR-015](decisions/ADR-015-indices-de-rendimiento.md).
+Se crean con `python -m db.indexes.crear_indices`. Mediciones completas, costo en espacio y experimentos en [`performance.md`](performance.md), [ADR-015](decisions/ADR-015-indices-de-rendimiento.md) y [ADR-022](decisions/ADR-022-simplificar-indices.md).
 
 ## Cómo se probó
 

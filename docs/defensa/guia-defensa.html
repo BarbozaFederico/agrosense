@@ -175,7 +175,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
     <div><dt>Lecturas simuladas</dt><dd>727.980</dd></div>
     <div><dt>Fincas / parcelas / nodos</dt><dd>3 / 6 / 12</dd></div>
     <div><dt>Colecciones</dt><dd>10</dd></div>
-    <div><dt>Consultas / índices</dt><dd>10 / 7</dd></div>
+    <div><dt>Consultas / índices</dt><dd>10 / 4</dd></div>
     <div><dt>Entrega</dt><dd>28/10/2026</dd></div>
   </dl>
 </header>
@@ -232,7 +232,7 @@ mongosh agrosense --eval "db.lecturas.countDocuments()"</code></pre><div class="
       <tr><td>Seed (datos base)</td><td><code>db/seeds/</code> (<code>cargar.py</code>), <code>docs/seed.md</code></td><td>Fincas, parcelas, nodos, variedades y configuración. Geometrías ficticias de 2 ha.</td></tr>
       <tr><td>Simulador de la temporada</td><td><code>simulator/</code> (<code>generar.py</code>), <code>docs/simulador.md</code></td><td>Clima, calendario de heladas, fenología, alertas y riego. Reglas exactas en el doc.</td></tr>
       <tr><td>Consultas Q1 a Q10</td><td><code>db/queries/qN_nombre.py</code>, <code>docs/consultas.md</code></td><td>Cada una con <code>pipeline()</code>, <code>consultar()</code> y <code>main()</code>. El doc explica cada etapa.</td></tr>
-      <tr><td>Índices</td><td><code>db/indexes/crear_indices.py</code>, <code>medir_indices.py</code>, <code>docs/performance.md</code></td><td>3 geoespaciales y 4 de rendimiento, con medición antes y después.</td></tr>
+      <tr><td>Índices</td><td><code>db/indexes/crear_indices.py</code>, <code>medir_indices.py</code>, <code>docs/performance.md</code></td><td>2 geoespaciales y 2 de rendimiento, con medición antes y después (y 3 más que se midieron y se descartaron).</td></tr>
       <tr><td>Backup y restauración</td><td><code>scripts/backup_restore/</code>, <code>docs/backup-restore.md</code></td><td><code>backup.py</code>, <code>restaurar.py</code>, <code>probar_respaldo.py</code>.</td></tr>
       <tr><td>Dashboard</td><td><code>dashboard/app.py</code>, <code>dashboard/paginas/</code>, <code>dashboard/data.py</code></td><td>Menú, una pantalla por archivo y el puente a las consultas con caché.</td></tr>
       <tr><td>Estilo del dashboard</td><td><code>.streamlit/config.toml</code>, <code>dashboard/estilo.py</code></td><td>Tema oscuro y colores de estado.</td></tr>
@@ -258,7 +258,7 @@ mongosh agrosense --eval "db.lecturas.countDocuments()"</code></pre><div class="
 <pre><code>python -m db.seeds.cargar</code></pre></div>
   <div class="cmd"><div class="why"><span>Generar la temporada: 727.980 lecturas, alertas, riegos y observaciones (unos 25 s)</span><button class="btn copy" type="button">Copiar</button></div>
 <pre><code>python -m simulator.generar</code></pre></div>
-  <div class="cmd"><div class="why"><span>Crear los índices (después del simulador; Q3 no funciona sin los geoespaciales)</span><button class="btn copy" type="button">Copiar</button></div>
+  <div class="cmd"><div class="why"><span>Crear los 4 índices (después del simulador; Q3 no funciona sin el de nodos)</span><button class="btn copy" type="button">Copiar</button></div>
 <pre><code>python -m db.indexes.crear_indices</code></pre></div>
 
   <h3>Consultas</h3>
@@ -293,7 +293,7 @@ python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code>
       <tr><td>Esquemas</td><td><code>python -m db.schemas.probar_esquemas</code></td><td class="n">62</td></tr>
       <tr><td>Simulador</td><td><code>python -m simulator.probar_simulador</code></td><td class="n">51</td></tr>
       <tr><td>Consultas Q1 a Q10</td><td><code>python -m db.queries.probar_consultas</code></td><td class="n">43</td></tr>
-      <tr><td>Índices</td><td><code>python -m db.indexes.probar_indices</code></td><td class="n">19</td></tr>
+      <tr><td>Índices</td><td><code>python -m db.indexes.probar_indices</code></td><td class="n">20</td></tr>
       <tr><td>Backup</td><td><code>python -m scripts.backup_restore.probar_respaldo</code></td><td class="n">19</td></tr>
       <tr><td>Dashboard: datos</td><td><code>python -m dashboard.probar_datos</code></td><td class="n">37</td></tr>
       <tr><td>Dashboard: detalle</td><td><code>python -m dashboard.probar_detalle</code></td><td class="n">53</td></tr>
@@ -362,13 +362,12 @@ python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code>
   <div class="tablewrap"><table>
     <thead><tr><th>Índice</th><th>Colección</th><th>Para qué</th></tr></thead>
     <tbody>
-      <tr><td><code>2dsphere</code></td><td><code>nodos</code>, <code>parcelas</code>, <code>eventos_climaticos</code></td><td>Q3 y Q4</td></tr>
+      <tr><td><code>2dsphere</code></td><td><code>nodos</code></td><td>Q3: sin él <code>$geoNear</code> falla (el único obligatorio)</td></tr>
+      <tr><td><code>2dsphere</code></td><td><code>parcelas</code></td><td>Q4: anda igual sin él; se deja como par geoespacial de Q3</td></tr>
       <tr><td><code>{meta.nodo_id, ts}</code></td><td><code>lecturas</code></td><td>Q5: de 5.053 a 433 documentos examinados</td></tr>
-      <tr><td><code>{parcela_id, inicio}</code></td><td><code>riegos</code></td><td>Q7</td></tr>
-      <tr><td><code>{tipo, inicio}</code></td><td><code>alertas</code></td><td>Q8</td></tr>
-      <tr><td><code>{parcela_id, fecha}</code></td><td><code>observaciones_fenologicas</code></td><td>Q9</td></tr>
+      <tr><td><code>{parcela_id, inicio}</code></td><td><code>riegos</code></td><td>Q7: de 563 a 33 documentos examinados</td></tr>
     </tbody></table></div>
-  <p><code>lecturas</code> conserva el índice automático de la serie temporal sobre <code>meta</code> y <code>ts</code> (<code>meta_1_ts_1</code>), y se dejó. Todo en <code>docs/performance.md</code> y ADR-015.</p>
+  <p><code>lecturas</code> conserva el índice automático de la serie temporal sobre <code>meta</code> y <code>ts</code> (<code>meta_1_ts_1</code>), y se dejó. También se midieron y se <strong>descartaron</strong> tres índices más (<code>alertas</code>, <code>observaciones_fenologicas</code> y un <code>2dsphere</code> en <code>eventos_climaticos</code>) porque no justificaban su costo. Todo en <code>docs/performance.md</code>, ADR-015 y ADR-022.</p>
   <div class="cmd"><div class="why"><span>Mostrar el plan de ejecución de una consulta en vivo</span><button class="btn copy" type="button">Copiar</button></div>
 <pre><code>mongosh agrosense --eval "db.riegos.find({parcela_id:'P-SR-1'}).sort({inicio:1}).explain('executionStats').executionStats"</code></pre>
   <div class="out">Mirá <code>totalDocsExamined</code> y la etapa <code>IXSCAN</code>. Ajustá el campo si te piden otra parcela.</div></div>
@@ -466,8 +465,11 @@ python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code>
     <p class="where"><code>docs/investigacion/verificacion-fuentes.md</code></p></div></details>
 
   <details><summary>¿Qué índices crearon y cómo demuestran que sirven?</summary><div class="ans">
-    <p>Tres <code>2dsphere</code> (Q3 y Q4) y cuatro de rendimiento (Q5, Q7, Q8 y Q9). Se midió cada una de las 10 consultas con el perfilador antes y después. El caso más claro es Q5: de 5.053 a 433 documentos examinados. La diferencia está en documentos examinados y no en milisegundos porque el volumen es chico.</p>
-    <p class="where">ADR-015, <code>docs/performance.md</code></p></div></details>
+    <p>Cuatro: dos <code>2dsphere</code> (<code>nodos</code> para Q3, que sin él falla, y <code>parcelas</code> para Q4) y dos de rendimiento (<code>lecturas</code> para Q5 y <code>riegos</code> para Q7). Se midió cada una de las 10 consultas con el perfilador antes y después. El caso más claro es Q5: de 5.053 a 433 documentos examinados. La diferencia está en documentos examinados y no en milisegundos porque el volumen es chico.</p>
+    <p class="where">ADR-015 y ADR-022, <code>docs/performance.md</code></p></div></details>
+  <details><summary>¿Por qué no indexaron <code>alertas</code> u <code>observaciones_fenologicas</code>?</summary><div class="ans">
+    <p>Los creamos y los medimos: <code>alertas</code> tiene 35 documentos y <code>tipo</code> solo 2 valores (Q8 pasa de 57 a 32 documentos y el tiempo no cambia), y el de <code>observaciones_fenologicas</code> ahorra un 22 % de documentos en Q9 sin cambiar el tiempo. No justificaban su costo ni la complejidad de explicarlos, así que los descartamos y dejamos la medición como evidencia. Si esas colecciones crecieran mucho, se vuelve a medir con <code>medir_indices.py</code>.</p>
+    <p class="where">ADR-022, <code>docs/performance.md</code></p></div></details>
 
   <details><summary>¿Cómo es la política de backup?</summary><div class="ans">
     <p><code>mongodump --archive --gzip</code>, manifiesto con sha256, fuera del repo, 7 diarios y 4 semanales (supuesto adoptado). Se restaura en una base aparte y se compara con la real; la serie temporal vuelve con las mismas 727.980 lecturas.</p>
@@ -494,7 +496,7 @@ python -m db.queries.q9_etapa_por_grados_dia --fecha 2026-10-05 --mongosh</code>
     <thead><tr><th>Síntoma</th><th>Qué hacer</th></tr></thead>
     <tbody>
       <tr><td>El dashboard no conecta o sale vacío</td><td>Revisá el servicio con <code>Get-Service *mongo*</code>. Si la base está vacía, <code>python -m db.seeds.cargar</code>, <code>python -m simulator.generar</code> y <code>python -m db.indexes.crear_indices</code>.</td></tr>
-      <tr><td>Q3 da error o no devuelve nada</td><td>Faltan los índices geoespaciales: <code>python -m db.indexes.crear_indices</code>.</td></tr>
+      <tr><td>Q3 da error o no devuelve nada</td><td>Falta el índice geoespacial de <code>nodos</code>: <code>python -m db.indexes.crear_indices</code>.</td></tr>
       <tr><td><code>mongodump</code> no se encuentra</td><td>Instalá las Database Tools con <code>winget install MongoDB.DatabaseTools</code> o definí <code>AGROSENSE_HERRAMIENTAS</code>.</td></tr>
       <tr><td>El puerto 8501 está ocupado</td><td><code>python -m streamlit run dashboard/app.py --server.port 8502</code></td></tr>
       <tr><td>Otra base en vez de la real</td><td>Revisá la variable <code>AGROSENSE_BD</code>; por defecto es <code>agrosense</code>.</td></tr>
