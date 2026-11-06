@@ -1,6 +1,6 @@
 # Hoja de ruta
 
-**Entrega:** miércoles 28 de octubre de 2026. Equipo de dos personas. Duración total: unas tres semanas.
+**Entrega:** miércoles 28 de octubre de 2026. Proyecto de grupo de dos integrantes, desarrollado por Federico Barboza. Duración total: unas tres semanas.
 
 ## Calendario
 
@@ -21,26 +21,26 @@
 4. Variedad simulada X (RF-20).
 5. Simulación en vivo (RF-14 y RF-15). **Es lo primero que se recorta.**
 
-## Reparto
+## Autoría
 
-El reparto es por funcionalidad completa, de la base al dashboard. Detalle en [`equipo.md`](equipo.md).
+Federico Barboza es el autor del proyecto y hizo todo el trabajo, de la base de datos al dashboard. Detalle en [`equipo.md`](equipo.md).
 
 ## Issues iniciales del Sprint A
 
 | # | Tipo | Tarea | Responsable |
 |---|---|---|---|
-| 1 | docs | Copiar los informes de investigación a `docs/investigacion/` (quitando datos de contacto personales) | Integrante 1 |
-| 2 | chore | Instalar MongoDB, `mongosh` y Compass; verificar la versión | Ambos |
-| 3 | spike | CRUD básico en `mongosh` y notas de lo aprendido | Ambos |
-| 4 | spike | Probar series temporales en la versión instalada (borrado e índices geoespaciales), según [ADR-001](decisions/ADR-001-series-temporales.md) | Integrante 1 |
-| 5 | docs | `modelo-datos.md`: colecciones, embeber o referenciar, diagrama | Ambos |
-| 6 | feat | Validaciones `$jsonSchema` de `nodos`, `lecturas` y `alertas` | Integrante 1 |
-| 7 | feat | Validaciones `$jsonSchema` de `fincas`, `parcelas`, `eventos_climaticos` y `riegos` | Integrante 2 |
-| 8 | feat | Simulador base: temporada 1/9/2026 a 31/3/2027, 12 nodos, funciones importables | Integrante 1 |
-| 9 | feat | Seed de 3 fincas, 6 parcelas y 12 nodos con geometrías | Integrante 2 |
-| 10 | docs | Wireframes de las 4 pantallas (2 por persona) | Ambos |
-| 11 | chore | Crear labels, milestones y board de GitHub | Integrante 1 |
-| 12 | docs | Completar `README.md` con los pasos de ejecución | Integrante 2 |
+| 1 | docs | Copiar los informes de investigación a `docs/investigacion/` (quitando datos de contacto personales) | Federico |
+| 2 | chore | Instalar MongoDB, `mongosh` y Compass; verificar la versión | Federico |
+| 3 | spike | CRUD básico en `mongosh` y notas de lo aprendido | Federico |
+| 4 | spike | Probar series temporales en la versión instalada (borrado e índices geoespaciales), según [ADR-001](decisions/ADR-001-series-temporales.md) | Federico |
+| 5 | docs | `modelo-datos.md`: colecciones, embeber o referenciar, diagrama | Federico |
+| 6 | feat | Validaciones `$jsonSchema` de `nodos`, `lecturas` y `alertas` | Federico |
+| 7 | feat | Validaciones `$jsonSchema` de `fincas`, `parcelas`, `eventos_climaticos` y `riegos` | Federico |
+| 8 | feat | Simulador base: temporada 1/9/2026 a 31/3/2027, 12 nodos, funciones importables | Federico |
+| 9 | feat | Seed de 3 fincas, 6 parcelas y 12 nodos con geometrías | Federico |
+| 10 | docs | Wireframes de las 4 pantallas | Federico |
+| 11 | chore | Crear labels, milestones y board de GitHub | Federico |
+| 12 | docs | Completar `README.md` con los pasos de ejecución | Federico |
 
 ## Qué quedó fuera por el plazo
 

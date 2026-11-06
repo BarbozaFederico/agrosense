@@ -4,6 +4,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [Sin publicar]
 
+### Cambiado
+- Autoría: `docs/equipo.md`, `docs/roadmap.md`, `README.md` y `CLAUDE.md` dejan asentado que Federico Barboza creó el repositorio, propuso la idea y realizó todo el trabajo, y que Luciano Fernandez Actis figura solo como integrante del grupo. Se quita el reparto de tareas por integrante. `CONTRIBUTING.md`, `docs/git-workflow.md`, la plantilla de pull request y `CLAUDE.md` ya no exigen la revisión de "la otra persona": la revisión es del autor y, si participa, del otro integrante. `LICENSE` queda con el copyright solo a nombre de Federico Daniel Barboza Araya.
+
 ### Agregado
 - `docs/defensa/guia-defensa.html`: guía de defensa oral en HTML (mapa de archivos, comandos de terminal, guion de la demo y preguntas probables).
 - Estructura inicial del repositorio y documentación base.

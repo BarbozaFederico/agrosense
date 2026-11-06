@@ -1,6 +1,6 @@
 # Flujo de trabajo en Git
 
-Equipo de dos personas, repositorio público.
+Proyecto de grupo de dos integrantes, con Federico Barboza como autor. Repositorio público.
 
 ## Ramas
 
@@ -32,7 +32,7 @@ Ejemplo: `docs(requisitos): agrega consultas principales (#3)`.
 2. Crear la **rama** desde `main` actualizado.
 3. Hacer commits pequeños.
 4. Abrir un **pull request** con `Closes #N`.
-5. **La otra persona revisa** y aprueba.
+5. **Revisión:** el autor repasa el cambio con la lista del pull request; si el otro integrante del grupo participa, también lo revisa.
 6. Merge a `main` y borrar la rama.
 
 ```bash
@@ -44,9 +44,9 @@ git commit -m "feat(simulador): genera lecturas de la temporada (#8)"
 git push -u origin feat/simulador-base
 ```
 
-## Reglas para el equipo
+## Reglas
 
-- Nadie hace merge de su propio pull request sin revisión de la otra persona.
+- Nadie hace merge de un pull request sin repasar antes la lista de verificación.
 - No se reescribe la historia de `main` ni se usa `push --force` sobre ramas compartidas.
 - Los conflictos se resuelven hablando, no sobrescribiendo.
 - Cada persona trabaja con su propia cuenta de GitHub, para que el aporte individual quede registrado.

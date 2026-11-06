@@ -4,7 +4,7 @@
 
 ## Contexto
 
-El alcance original simulaba 30 días de septiembre sin una variedad definida. El equipo propuso seguir una variedad concreta a lo largo de la temporada, con su etapa fenológica, y estimar el daño por helada. Se evaluaron pros y contras de cada idea frente al plazo (entrega el 28/10/2026) y al foco de la materia (la base de datos).
+El alcance original simulaba 30 días de septiembre sin una variedad definida. Federico propuso seguir una variedad concreta a lo largo de la temporada, con su etapa fenológica, y estimar el daño por helada. Se evaluaron pros y contras de cada idea frente al plazo (entrega el 28/10/2026) y al foco de la materia (la base de datos).
 
 ## Decisiones
 

@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Antes de escribir `modelo-datos.md` y los esquemas, el equipo eligió entre dos opciones para cuatro puntos del modelo.
+Antes de escribir `modelo-datos.md` y los esquemas, Federico eligió entre dos opciones para cuatro puntos del modelo.
 
 ## Decisiones
 

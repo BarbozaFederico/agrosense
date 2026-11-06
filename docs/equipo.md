@@ -1,31 +1,25 @@
 # Equipo
 
-## Integrantes
+## Autoría
 
-| Integrante | GitHub | Rol principal |
+**Federico Daniel Barboza Araya** ([@BarbozaFederico](https://github.com/BarbozaFederico)) es el autor del proyecto. Creó el repositorio, planteó la idea (monitorear sensores en viñedos con MongoDB) y realizó todo el trabajo técnico y de documentación:
+
+- Investigación, requisitos, alcance y hoja de ruta.
+- Modelado de datos, esquemas `$jsonSchema` y decisiones de diseño (ADR).
+- Seed base, simulador de la temporada y carga de datos.
+- Consultas Q1 a Q10, índices con su medición y backup con restauración.
+- Dashboard con las 4 pantallas.
+- Pruebas, formato del código y toda la documentación.
+
+El historial de Git y los pull requests del repositorio registran este trabajo.
+
+## Integrantes del grupo
+
+| Integrante | GitHub | Participación |
 |---|---|---|
-| Federico Daniel Barboza Araya | [@BarbozaFederico](https://github.com/BarbozaFederico) | Integrante 1: monitoreo y helada |
-| FERNANDEZ ACTIS, Luciano Agustín | [@lufernandez-um](https://github.com/lufernandez-um) | Integrante 2: geoespacial y riego |
-
-## Reparto por funcionalidad completa
-
-Cada integrante toma funcionalidades de punta a punta, de la base de datos al dashboard.
-
-| | Integrante 1: monitoreo y helada | Integrante 2: geoespacial y riego |
-|---|---|---|
-| Colecciones | `nodos`, `lecturas`, `alertas` | `fincas`, `parcelas`, `eventos_climaticos`, `riegos` |
-| Consultas | Q1, Q2, Q5, Q6 | Q3, Q4, Q7, Q8 |
-| Pantallas | Detalle de parcela, alertas, estado de nodos | Resumen de finca |
-| Otras tareas | Simulador | Seed de fincas, parcelas y nodos |
-
-## Responsabilidades compartidas
-
-- **Modelado de datos:** se trabaja entre los dos.
-- **Índices, backup y roles:** se reparten durante el Sprint C.
-- **Revisión cruzada** de todos los pull requests.
+| Federico Daniel Barboza Araya | [@BarbozaFederico](https://github.com/BarbozaFederico) | Autor y responsable de todo el proyecto |
+| FERNANDEZ ACTIS, Luciano Agustín | [@lufernandez-um](https://github.com/lufernandez-um) | Integrante del grupo |
 
 ## Evaluación individual
 
-La evaluación es individual: cada integrante debe poder explicar **todo** el modelo, las consultas, los índices y el backup, no solo su parte. Por eso el modelado se trabaja en conjunto y se revisan mutuamente los cambios.
-
-El reparto fue confirmado por el equipo el 8/10/2026.
+La evaluación es individual: quien presenta el proyecto debe poder explicar **todo** el modelo, las consultas, los índices y el backup, y defender cada decisión.

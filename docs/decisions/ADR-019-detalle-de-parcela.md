@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Con "Resumen de la mañana" hecha, la siguiente pantalla de `pantallas.md` es "Detalle de parcela". La usa el técnico agrónomo, o el encargado que viene desde una fila del resumen, para entender **por qué saltó la alerta**: cuándo y cuánto bajó la temperatura del brote contra su umbral, cuánto duró y qué pasó con el suelo y el riego. Se acordó con el equipo el foco, la forma de llegar a la pantalla y qué dibuja la curva (filas 1 a 3).
+Con "Resumen de la mañana" hecha, la siguiente pantalla de `pantallas.md` es "Detalle de parcela". La usa el técnico agrónomo, o el encargado que viene desde una fila del resumen, para entender **por qué saltó la alerta**: cuándo y cuánto bajó la temperatura del brote contra su umbral, cuánto duró y qué pasó con el suelo y el riego. Federico acordó el foco, la forma de llegar a la pantalla y qué dibuja la curva (filas 1 a 3).
 
 ## Decisiones
 

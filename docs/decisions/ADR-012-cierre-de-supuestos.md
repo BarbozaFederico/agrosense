@@ -12,7 +12,7 @@ Quedaban unas 60 marcas "a validar" en código y documentos. Con la entrega el 2
 
 | # | Tema | Decisión |
 |---|---|---|
-| 1 | Marcas de un dato | Solo dos categorías: **con fuente** y **supuesto adoptado** (decisión del equipo por falta de datos o de tiempo, con su ADR). Desaparece "a validar". Se reescribe la regla de `CLAUDE.md` |
+| 1 | Marcas de un dato | Solo dos categorías: **con fuente** y **supuesto adoptado** (decisión del autor por falta de datos o de tiempo, con su ADR). Desaparece "a validar". Se reescribe la regla de `CLAUDE.md` |
 
 ### Datos del seed
 
