@@ -4,7 +4,7 @@
 
 ## Contexto
 
-La tercera pantalla de `pantallas.md` es "Alertas": qué alertas hubo, el historial y las heladas por departamento y semana. La usa el encargado o el técnico después de ver el resumen. Al diseñarla apareció un problema de significado: las 35 alertas de la base (10 de helada y 25 de riego) están **todas cerradas**, y las de helada terminan antes de las 09:00, así que a las 12:00 (el "ahora" de la app, ADR-018) casi nunca hay una abierta. Una lista de "activas" en sentido estricto quedaría vacía casi siempre. Se acordó con el equipo el significado de "activas", si entran las de riego y cómo se muestra Q8 (filas 1 a 3).
+La tercera pantalla de `pantallas.md` es "Alertas": qué alertas hubo, el historial y las heladas por departamento y semana. La usa el encargado o el técnico después de ver el resumen. Al diseñarla apareció un problema de significado: las 35 alertas de la base (10 de helada y 25 de riego) están **todas cerradas**, y las de helada terminan antes de las 09:00, así que a las 12:00 (el "ahora" de la app, ADR-018) casi nunca hay una abierta. Una lista de "activas" en sentido estricto quedaría vacía casi siempre. Federico acordó el significado de "activas", si entran las de riego y cómo se muestra Q8 (filas 1 a 3).
 
 ## Decisiones
 

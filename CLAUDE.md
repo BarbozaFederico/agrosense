@@ -4,22 +4,22 @@ Contexto para trabajar en este repositorio con Claude Code. Leer completo antes 
 
 ## 1. Qué es este proyecto
 
-**agrosense** es un proyecto de la materia *Diseño de Bases de Datos II* (Universidad de Mendoza, 2026), desarrollado por un **equipo de dos personas**. Implementa una base de datos **MongoDB** para monitorear sensores en viñedos: temperatura, humedad de suelo y de aire, alerta de heladas y riego, con un dashboard web.
+**agrosense** es un proyecto de la materia *Diseño de Bases de Datos II* (Universidad de Mendoza, 2026). Es un proyecto de grupo de dos integrantes, pero el autor es **Federico Barboza**: creó el repositorio, propuso la idea y realizó todo el trabajo (investigación, modelado, implementación, consultas, índices, backup, dashboard y documentación). El otro integrante del grupo, Luciano Fernandez Actis, figura solo como integrante (ver `docs/equipo.md`). Implementa una base de datos **MongoDB** para monitorear sensores en viñedos: temperatura, humedad de suelo y de aire, alerta de heladas y riego, con un dashboard web.
 
 - Repo: https://github.com/BarbozaFederico/agrosense (**público**).
 - Entrega: **miércoles 28 de octubre de 2026**.
 - El foco es la **base de datos**. La materia evalúa: requisitos, modelado documental, implementación, carga de datos, consultas avanzadas, índices con medición de rendimiento y política de resguardo (backup).
-- La evaluación es **individual**: cada integrante debe poder explicar y defender cada decisión y cada línea.
+- La evaluación es **individual**: quien presenta debe poder explicar y defender cada decisión y cada línea.
 
-## 2. Cómo trabajar con el equipo (importante)
+## 2. Cómo trabajar en este proyecto (importante)
 
-- Son estudiantes de 3er año y **están aprendiendo MongoDB** (conocen la teoría, no la práctica). Explicá brevemente el porqué de cada comando o decisión antes de ejecutarlo.
+- Federico es estudiante de 3er año y **está aprendiendo MongoDB** (conoce la teoría, no la práctica). Explicá brevemente el porqué de cada comando o decisión antes de ejecutarlo.
 - Pasos chicos y verificables. Un cambio, una explicación, un commit.
 - No agregues funcionalidades fuera del alcance (sección 4) sin consultarlo.
 - Antes de decisiones de diseño relevantes (qué embeber, qué referenciar, qué índices), presentá 2 opciones con ventajas y desventajas y esperá la elección. Registrá la decisión en `docs/decisions/`.
 - No asumas el sistema operativo ni cómo se instaló MongoDB: verificalo (`mongosh --version`, `mongosh --eval "db.version()"`).
 - Idioma: **español** para documentación, comentarios, commits y explicaciones. Identificadores y nombres de colecciones y campos en español, `snake_case`, sin tildes ni eñes (`viñedo` → `vinedo`).
-- No inventes datos ni cifras. Todo dato lleva una de dos marcas: **con fuente** (con la cita) o **supuesto adoptado** (decisión del equipo por falta de datos o de tiempo, registrada en un ADR; ver ADR-012). No dejes datos "a validar": si no hay fuente, se propone una opción y se adopta.
+- No inventes datos ni cifras. Todo dato lleva una de dos marcas: **con fuente** (con la cita) o **supuesto adoptado** (decisión del autor por falta de datos o de tiempo, registrada en un ADR; ver ADR-012). No dejes datos "a validar": si no hay fuente, se propone una opción y se adopta.
 - **Repo público:** nunca subas credenciales, cadenas de conexión con contraseña, `.env`, backups ni datos personales.
 - **Mantené la documentación al día, siempre, en el mismo cambio** (regla permanente): `CLAUDE.md` (tabla de ADR, estructura del repo, entorno, reglas de dominio y estado actual), `README.md` (índice de ADR y "Cómo ejecutarlo") y `CHANGELOG.md`. Si agregás un ADR, un módulo, un comando o un dato de configuración, actualizá esos archivos antes de pedir el commit. Si ves que alguno quedó atrasado, avisalo y corregilo.
 
@@ -179,7 +179,7 @@ agrosense/
 
 - Rama principal `main`. Trabajo en ramas con prefijo: `docs/...`, `feat/...`, `perf/...`, `chore/...`, `fix/...`.
 - Commits en español, Conventional Commits: `docs(requisitos): agrega consultas principales (#3)`.
-- Cada tarea: **issue → rama → commits → pull request → revisión de la otra persona → merge**, con `Closes #N` en el PR.
+- Cada tarea: **issue → rama → commits → pull request → revisión (del autor y, si participa, del otro integrante) → merge**, con `Closes #N` en el PR.
 - Un milestone por sprint. Issues de máximo 3 a 4 horas, con responsable asignado.
 - Cada persona usa su propia cuenta de GitHub, para que el aporte individual quede registrado.
 - No hacer `push --force` ni reescribir historia sin pedirlo. Detalle en `docs/git-workflow.md`.
@@ -231,7 +231,7 @@ Reglas:
 - [ ] Código formateado: `python -m black --check .` no encuentra nada por cambiar.
 - [ ] Documentación actualizada (`docs/`, comentario o ADR) y también `CLAUDE.md`, `README.md` y `CHANGELOG.md` (regla de la sección 2).
 - [ ] Commit con mensaje convencional y PR enlazado al issue.
-- [ ] Revisado por la otra persona del equipo.
+- [ ] Revisado por el autor (y por el otro integrante, si participó).
 - [ ] Quien lo hizo entiende el cambio y puede explicarlo.
 - [ ] Sin credenciales ni datos sensibles (el repo es público).
 

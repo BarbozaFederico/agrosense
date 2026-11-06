@@ -4,7 +4,7 @@
 
 ## Contexto
 
-La cuarta pantalla de `pantallas.md` es "Estado de nodos": qué sensores reportan, cuáles no y desde cuándo. Es la pantalla de "confianza en el dato" de los criterios de UX, y la usa el administrador, el técnico o el encargado que duda de un valor. Al diseñarla se midieron los datos antes de decidir: con el "ahora" de las otras pantallas (las 12:00 de la mañana elegida) los 12 nodos reportan en casi toda la temporada. Solo hay nodos sin reportar en 17 días: el 3/12 (N-SM-2-B, 10 h), el 2/3 (N-SM-1-B, 65 min) y del 17/3 en adelante (N-TU-2-B, que deja de reportar el 17/3 a las 02:55 UTC). Además, N-TU-2-B figura `mantenimiento` en el catálogo durante **toda** la temporada, pero reporta hasta el 17/3. Se acordó con el equipo el "ahora", cómo mostrar los dos estados y el alcance (filas 1 a 3).
+La cuarta pantalla de `pantallas.md` es "Estado de nodos": qué sensores reportan, cuáles no y desde cuándo. Es la pantalla de "confianza en el dato" de los criterios de UX, y la usa el administrador, el técnico o el encargado que duda de un valor. Al diseñarla se midieron los datos antes de decidir: con el "ahora" de las otras pantallas (las 12:00 de la mañana elegida) los 12 nodos reportan en casi toda la temporada. Solo hay nodos sin reportar en 17 días: el 3/12 (N-SM-2-B, 10 h), el 2/3 (N-SM-1-B, 65 min) y del 17/3 en adelante (N-TU-2-B, que deja de reportar el 17/3 a las 02:55 UTC). Además, N-TU-2-B figura `mantenimiento` en el catálogo durante **toda** la temporada, pero reporta hasta el 17/3. Federico acordó el "ahora", cómo mostrar los dos estados y el alcance (filas 1 a 3).
 
 ## Decisiones
 

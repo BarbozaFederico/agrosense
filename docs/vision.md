@@ -24,7 +24,7 @@ El foco es la **base de datos**: modelado documental, carga de datos, consultas 
 El MVP tiene dos objetivos:
 
 1. **Objetivo del problema.** Responder, con datos de sensores por parcela: *¿qué parcelas están en riesgo de helada, desde cuándo, y ya se regaron?*
-2. **Objetivo académico.** Demostrar que el equipo sabe modelar, implementar y operar una base MongoDB. El caso de monitoreo de viñedos es el escenario donde se aplica.
+2. **Objetivo académico.** Demostrar que el autor sabe modelar, implementar y operar una base MongoDB. El caso de monitoreo de viñedos es el escenario donde se aplica.
 
 El MVP **no resuelve el problema real del viñatero**, porque los datos son simulados. Resuelve y demuestra la capa de datos que haría falta para resolverlo.
 

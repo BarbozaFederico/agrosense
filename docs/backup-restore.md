@@ -14,7 +14,7 @@ Requisito: MongoDB Database Tools (`winget install MongoDB.DatabaseTools`). El i
 
 ## Política
 
-Estos números no tienen fuente: son un **supuesto adoptado** por el equipo (ADR-012 y ADR-016).
+Estos números no tienen fuente: son un **supuesto adoptado** por el autor (ADR-012 y ADR-016).
 
 | Tema | Política |
 |---|---|

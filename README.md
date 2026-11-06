@@ -10,6 +10,8 @@
 
 **agrosense** es un proyecto académico de *Diseño de Bases de Datos II* (Universidad de Mendoza, 2026). Diseña e implementa una base de datos MongoDB que almacena las lecturas de sensores de varias fincas y permite detectar riesgo de helada por parcela, registrar el riego y consultar los datos desde un dashboard web.
 
+**Autor:** [Federico Barboza](https://github.com/BarbozaFederico) creó el repositorio, propuso la idea y realizó todo el trabajo: investigación, modelado, implementación, consultas, índices, backup, dashboard y documentación. Luciano Fernandez Actis es el otro integrante del grupo (ver [`docs/equipo.md`](docs/equipo.md)).
+
 > **Todos los datos del proyecto son sintéticos.** Los genera un simulador, se inspiran en eventos reales y no representan fincas reales ni datos oficiales.
 
 ## Qué resuelve
@@ -68,7 +70,7 @@ agrosense/
 | [`docs/performance.md`](docs/performance.md) | Índices: los 4 que se mantienen, con una tabla de documentos examinados con y sin cada uno y los comandos de `mongosh` para repetirla |
 | [`docs/backup-restore.md`](docs/backup-restore.md) | Política de resguardo, procedimiento y prueba de restauración |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Flujo de trabajo en Git |
-| [`docs/equipo.md`](docs/equipo.md) | Equipo y reparto de tareas |
+| [`docs/equipo.md`](docs/equipo.md) | Autoría e integrantes del grupo |
 | [`docs/defensa/guia-defensa.html`](docs/defensa/guia-defensa.html) | Guía de defensa oral (se abre en el navegador): qué decir, dónde está cada cosa, comandos, guion de demo y preguntas probables |
 | [`docs/seed.md`](docs/seed.md) | Seed base: qué carga, cómo se usa y qué supuestos tiene |
 | [`docs/consultas.md`](docs/consultas.md) | Consultas Q1 a Q10: qué responden, cómo se calculan etapa por etapa y su resultado real |
@@ -150,9 +152,9 @@ python -m black --check .    # solo comprueba: no cambia nada y termina con erro
 
 La base se elige con la variable `AGROSENSE_BD` (por defecto `agrosense`). *Falta, y se agrega a medida que se completa:* roles.
 
-## Equipo
+## Autoría e integrantes
 
-Ver [`docs/equipo.md`](docs/equipo.md).
+Autor y responsable de todo el proyecto: Federico Barboza. Integrante del grupo: Luciano Fernandez Actis. Ver [`docs/equipo.md`](docs/equipo.md).
 
 ## Licencia
 

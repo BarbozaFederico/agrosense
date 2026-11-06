@@ -4,7 +4,7 @@
 
 ## Contexto
 
-El dashboard es parte obligatoria de la demo, corre en la notebook en local, es de escritorio y debe poder construirse en pocas semanas por un equipo de dos que está aprendiendo MongoDB.
+El dashboard es parte obligatoria de la demo, corre en la notebook en local, es de escritorio y debe poder construirse en pocas semanas por una persona que está aprendiendo MongoDB.
 
 ## Decisión
 

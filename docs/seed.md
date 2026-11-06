@@ -56,7 +56,7 @@ Con umbrales de riego de prueba (no verificados, solo para ejercitar el flujo):
 
 ## Supuestos adoptados
 
-Ninguno queda pendiente: todos son decisiones del equipo por falta de datos o de tiempo ([ADR-012](decisions/ADR-012-cierre-de-supuestos.md)).
+Ninguno queda pendiente: todos son decisiones del autor por falta de datos o de tiempo ([ADR-012](decisions/ADR-012-cierre-de-supuestos.md)).
 
 - Coordenadas de los centros de las fincas: ficticias, cerca de cada departamento.
 - Altitudes: las de las estaciones de referencia, aproximadas.
